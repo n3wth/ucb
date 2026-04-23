@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { env } from "@/lib/env"
 import { hasGoogleCredentials } from "@/lib/google"
 import { createDriveFolder, createCalendarEvent, sendEmail } from "@/lib/google-actions"
 import { renderShowConfirmationSubject } from "@/lib/emails"
@@ -29,11 +30,11 @@ async function rateLimitKey(request: NextRequest): Promise<string> {
 }
 
 const VENUE_FOLDER_IDS: Record<string, string | undefined> = {
-  "UCB Franklin": process.env.UCB_FRANKLIN_FOLDER_ID,
-  "UCB Annex": process.env.UCB_ANNEX_FOLDER_ID,
+  "UCB Franklin": env.UCB_FRANKLIN_FOLDER_ID,
+  "UCB Annex": env.UCB_ANNEX_FOLDER_ID,
 }
 
-const UCB_CALENDAR_ID = process.env.UCB_CALENDAR_ID || "primary"
+const UCB_CALENDAR_ID = env.UCB_CALENDAR_ID || "primary"
 const TIMEZONE = "America/New_York"
 const DEFAULT_EVENT_DURATION_HOURS = 2
 

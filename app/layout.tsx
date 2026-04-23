@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono, Archivo_Black } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { env } from '@/lib/env'
 import './globals.css'
 
 const geist = Geist({
@@ -17,7 +18,7 @@ const archivoBlack = Archivo_Black({
   variable: '--font-archivo-black',
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ucb-bookings.vercel.app'
+const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? 'https://ucb-bookings.vercel.app'
 const title = 'UCB Bookings'
 const description = 'Staff tools for confirming shows.'
 

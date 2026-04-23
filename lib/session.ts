@@ -1,15 +1,13 @@
 // Edge-compatible HMAC-signed session cookies using Web Crypto.
 // Format: base64url(payload) + "." + base64url(HMAC-SHA256(payload))
 
+import { env } from "./env"
+
 const COOKIE_NAME = "ucb_session"
 const DEFAULT_MAX_AGE_SECONDS = 60 * 60 * 24 * 7 // 7 days
 
 function getSecret(): string {
-  const secret = process.env.SESSION_SECRET
-  if (!secret) {
-    throw new Error("SESSION_SECRET env var is not set")
-  }
-  return secret
+  return env.SESSION_SECRET
 }
 
 function base64UrlEncode(bytes: Uint8Array): string {

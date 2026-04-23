@@ -1,17 +1,18 @@
 import { NextResponse } from "next/server"
+import { env } from "@/lib/env"
 
 // GET /api/auth/status - Check if Google OAuth is configured
 export async function GET() {
   const hasCredentials = !!(
-    process.env.GOOGLE_CLIENT_ID &&
-    process.env.GOOGLE_CLIENT_SECRET &&
-    process.env.GOOGLE_REFRESH_TOKEN
+    env.GOOGLE_CLIENT_ID &&
+    env.GOOGLE_CLIENT_SECRET &&
+    env.GOOGLE_REFRESH_TOKEN
   )
 
   return NextResponse.json({
     connected: hasCredentials,
-    hasClientId: !!process.env.GOOGLE_CLIENT_ID,
-    hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
-    hasRefreshToken: !!process.env.GOOGLE_REFRESH_TOKEN,
+    hasClientId: !!env.GOOGLE_CLIENT_ID,
+    hasClientSecret: !!env.GOOGLE_CLIENT_SECRET,
+    hasRefreshToken: !!env.GOOGLE_REFRESH_TOKEN,
   })
 }

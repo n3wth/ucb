@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
+import { env } from "@/lib/env"
 import { signSession, constantTimeEqual, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/session"
 
 export async function POST(request: NextRequest) {
-  const expected = process.env.UCB_APP_PASSWORD
-  if (!expected) {
-    return NextResponse.json(
-      { error: "Server not configured: UCB_APP_PASSWORD is missing." },
-      { status: 500 },
-    )
-  }
+  const expected = env.UCB_APP_PASSWORD
 
   let password = ""
   try {

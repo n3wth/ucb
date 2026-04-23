@@ -1,4 +1,5 @@
 import { google, type Auth } from "googleapis"
+import { env } from "./env"
 
 // Google OAuth2 configuration
 // Env vars required for live mode:
@@ -16,22 +17,22 @@ export class GoogleAuthError extends Error {
 
 export function hasGoogleCredentials(): boolean {
   return !!(
-    process.env.GOOGLE_CLIENT_ID &&
-    process.env.GOOGLE_CLIENT_SECRET &&
-    process.env.GOOGLE_REFRESH_TOKEN
+    env.GOOGLE_CLIENT_ID &&
+    env.GOOGLE_CLIENT_SECRET &&
+    env.GOOGLE_REFRESH_TOKEN
   )
 }
 
 export function getOAuth2Client(): Auth.OAuth2Client {
   const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI,
+    env.GOOGLE_CLIENT_ID,
+    env.GOOGLE_CLIENT_SECRET,
+    env.GOOGLE_REDIRECT_URI,
   )
 
-  if (process.env.GOOGLE_REFRESH_TOKEN) {
+  if (env.GOOGLE_REFRESH_TOKEN) {
     oauth2Client.setCredentials({
-      refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+      refresh_token: env.GOOGLE_REFRESH_TOKEN,
     })
   }
 
@@ -41,10 +42,10 @@ export function getOAuth2Client(): Auth.OAuth2Client {
 // Returns an OAuth2 client with a freshly-refreshed access token.
 // Throws GoogleAuthError with a clear message on failure.
 export async function getAuthedClient(): Promise<Auth.OAuth2Client> {
-  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+  if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
     throw new GoogleAuthError("GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET is missing")
   }
-  if (!process.env.GOOGLE_REFRESH_TOKEN) {
+  if (!env.GOOGLE_REFRESH_TOKEN) {
     throw new GoogleAuthError(
       "GOOGLE_REFRESH_TOKEN is missing. Run the OAuth flow at /api/auth/google and paste the returned refresh token into env vars.",
     )
