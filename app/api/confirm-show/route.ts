@@ -4,6 +4,7 @@ import { createDriveFolder, createCalendarEvent, sendEmail } from "@/lib/google-
 import { renderShowConfirmationSubject } from "@/lib/emails"
 import { createLogger } from "@/lib/logger"
 import { RateLimiter, hashKey } from "@/lib/rate-limit"
+import { confirmShowRequestSchema, type ConfirmShowRequest } from "@/lib/schemas"
 import { SESSION_COOKIE } from "@/lib/session"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
@@ -36,11 +37,6 @@ const UCB_CALENDAR_ID = process.env.UCB_CALENDAR_ID || "primary"
 const TIMEZONE = "America/New_York"
 const DEFAULT_EVENT_DURATION_HOURS = 2
 
-interface ConfirmShowRequest extends ShowDetails {
-  emailSubject?: string
-  emailBody?: string
-}
-
 function buildFolderName(d: ShowDetails): string {
   return `${d.showTitle} – ${d.showDate}`
 }
@@ -68,16 +64,6 @@ function computeStartEnd(d: ShowDetails): { startISO: string; endISO: string } {
   return { startISO, endISO }
 }
 
-function validate(body: ConfirmShowRequest): string | null {
-  if (!body?.showTitle) return "showTitle is required"
-  if (!body?.showDate) return "showDate is required"
-  if (!body?.showTime) return "showTime is required"
-  if (!body?.venue) return "venue is required"
-  if (!body?.producerEmail) return "producerEmail is required"
-  if (!/.+@.+\..+/.test(body.producerEmail)) return "producerEmail is invalid"
-  return null
-}
-
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
   const reqLog = log.child(requestId.slice(0, 8))
@@ -101,19 +87,22 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  let body: ConfirmShowRequest
+  let rawBody: unknown
   try {
-    body = (await request.json()) as ConfirmShowRequest
+    rawBody = await request.json()
   } catch (err) {
     reqLog.error("invalid JSON", err)
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
   }
 
-  const validationError = validate(body)
-  if (validationError) {
-    reqLog.warn("validation failed", { validationError })
+  const parsed = confirmShowRequestSchema.safeParse(rawBody)
+  if (!parsed.success) {
+    const firstIssue = parsed.error.issues[0]
+    const validationError = firstIssue?.message ?? "Invalid request body"
+    reqLog.warn("validation failed", { validationError, issues: parsed.error.issues })
     return NextResponse.json({ error: validationError }, { status: 400 })
   }
+  const body: ConfirmShowRequest = parsed.data
 
   reqLog.info("starting", {
     title: body.showTitle,
