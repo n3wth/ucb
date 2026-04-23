@@ -41,7 +41,7 @@ export function StageProgress({ current }: StageProgressProps) {
                   {/* Active ring */}
                   {active && (
                     <div 
-                      className="absolute inset-0 rounded-full ring-[3px] ring-primary/25 animate-pulse" 
+                      className="absolute -inset-1 rounded-full ring-2 ring-primary/30" 
                       aria-hidden="true" 
                     />
                   )}

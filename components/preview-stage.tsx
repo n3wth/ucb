@@ -104,7 +104,7 @@ export function PreviewStage({
 
       {/* Action bar */}
       <div className="sticky bottom-4 z-10 pt-2">
-        <div className="flex gap-3 rounded-lg border border-border bg-card shadow-md p-3">
+        <div className="flex gap-3 rounded-xl border border-border bg-card shadow-lg p-3">
           <Button 
             variant="ghost" 
             onClick={onBack} 

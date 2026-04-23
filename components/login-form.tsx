@@ -52,7 +52,7 @@ export function LoginForm() {
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">
           {error && (
-            <Alert variant="destructive" className="bg-red-500/10 border-red-500/30">
+            <Alert variant="destructive" className="bg-destructive/10 border-destructive/30">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="text-xs">{error}</AlertDescription>
             </Alert>

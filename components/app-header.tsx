@@ -21,15 +21,15 @@ export function AppHeader({ showSignOut = true }: AppHeaderProps) {
 
   return (
     <header className="bg-sidebar text-sidebar-foreground border-b border-sidebar-border">
-      <div className="container mx-auto px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <UcbLogo size={36} showEyes={false} className="invert" />
-          <div className="flex flex-col">
-            <span className="font-display text-sm uppercase tracking-wide leading-tight text-sidebar-foreground">
-              {APP_NAME.replace("UCB ", "")}
+      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <UcbLogo size={32} showEyes={false} className="invert" />
+          <div className="flex flex-col leading-none">
+            <span className="font-display text-base uppercase tracking-wide text-sidebar-foreground">
+              {APP_NAME}
             </span>
-            <span className="text-[10px] text-sidebar-foreground/60 uppercase tracking-widest mt-0.5">
-              Internal booking tool
+            <span className="text-[10px] text-sidebar-foreground/60 uppercase tracking-[0.2em] mt-1">
+              Internal Booking Tool
             </span>
           </div>
         </div>

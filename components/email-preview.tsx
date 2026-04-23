@@ -120,7 +120,7 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
         <Button onClick={handleCopy} variant="outline" size="sm" className="w-full">
           {copied ? (
             <>
-              <Check className="h-3.5 w-3.5 mr-2 text-emerald-500" />
+              <Check className="h-3.5 w-3.5 mr-2 text-success" />
               Copied!
             </>
           ) : (

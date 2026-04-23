@@ -45,7 +45,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
   const inputClasses = "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
 
   return (
-    <Card className="w-full shadow-md border-border">
+    <Card className="w-full shadow-sm border-border">
       <CardHeader className="pb-2">
         <CardTitle className="font-display text-lg uppercase tracking-wide text-foreground">
           Show Details
@@ -256,7 +256,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             className="w-full h-12 font-display uppercase tracking-wide text-sm group"
             size="lg"
           >
-            Review Preview
+            Continue to Review
             <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
         </form>

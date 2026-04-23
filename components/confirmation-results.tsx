@@ -92,7 +92,7 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
   const allSuccess = statuses.every((s) => s === "success")
 
   return (
-    <Card className="w-full shadow-md border-border">
+    <Card className="w-full shadow-sm border-border">
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1.5">
