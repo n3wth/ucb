@@ -44,7 +44,7 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="shadow-md border-border">
+    <Card className="shadow-sm border-border">
       <CardHeader className="pb-4">
         <CardTitle className="font-display text-base uppercase tracking-wide text-foreground">Sign In</CardTitle>
         <CardDescription className="text-sm text-muted-foreground">Enter the shared team password to continue.</CardDescription>
