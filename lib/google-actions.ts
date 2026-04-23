@@ -130,6 +130,23 @@ export interface SendEmailInput {
   bcc?: string[]
 }
 
+// Encode a header value that contains non-ASCII (em dashes, accents, emoji)
+// as an RFC 2047 "encoded-word": =?UTF-8?B?<base64>?=
+// Pure ASCII values are returned as-is so we don't waste bytes on simple subjects.
+function encodeHeader(value: string): string {
+  // eslint-disable-next-line no-control-regex
+  const isAscii = /^[\x00-\x7F]*$/.test(value)
+  if (isAscii) return value
+  const b64 = Buffer.from(value, "utf-8").toString("base64")
+  return `=?UTF-8?B?${b64}?=`
+}
+
+// Base64-encode the body in 76-char lines (MIME "base64" transfer encoding).
+function base64EncodeBody(body: string): string {
+  const b64 = Buffer.from(body, "utf-8").toString("base64")
+  return b64.match(/.{1,76}/g)?.join("\r\n") ?? b64
+}
+
 // RFC 2822 message, base64url encoded, as Gmail expects.
 function buildRawMessage(input: SendEmailInput): string {
   const headers: string[] = []
@@ -139,10 +156,10 @@ function buildRawMessage(input: SendEmailInput): string {
   if (input.bcc?.length) headers.push(`Bcc: ${input.bcc.join(", ")}`)
   headers.push("MIME-Version: 1.0")
   headers.push('Content-Type: text/plain; charset="UTF-8"')
-  headers.push("Content-Transfer-Encoding: 7bit")
-  headers.push(`Subject: ${input.subject}`)
+  headers.push("Content-Transfer-Encoding: base64")
+  headers.push(`Subject: ${encodeHeader(input.subject)}`)
 
-  const message = headers.join("\r\n") + "\r\n\r\n" + input.body
+  const message = headers.join("\r\n") + "\r\n\r\n" + base64EncodeBody(input.body)
 
   // Gmail requires URL-safe base64 (no padding issues with +/ vs -_)
   return Buffer.from(message, "utf-8")
