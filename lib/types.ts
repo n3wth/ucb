@@ -29,3 +29,16 @@ export interface ConfirmationResult {
   calendarEvent: StepResult
   driveFolder: StepResult
 }
+
+export interface ShowListItem {
+  id: string
+  title: string
+  startISO: string
+  venue: string
+  producer: string
+  link: string
+}
+
+export interface ShowListResponse {
+  shows: ShowListItem[]
+}

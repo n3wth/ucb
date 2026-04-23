@@ -10,7 +10,7 @@
  */
 
 import type { LucideIcon } from "lucide-react"
-import { CalendarCheck } from "lucide-react"
+import { CalendarCheck, CalendarDays } from "lucide-react"
 
 export type ToolStatus = "available" | "coming-soon"
 
@@ -31,6 +31,15 @@ export const TOOLS: Tool[] = [
       "Confirm a show in one form. Sends the producer email, adds the calendar event, and creates the Drive folder.",
     href: "/tools/show-confirmation",
     icon: CalendarCheck,
+    status: "available",
+  },
+  {
+    id: "show-list",
+    name: "Show List",
+    description:
+      "Read-only list of upcoming confirmed shows from the UCB calendar.",
+    href: "/tools/show-list",
+    icon: CalendarDays,
     status: "available",
   },
 ]

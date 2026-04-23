@@ -119,6 +119,65 @@ export async function createCalendarEvent(input: CreateCalendarEventInput): Prom
   }
 }
 
+export interface ListCalendarEventsInput {
+  calendarId: string
+  timeMin: string // ISO
+  timeMax: string // ISO
+  maxResults?: number
+}
+
+export interface CalendarEventSummary {
+  id: string
+  summary: string
+  description: string
+  location: string
+  startISO: string
+  htmlLink: string
+}
+
+export async function listCalendarEvents(
+  input: ListCalendarEventsInput,
+): Promise<{ status: "success"; events: CalendarEventSummary[] } | { status: "error"; error: string }> {
+  const log = createLogger("calendar")
+  log.info("list events: start", {
+    calendarId: input.calendarId,
+    timeMin: input.timeMin,
+    timeMax: input.timeMax,
+  })
+
+  try {
+    const calendar = await getCalendar()
+    const response = await withRetry(
+      () =>
+        calendar.events.list({
+          calendarId: input.calendarId,
+          timeMin: input.timeMin,
+          timeMax: input.timeMax,
+          singleEvents: true,
+          orderBy: "startTime",
+          maxResults: input.maxResults ?? 250,
+        }),
+      { label: "calendar.events.list" },
+    )
+
+    const events: CalendarEventSummary[] = (response.data.items ?? []).map((item) => ({
+      id: item.id ?? "",
+      summary: item.summary ?? "",
+      description: item.description ?? "",
+      location: item.location ?? "",
+      startISO: item.start?.dateTime ?? item.start?.date ?? "",
+      htmlLink: item.htmlLink ?? "",
+    }))
+
+    log.info("list events: success", { count: events.length })
+    return { status: "success", events }
+  } catch (err) {
+    const error = describeError(err)
+    log.error("list events: failed", err)
+    return { status: "error", error }
+  }
+}
+
 // ---------- Gmail ----------
 
 export interface SendEmailInput {
