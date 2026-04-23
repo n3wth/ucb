@@ -1,0 +1,19 @@
+/* TEAM */
+
+    UCB Artistic Team -- Upright Citizens Brigade
+    Site: https://ucbtheatre.com
+
+    Producers & Staff -- Upright Citizens Brigade
+    Location: New York / Los Angeles
+
+/* THANKS */
+
+    To the performers, producers, and staff who keep UCB running.
+
+/* SITE */
+
+    Name: UCB Bookings
+    Description: Internal tools for the UCB artistic team.
+    Standards: HTML5, CSS3
+    Components: Next.js, React, TypeScript, Tailwind CSS
+    Software: Next.js (App Router), Vercel
