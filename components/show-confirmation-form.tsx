@@ -181,10 +181,10 @@ export function ShowConfirmationForm({ onSubmit, isLoading }: ShowConfirmationFo
               <div className="space-y-0.5">
                 <Label htmlFor="liveStream" className="text-base flex items-center gap-2">
                   <Video className="h-4 w-4" />
-                  Live Stream
+                  Digital Option
                 </Label>
                 <p className="text-sm text-muted-foreground">
-                  Will this show be streamed live?
+                  Do you want to add a digital option for $10?
                 </p>
               </div>
               <Switch
