@@ -23,15 +23,7 @@ export default function LoginPage() {
 
       {/* Centered login */}
       <div className="flex-1 flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-sm space-y-6">
-          <div className="text-center space-y-2">
-            <h1 className="font-display text-xl uppercase tracking-wide text-foreground">
-              Staff Sign In
-            </h1>
-            <p className="text-xs text-muted-foreground">
-              Enter the shared team password to access internal tools.
-            </p>
-          </div>
+        <div className="w-full max-w-sm space-y-5">
           <Suspense fallback={<LoginFormSkeleton />}>
             <LoginForm />
           </Suspense>
