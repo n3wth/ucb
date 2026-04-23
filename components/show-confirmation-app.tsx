@@ -5,6 +5,7 @@ import { ShowConfirmationForm } from "@/components/show-confirmation-form"
 import { PreviewStage } from "@/components/preview-stage"
 import { ConfirmationResults } from "@/components/confirmation-results"
 import { StageProgress } from "@/components/stage-progress"
+import { ToolPage } from "@/components/tool-page"
 import { renderShowConfirmationBody, renderShowConfirmationSubject } from "@/lib/emails"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
@@ -87,40 +88,45 @@ export function ShowConfirmationApp() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-10 max-w-2xl mx-auto">
-      <StageProgress current={stage} />
+    <ToolPage
+      title="Show Confirmation"
+      description="Confirm a show in one form. Sends the producer email, adds the calendar event, and creates the Drive folder."
+    >
+      <div className="flex flex-col items-center gap-10">
+        <StageProgress current={stage} />
 
-      <div className="w-full">
-        {stage === "compose" && (
-          <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
-            <ShowConfirmationForm initialValue={showDetails} onSubmit={handleComposeSubmit} />
-          </div>
-        )}
+        <div className="w-full">
+          {stage === "compose" && (
+            <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
+              <ShowConfirmationForm initialValue={showDetails} onSubmit={handleComposeSubmit} />
+            </div>
+          )}
 
-        {stage === "preview" && showDetails && (
-          <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
-            <PreviewStage
-              showDetails={showDetails}
-              emailContent={emailContent}
-              onEmailContentChange={setEmailContent}
-              onBack={handleBackToCompose}
-              onConfirm={handleConfirm}
-              isConfirming={isConfirming}
-            />
-          </div>
-        )}
+          {stage === "preview" && showDetails && (
+            <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
+              <PreviewStage
+                showDetails={showDetails}
+                emailContent={emailContent}
+                onEmailContentChange={setEmailContent}
+                onBack={handleBackToCompose}
+                onConfirm={handleConfirm}
+                isConfirming={isConfirming}
+              />
+            </div>
+          )}
 
-        {stage === "result" && showDetails && result && (
-          <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
-            <ConfirmationResults
-              result={result}
-              showDetails={showDetails}
-              onReset={handleReset}
-              onRetry={handleConfirm}
-            />
-          </div>
-        )}
+          {stage === "result" && showDetails && result && (
+            <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
+              <ConfirmationResults
+                result={result}
+                showDetails={showDetails}
+                onReset={handleReset}
+                onRetry={handleConfirm}
+              />
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </ToolPage>
   )
 }
