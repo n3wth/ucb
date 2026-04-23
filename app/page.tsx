@@ -2,8 +2,6 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { UcbLogo } from "@/components/ucb-logo"
 
-const ESTABLISHED = 1996
-
 function formatToday(date: Date) {
   return new Intl.DateTimeFormat("en-US", {
     weekday: "long",
@@ -16,7 +14,6 @@ function formatToday(date: Date) {
 export default function LandingPage() {
   const now = new Date()
   const year = now.getFullYear()
-  const issueNumber = String(year - ESTABLISHED + 1).padStart(3, "0")
   const todayLong = formatToday(now).toUpperCase()
 
   return (
@@ -38,8 +35,7 @@ export default function LandingPage() {
         </div>
         <div className="border-t border-foreground/30">
           <div className="mx-auto max-w-6xl px-6 py-2 flex items-center justify-between gap-4 text-[10px] sm:text-xs tracking-[0.22em] uppercase text-foreground/70 font-medium">
-            <span>No.&nbsp;{issueNumber}</span>
-            <span className="hidden sm:inline">Established MCMXCVI</span>
+            <span>Established MCMXCVI</span>
             <span>New York · Los Angeles</span>
           </div>
         </div>
