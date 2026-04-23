@@ -1,14 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
 import { ShowConfirmationForm } from "@/components/show-confirmation-form"
 import { PreviewStage } from "@/components/preview-stage"
 import { ConfirmationResults } from "@/components/confirmation-results"
 import { StageProgress } from "@/components/stage-progress"
-import { Button } from "@/components/ui/button"
-import { LogOut } from "lucide-react"
+import { AppHeader } from "@/components/app-header"
+import { PageContainer } from "@/components/page-container"
 import { generateEmailContent } from "@/components/email-preview"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
@@ -21,11 +19,10 @@ const PENDING_RESULT: ConfirmationResult = {
 }
 
 function buildSubject(d: ShowDetails): string {
-  return `Your show at ${d.venue} is confirmed — ${d.showTitle}`
+  return `Your show at ${d.venue} is confirmed - ${d.showTitle}`
 }
 
 export default function Home() {
-  const router = useRouter()
   const [stage, setStage] = useState<Stage>("compose")
   const [showDetails, setShowDetails] = useState<ShowDetails | null>(null)
   const [emailContent, setEmailContent] = useState<string>("")
@@ -60,8 +57,8 @@ export default function Home() {
       if (data.driveFolder.status === "success" && data.driveFolder.url) {
         setEmailContent(generateEmailContent(showDetails, data.driveFolder.url))
       }
-    } catch (err: any) {
-      const msg = err?.message || "Network error"
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Network error"
       setResult({
         email: { status: "error", error: msg },
         calendarEvent: { status: "error", error: msg },
@@ -83,71 +80,47 @@ export default function Home() {
     setStage("compose")
   }
 
-  const handleSignOut = async () => {
-    await fetch("/api/auth/logout", { method: "POST" })
-    router.push("/login")
-    router.refresh()
-  }
-
   return (
     <main className="min-h-screen bg-background">
-      <div className="h-1 w-full bg-primary" aria-hidden="true" />
-      <header className="border-b border-border">
-        <div className="container mx-auto px-4 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/ucb.svg"
-              alt="UCB"
-              width={40}
-              height={40}
-              className="h-10 w-10 invert"
-              priority
-            />
-            <div>
-              <div className="font-display text-base uppercase tracking-wider leading-none">
-                Show Confirmation
-              </div>
-              <div className="text-xs text-muted-foreground mt-1.5 uppercase tracking-widest">
-                Every show, confirmed in 300 clicks.
-              </div>
-            </div>
-          </div>
-          <Button variant="ghost" size="sm" onClick={handleSignOut} className="uppercase tracking-wider text-xs">
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign out
-          </Button>
-        </div>
-      </header>
+      <AppHeader />
 
-      <div className="container mx-auto px-4 py-10">
-        <div className="flex flex-col items-center gap-6">
+      <PageContainer className="py-10">
+        <div className="flex flex-col items-center gap-8">
           <StageProgress current={stage} />
 
-          {stage === "compose" && (
-            <ShowConfirmationForm initialValue={showDetails} onSubmit={handleComposeSubmit} />
-          )}
+          <div className="w-full transition-opacity duration-200">
+            {stage === "compose" && (
+              <div className="flex justify-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <ShowConfirmationForm initialValue={showDetails} onSubmit={handleComposeSubmit} />
+              </div>
+            )}
 
-          {stage === "preview" && showDetails && (
-            <PreviewStage
-              showDetails={showDetails}
-              emailContent={emailContent}
-              onEmailContentChange={setEmailContent}
-              onBack={handleBackToCompose}
-              onConfirm={handleConfirm}
-              isConfirming={isConfirming}
-            />
-          )}
+            {stage === "preview" && showDetails && (
+              <div className="flex justify-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <PreviewStage
+                  showDetails={showDetails}
+                  emailContent={emailContent}
+                  onEmailContentChange={setEmailContent}
+                  onBack={handleBackToCompose}
+                  onConfirm={handleConfirm}
+                  isConfirming={isConfirming}
+                />
+              </div>
+            )}
 
-          {stage === "result" && showDetails && result && (
-            <ConfirmationResults
-              result={result}
-              showDetails={showDetails}
-              onReset={handleReset}
-              onRetry={handleConfirm}
-            />
-          )}
+            {stage === "result" && showDetails && result && (
+              <div className="flex justify-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <ConfirmationResults
+                  result={result}
+                  showDetails={showDetails}
+                  onReset={handleReset}
+                  onRetry={handleConfirm}
+                />
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </PageContainer>
     </main>
   )
 }

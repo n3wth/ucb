@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
 import { Calendar, Clock, FolderOpen, MapPin, Monitor, ArrowLeft, Send, DollarSign } from "lucide-react"
 import { EmailPreview } from "@/components/email-preview"
+import { formatDate, formatTime, formatPrice } from "@/lib/format"
 import type { ShowDetails } from "@/lib/types"
 
 interface PreviewStageProps {
@@ -17,26 +18,6 @@ interface PreviewStageProps {
   isConfirming: boolean
 }
 
-function formatDate(dateString: string): string {
-  if (!dateString) return ""
-  const date = new Date(dateString + "T00:00:00")
-  return date.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  })
-}
-
-function formatTime(timeString: string): string {
-  if (!timeString) return ""
-  const [hours, minutes] = timeString.split(":")
-  const hour = parseInt(hours)
-  const ampm = hour >= 12 ? "PM" : "AM"
-  const hour12 = hour % 12 || 12
-  return `${hour12}:${minutes} ${ampm}`
-}
-
 export function PreviewStage({
   showDetails,
   emailContent,
@@ -45,13 +26,15 @@ export function PreviewStage({
   onConfirm,
   isConfirming,
 }: PreviewStageProps) {
-  const folderName = `${showDetails.showTitle} – ${showDetails.showDate}`
+  const folderName = `${showDetails.showTitle} - ${showDetails.showDate}`
 
   return (
-    <div className="w-full max-w-2xl space-y-4">
-      <div className="space-y-1">
-        <h2 className="text-2xl font-semibold tracking-tight text-balance">Review before confirming</h2>
-        <p className="text-sm text-muted-foreground text-pretty">
+    <div className="w-full max-w-2xl space-y-5">
+      <div className="space-y-2 text-center">
+        <h2 className="font-display text-xl uppercase tracking-wider text-balance">
+          Review Before Confirming
+        </h2>
+        <p className="text-sm text-muted-foreground text-pretty max-w-md mx-auto">
           Nothing is sent or created yet. Confirm below to send the email, add the calendar event, and create the Drive folder.
         </p>
       </div>
@@ -62,41 +45,41 @@ export function PreviewStage({
         onEmailContentChange={onEmailContentChange}
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+      <Card className="shadow-lg shadow-black/10 border-border/50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-primary" />
             Calendar Event
           </CardTitle>
-          <CardDescription>Will be added to the UCB shared calendar</CardDescription>
+          <CardDescription className="text-xs">Will be added to the UCB shared calendar</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div>
-              <div className="text-sm text-muted-foreground mb-1">Title</div>
-              <div className="font-medium">{showDetails.showTitle || <span className="text-muted-foreground">—</span>}</div>
+              <div className="text-xs text-muted-foreground mb-1">Event Title</div>
+              <div className="font-medium">{showDetails.showTitle || <span className="text-muted-foreground">-</span>}</div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <DetailRow icon={<Calendar className="h-4 w-4" />} label="Date" value={formatDate(showDetails.showDate)} />
-              <DetailRow icon={<Clock className="h-4 w-4" />} label="Show Time" value={formatTime(showDetails.showTime)} />
-              <DetailRow icon={<MapPin className="h-4 w-4" />} label="Venue" value={showDetails.venue} />
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <DetailRow icon={<Calendar className="h-3.5 w-3.5" />} label="Date" value={formatDate(showDetails.showDate)} />
+              <DetailRow icon={<Clock className="h-3.5 w-3.5" />} label="Time" value={formatTime(showDetails.showTime)} />
+              <DetailRow icon={<MapPin className="h-3.5 w-3.5" />} label="Venue" value={showDetails.venue} />
               {showDetails.techRehearsalTime && (
                 <DetailRow
-                  icon={<Clock className="h-4 w-4" />}
-                  label="Tech Rehearsal"
+                  icon={<Clock className="h-3.5 w-3.5" />}
+                  label="Tech"
                   value={formatTime(showDetails.techRehearsalTime)}
                 />
               )}
               <DetailRow
-                icon={<DollarSign className="h-4 w-4" />}
-                label="Presale / Door"
-                value={`$${showDetails.presaleTicketPrice.toFixed(2)} / $${showDetails.doorTicketPrice.toFixed(2)}`}
+                icon={<DollarSign className="h-3.5 w-3.5" />}
+                label="Tickets"
+                value={`${formatPrice(showDetails.presaleTicketPrice)} / ${formatPrice(showDetails.doorTicketPrice)}`}
               />
               {showDetails.digitalTicket.enabled && (
                 <DetailRow
-                  icon={<Monitor className="h-4 w-4" />}
-                  label="Digital Ticket"
-                  value={`$${showDetails.digitalTicket.price.toFixed(2)}`}
+                  icon={<Monitor className="h-3.5 w-3.5" />}
+                  label="Digital"
+                  value={formatPrice(showDetails.digitalTicket.price)}
                 />
               )}
             </div>
@@ -104,32 +87,36 @@ export function PreviewStage({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <FolderOpen className="h-5 w-5" />
+      <Card className="shadow-lg shadow-black/10 border-border/50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <FolderOpen className="h-4 w-4 text-primary" />
             Drive Folder
           </CardTitle>
-          <CardDescription>Will be created inside the venue&apos;s show folder</CardDescription>
+          <CardDescription className="text-xs">Will be created inside the venue&apos;s show folder</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="secondary">{showDetails.venue}</Badge>
-              <span className="text-muted-foreground text-sm">/</span>
-              <span className="font-medium text-sm">{folderName}</span>
-            </div>
+          <div className="flex items-center gap-2 flex-wrap text-sm">
+            <Badge variant="secondary" className="font-normal text-xs">
+              {showDetails.venue}
+            </Badge>
+            <span className="text-muted-foreground">/</span>
+            <span className="font-medium">{folderName}</span>
           </div>
         </CardContent>
       </Card>
 
       <div className="sticky bottom-4 z-10">
-        <div className="flex gap-2 rounded-xl border border-border bg-card p-3 shadow-lg">
+        <div className="flex gap-3 rounded-xl border border-border bg-card/95 backdrop-blur-sm p-3 shadow-xl shadow-black/20">
           <Button variant="ghost" onClick={onBack} disabled={isConfirming} className="flex-1">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to edit
+            Back
           </Button>
-          <Button onClick={onConfirm} disabled={isConfirming} className="flex-1">
+          <Button
+            onClick={onConfirm}
+            disabled={isConfirming}
+            className="flex-1 font-display uppercase tracking-wider text-sm"
+          >
             {isConfirming ? (
               <>
                 <Spinner className="mr-2" />
@@ -138,7 +125,7 @@ export function PreviewStage({
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />
-                Confirm &amp; Send
+                Confirm
               </>
             )}
           </Button>
@@ -150,12 +137,12 @@ export function PreviewStage({
 
 function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div>
-      <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1.5">
+    <div className="min-w-0">
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 flex items-center gap-1.5">
         {icon}
         {label}
       </div>
-      <div className="text-sm font-medium">{value || <span className="text-muted-foreground">—</span>}</div>
+      <div className="text-sm font-medium truncate">{value || <span className="text-muted-foreground">-</span>}</div>
     </div>
   )
 }

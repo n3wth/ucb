@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Copy, Check, Mail, Edit2 } from "lucide-react"
+import { Copy, Check, Mail, Edit2, RotateCcw } from "lucide-react"
+import { formatDate, formatTime, formatPrice } from "@/lib/format"
 import type { ShowDetails } from "@/lib/types"
 
 interface EmailPreviewProps {
@@ -14,30 +15,6 @@ interface EmailPreviewProps {
   driveFolderUrl?: string
   emailContent: string
   onEmailContentChange: (value: string) => void
-}
-
-function formatDate(dateString: string): string {
-  if (!dateString) return ""
-  const date = new Date(dateString + "T00:00:00")
-  return date.toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
-}
-
-function formatTime(timeString: string): string {
-  if (!timeString) return ""
-  const [hours, minutes] = timeString.split(":")
-  const hour = parseInt(hours)
-  const ampm = hour >= 12 ? "PM" : "AM"
-  const hour12 = hour % 12 || 12
-  return `${hour12}:${minutes} ${ampm}`
-}
-
-function formatPrice(price: number): string {
-  return `$${price.toFixed(2)}`
 }
 
 export function generateEmailContent(showDetails: ShowDetails, driveFolderUrl?: string): string {
@@ -88,9 +65,6 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
     onEmailContentChange(generateEmailContent(showDetails, driveFolderUrl))
   }
 
-  // Keep email in sync if driveFolderUrl arrives later (e.g. after confirmation)
-  // but only if the user hasn't manually edited. We detect "hasn't edited"
-  // by comparing to the generated default without the URL.
   useEffect(() => {
     if (!driveFolderUrl) return
     const withoutUrl = generateEmailContent(showDetails, undefined)
@@ -101,56 +75,57 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
   }, [driveFolderUrl])
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="shadow-lg shadow-black/10 border-border/50">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="space-y-1">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Mail className="h-5 w-5" />
+            <CardTitle className="text-base flex items-center gap-2">
+              <Mail className="h-4 w-4 text-primary" />
               Confirmation Email
             </CardTitle>
-            <CardDescription>Review and customize before sending</CardDescription>
+            <CardDescription className="text-xs">Review and customize before sending</CardDescription>
           </div>
-          <Badge variant="secondary" className="font-normal">
+          <Badge variant="secondary" className="font-normal text-xs">
             To: {showDetails.producerEmail}
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <Tabs defaultValue="preview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="preview">Preview</TabsTrigger>
-            <TabsTrigger value="edit">
-              <Edit2 className="h-4 w-4 mr-1.5" />
+          <TabsList className="grid w-full grid-cols-2 h-9">
+            <TabsTrigger value="preview" className="text-xs">Preview</TabsTrigger>
+            <TabsTrigger value="edit" className="text-xs">
+              <Edit2 className="h-3 w-3 mr-1.5" />
               Edit
             </TabsTrigger>
           </TabsList>
           <TabsContent value="preview" className="mt-4">
-            <div className="rounded-lg border border-border bg-muted/20 p-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-4 max-h-80 overflow-y-auto">
               <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">{emailContent}</pre>
             </div>
           </TabsContent>
-          <TabsContent value="edit" className="mt-4">
+          <TabsContent value="edit" className="mt-4 space-y-3">
             <Textarea
               value={emailContent}
               onChange={(e) => onEmailContentChange(e.target.value)}
-              className="min-h-[360px] font-sans text-sm leading-relaxed"
+              className="min-h-[280px] font-sans text-sm leading-relaxed bg-input/50 focus:bg-input transition-colors resize-none"
             />
-            <Button variant="ghost" size="sm" onClick={handleReset} className="mt-2">
+            <Button variant="ghost" size="sm" onClick={handleReset} className="text-xs">
+              <RotateCcw className="h-3 w-3 mr-1.5" />
               Reset to default
             </Button>
           </TabsContent>
         </Tabs>
 
-        <Button onClick={handleCopy} variant="outline" className="w-full">
+        <Button onClick={handleCopy} variant="outline" size="sm" className="w-full">
           {copied ? (
             <>
-              <Check className="h-4 w-4 mr-2" />
-              Copied
+              <Check className="h-3.5 w-3.5 mr-2 text-emerald-500" />
+              Copied!
             </>
           ) : (
             <>
-              <Copy className="h-4 w-4 mr-2" />
+              <Copy className="h-3.5 w-3.5 mr-2" />
               Copy to Clipboard
             </>
           )}

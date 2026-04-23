@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Spinner } from "@/components/ui/spinner"
-import { Lock, AlertCircle } from "lucide-react"
+import { Lock, AlertCircle, ArrowRight } from "lucide-react"
 
 export function LoginForm() {
   const router = useRouter()
@@ -44,23 +44,23 @@ export function LoginForm() {
   }
 
   return (
-    <Card>
+    <Card className="shadow-xl shadow-black/20 border-border/50">
       <CardHeader>
-        <CardTitle className="font-display uppercase tracking-wider text-lg">Sign in</CardTitle>
-        <CardDescription>Enter the shared team password to continue.</CardDescription>
+        <CardTitle className="font-display uppercase tracking-wider text-base">Sign In</CardTitle>
+        <CardDescription className="text-xs">Enter the shared team password to continue.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" className="bg-red-500/10 border-red-500/30">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription className="text-xs">{error}</AlertDescription>
             </Alert>
           )}
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="password">
-                <Lock className="inline-block h-4 w-4 mr-1.5 -mt-0.5" />
+                <Lock className="inline-block h-3.5 w-3.5 mr-1.5 -mt-0.5 text-muted-foreground" />
                 Password
               </FieldLabel>
               <Input
@@ -69,19 +69,27 @@ export function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
+                className="bg-input/50 focus:bg-input transition-colors"
                 required
                 autoFocus
               />
             </Field>
           </FieldGroup>
-          <Button type="submit" className="w-full" disabled={loading || !password}>
+          <Button
+            type="submit"
+            className="w-full font-display uppercase tracking-wider text-sm group"
+            disabled={loading || !password}
+          >
             {loading ? (
               <>
                 <Spinner className="mr-2" />
                 Signing in...
               </>
             ) : (
-              "Sign in"
+              <>
+                Sign in
+                <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
+              </>
             )}
           </Button>
         </form>

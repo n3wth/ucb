@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Check, X, Calendar, FolderOpen, Mail, ExternalLink, RefreshCw, AlertCircle } from "lucide-react"
+import { Check, X, Calendar, FolderOpen, Mail, ExternalLink, RefreshCw, AlertCircle, Plus } from "lucide-react"
+import { formatShortDate } from "@/lib/format"
 import type { ConfirmationResult, ShowDetails, StepStatus } from "@/lib/types"
 
 interface ConfirmationResultsProps {
@@ -27,48 +28,46 @@ interface StatusItemProps {
 
 function StatusItem({ label, description, status, icon, actionUrl, actionLabel, error }: StatusItemProps) {
   return (
-    <div className="p-3 rounded-lg border border-border bg-card space-y-2">
+    <div className="p-4 rounded-lg border border-border bg-card/50 space-y-2 transition-colors hover:bg-card/80">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3 min-w-0">
           <div
-            className={`p-2 rounded-full shrink-0 ${
+            className={`p-2 rounded-full shrink-0 transition-colors ${
               status === "success"
-                ? "bg-emerald-100 text-emerald-700"
+                ? "bg-emerald-500/15 text-emerald-400"
                 : status === "error"
-                  ? "bg-red-100 text-red-700"
-                  : status === "pending"
-                    ? "bg-muted text-muted-foreground"
-                    : "bg-muted text-muted-foreground"
+                  ? "bg-red-500/15 text-red-400"
+                  : "bg-muted text-muted-foreground"
             }`}
           >
             {icon}
           </div>
           <div className="min-w-0">
-            <div className="font-medium truncate">{label}</div>
+            <div className="font-medium text-sm">{label}</div>
             {description && <div className="text-xs text-muted-foreground truncate">{description}</div>}
           </div>
         </div>
         <div className="flex items-center gap-2">
           {status === "pending" && (
-            <Badge variant="secondary" className="font-normal">
+            <Badge variant="secondary" className="font-normal text-xs">
               <Spinner className="h-3 w-3 mr-1.5" />
               Working...
             </Badge>
           )}
           {status === "success" && (
-            <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+            <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 font-normal text-xs">
               <Check className="h-3 w-3 mr-1" />
-              Complete
+              Done
             </Badge>
           )}
           {status === "error" && (
-            <Badge variant="secondary" className="bg-red-50 text-red-700 border-red-200">
+            <Badge className="bg-red-500/15 text-red-400 border-red-500/30 font-normal text-xs">
               <X className="h-3 w-3 mr-1" />
               Failed
             </Badge>
           )}
           {status === "success" && actionUrl && (
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="ghost" size="sm" asChild className="h-7 px-2 text-xs">
               <a href={actionUrl} target="_blank" rel="noopener noreferrer">
                 {actionLabel}
                 <ExternalLink className="h-3 w-3 ml-1" />
@@ -78,7 +77,7 @@ function StatusItem({ label, description, status, icon, actionUrl, actionLabel, 
         </div>
       </div>
       {status === "error" && error && (
-        <div className="text-xs text-red-700 bg-red-50 border border-red-200 rounded px-2 py-1.5 break-words">
+        <div className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded px-3 py-2 break-words">
           {error}
         </div>
       )}
@@ -93,38 +92,36 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
   const allSuccess = statuses.every((s) => s === "success")
 
   return (
-    <Card className="w-full max-w-2xl">
-      <CardHeader>
+    <Card className="w-full max-w-2xl shadow-xl shadow-black/20 border-border/50">
+      <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <CardTitle className="text-xl text-balance">
+            <CardTitle className="font-display text-xl uppercase tracking-wider text-balance">
               {anyPending
-                ? "Confirming show..."
+                ? "Confirming..."
                 : allSuccess
-                  ? "Show confirmed"
-                  : anyError
-                    ? "Some steps failed"
-                    : "Ready"}
+                  ? "Confirmed"
+                  : "Partially Failed"}
             </CardTitle>
-            <CardDescription className="text-pretty">{showDetails.showTitle}</CardDescription>
+            <CardDescription className="text-sm">
+              {showDetails.showTitle} &middot; {formatShortDate(showDetails.showDate)}
+            </CardDescription>
           </div>
           <div
-            className={`p-3 rounded-full shrink-0 ${
+            className={`p-3 rounded-full shrink-0 transition-colors ${
               anyPending
                 ? "bg-muted"
                 : allSuccess
-                  ? "bg-emerald-100"
-                  : anyError
-                    ? "bg-red-100"
-                    : "bg-muted"
+                  ? "bg-emerald-500/15"
+                  : "bg-red-500/15"
             }`}
           >
             {anyPending ? (
               <Spinner className="h-6 w-6" />
             ) : allSuccess ? (
-              <Check className="h-6 w-6 text-emerald-700" />
+              <Check className="h-6 w-6 text-emerald-400" />
             ) : (
-              <AlertCircle className="h-6 w-6 text-red-700" />
+              <AlertCircle className="h-6 w-6 text-red-400" />
             )}
           </div>
         </div>
@@ -132,52 +129,56 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
       <CardContent className="space-y-4">
         <div className="space-y-3">
           <StatusItem
-            label="Confirmation email"
-            description={`Ready to send to ${showDetails.producerEmail}`}
+            label="Confirmation Email"
+            description={`Sent to ${showDetails.producerEmail}`}
             status={result.email.status}
             icon={<Mail className="h-4 w-4" />}
             error={result.email.error}
           />
           <StatusItem
-            label="Calendar event"
-            description={`${showDetails.venue} · ${showDetails.showDate}`}
+            label="Calendar Event"
+            description={`${showDetails.venue} shared calendar`}
             status={result.calendarEvent.status}
             icon={<Calendar className="h-4 w-4" />}
             actionUrl={result.calendarEvent.url}
-            actionLabel="Open event"
+            actionLabel="Open"
             error={result.calendarEvent.error}
           />
           <StatusItem
-            label="Drive folder"
-            description={`${showDetails.showTitle} – ${showDetails.showDate}`}
+            label="Drive Folder"
+            description={`${showDetails.showTitle} - ${showDetails.showDate}`}
             status={result.driveFolder.status}
             icon={<FolderOpen className="h-4 w-4" />}
             actionUrl={result.driveFolder.url}
-            actionLabel="Open folder"
+            actionLabel="Open"
             error={result.driveFolder.error}
           />
         </div>
 
         {anyError && !anyPending && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="bg-red-500/10 border-red-500/30">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>One or more steps failed</AlertTitle>
-            <AlertDescription>
-              You can retry the full confirmation or go back to review and fix the details.
+            <AlertTitle className="text-sm font-medium">Some steps failed</AlertTitle>
+            <AlertDescription className="text-xs">
+              You can retry the confirmation or start fresh with a new show.
             </AlertDescription>
           </Alert>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex gap-3 pt-2">
           {anyError && !anyPending && (
-            <Button onClick={onRetry} variant="default" className="flex-1">
+            <Button onClick={onRetry} className="flex-1 font-display uppercase tracking-wider text-xs">
               <RefreshCw className="h-4 w-4 mr-2" />
               Retry
             </Button>
           )}
-          <Button onClick={onReset} variant={anyError ? "outline" : "default"} className="flex-1">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Confirm another show
+          <Button
+            onClick={onReset}
+            variant={anyError ? "outline" : "default"}
+            className={`flex-1 ${!anyError ? "font-display uppercase tracking-wider text-xs" : ""}`}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            New Show
           </Button>
         </div>
       </CardContent>
