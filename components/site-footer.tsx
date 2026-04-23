@@ -17,7 +17,6 @@ export function SiteFooter() {
         >
           ucbcomedy.com <span aria-hidden="true">↗</span>
         </a>
-        <span>Staff Access Only</span>
       </div>
     </footer>
   )
