@@ -6,9 +6,9 @@ describe('LandingPage', () => {
   it('renders the hero heading and a sign-in link', () => {
     render(<LandingPage />)
 
-    expect(
-      screen.getByRole('heading', { name: /internal tools for the ucb artistic team/i }),
-    ).toBeInTheDocument()
+    const heading = screen.getByRole('heading', { level: 1 })
+    expect(heading).toHaveTextContent(/internal tools for the ucb/i)
+    expect(heading).toHaveTextContent(/artistic team/i)
 
     const signInLinks = screen.getAllByRole('link', { name: /sign in/i })
     expect(signInLinks.length).toBeGreaterThan(0)

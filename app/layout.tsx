@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Archivo_Black } from 'next/font/google'
+import { Geist, Geist_Mono, Archivo_Black, Playfair_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { env } from '@/lib/env'
 import './globals.css'
@@ -16,6 +16,12 @@ const archivoBlack = Archivo_Black({
   subsets: ['latin'],
   weight: '400',
   variable: '--font-archivo-black',
+})
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['400', '700', '900'],
+  style: ['normal', 'italic'],
+  variable: '--font-playfair',
 })
 
 const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? 'https://ucb-bookings.vercel.app'
@@ -64,7 +70,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`bg-background ${geist.variable} ${geistMono.variable} ${archivoBlack.variable}`}
+      className={`bg-background ${geist.variable} ${geistMono.variable} ${archivoBlack.variable} ${playfair.variable}`}
     >
       <body className="font-sans antialiased">
         {children}

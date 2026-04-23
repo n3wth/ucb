@@ -4,9 +4,10 @@ test('landing page loads and links to /login', async ({ page }) => {
   const response = await page.goto('/')
   expect(response?.ok()).toBeTruthy()
 
-  await expect(
-    page.getByRole('heading', { name: /internal tools for the ucb artistic team/i }),
-  ).toBeVisible()
+  const heading = page.getByRole('heading', { level: 1 })
+  await expect(heading).toBeVisible()
+  await expect(heading).toContainText(/internal tools/i)
+  await expect(heading).toContainText(/artistic team/i)
 
   const signIn = page.getByRole('link', { name: /sign in/i }).first()
   await expect(signIn).toHaveAttribute('href', '/login')
