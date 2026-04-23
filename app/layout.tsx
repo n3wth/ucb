@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Archivo_Black } from 'next/font/google'
+import { Geist, Geist_Mono, Archivo_Black, Playfair_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
@@ -15,6 +15,12 @@ const archivoBlack = Archivo_Black({
   subsets: ['latin'],
   weight: '400',
   variable: '--font-archivo-black',
+})
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['700', '900'],
+  style: ['normal', 'italic'],
+  variable: '--font-playfair',
 })
 
 export const metadata: Metadata = {
@@ -51,7 +57,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`bg-background ${geist.variable} ${geistMono.variable} ${archivoBlack.variable}`}
+      className={`bg-background ${geist.variable} ${geistMono.variable} ${archivoBlack.variable} ${playfair.variable}`}
     >
       <body className="font-sans antialiased">
         {children}
