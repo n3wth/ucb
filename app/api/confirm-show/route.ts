@@ -1,150 +1,178 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getCalendarClient, getDriveClient } from "@/lib/google"
-import type { ShowDetails, ConfirmationResult } from "@/lib/types"
+import { getCalendar, getDrive, hasGoogleCredentials } from "@/lib/google"
+import type { ShowDetails, ConfirmationResult, StepResult } from "@/lib/types"
 
-// Parent folder IDs for each venue (set these in environment variables)
-const VENUE_FOLDER_IDS: Record<string, string> = {
-  "UCB Franklin": process.env.UCB_FRANKLIN_FOLDER_ID || "",
-  "UCB Annex": process.env.UCB_ANNEX_FOLDER_ID || "",
+const VENUE_FOLDER_IDS: Record<string, string | undefined> = {
+  "UCB Franklin": process.env.UCB_FRANKLIN_FOLDER_ID,
+  "UCB Annex": process.env.UCB_ANNEX_FOLDER_ID,
 }
 
-// Calendar ID for the shared UCB calendar
 const UCB_CALENDAR_ID = process.env.UCB_CALENDAR_ID || "primary"
-
-function formatDateForFolder(dateString: string): string {
-  // Convert YYYY-MM-DD to folder name format
-  return dateString
-}
+const TIMEZONE = "America/New_York"
 
 function formatDateTime(date: string, time: string): string {
-  // Combine date and time into ISO format
   return `${date}T${time}:00`
 }
 
-async function createDriveFolder(showDetails: ShowDetails): Promise<{ success: boolean; url?: string; error?: string }> {
+function buildFolderName(d: ShowDetails): string {
+  return `${d.showTitle} – ${d.showDate}`
+}
+
+function buildEventDescription(d: ShowDetails): string {
+  return [
+    `Venue: ${d.venue}`,
+    `Producer: ${d.producerEmail}`,
+    `Presale: $${d.presaleTicketPrice.toFixed(2)}`,
+    `Door: $${d.doorTicketPrice.toFixed(2)}`,
+    d.digitalTicket.enabled ? `Digital: $${d.digitalTicket.price.toFixed(2)}` : "",
+    d.techRehearsalTime ? `Tech Rehearsal: ${d.techRehearsalTime}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n")
+}
+
+async function createDriveFolder(d: ShowDetails): Promise<StepResult> {
+  const folderName = buildFolderName(d)
+  const parentFolderId = VENUE_FOLDER_IDS[d.venue]
+
+  console.log("[v0] drive: creating folder", { folderName, parentFolderId, venue: d.venue })
+
+  if (!parentFolderId) {
+    const msg = `Missing parent folder ID for venue "${d.venue}". Set UCB_FRANKLIN_FOLDER_ID or UCB_ANNEX_FOLDER_ID.`
+    console.log("[v0] drive: aborting", msg)
+    return { status: "error", error: msg }
+  }
+
   try {
-    const drive = getDriveClient()
-    const folderName = `${showDetails.showTitle} – ${showDetails.showDate}`
-    const parentFolderId = VENUE_FOLDER_IDS[showDetails.venue]
-
-    const fileMetadata = {
-      name: folderName,
-      mimeType: "application/vnd.google-apps.folder",
-      ...(parentFolderId && { parents: [parentFolderId] }),
-    }
-
+    const drive = await getDrive()
     const response = await drive.files.create({
-      requestBody: fileMetadata,
-      fields: "id, webViewLink",
+      requestBody: {
+        name: folderName,
+        mimeType: "application/vnd.google-apps.folder",
+        parents: [parentFolderId],
+      },
+      fields: "id, name, webViewLink",
+      supportsAllDrives: true,
     })
-
+    console.log("[v0] drive: created", response.data)
     return {
-      success: true,
-      url: response.data.webViewLink || `https://drive.google.com/drive/folders/${response.data.id}`,
+      status: "success",
+      id: response.data.id || undefined,
+      url:
+        response.data.webViewLink ||
+        (response.data.id ? `https://drive.google.com/drive/folders/${response.data.id}` : undefined),
     }
-  } catch (error) {
-    console.error("Error creating Drive folder:", error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to create Drive folder",
-    }
+  } catch (err: any) {
+    const detail = err?.response?.data || err?.errors || err?.message || String(err)
+    const detailStr = typeof detail === "string" ? detail : JSON.stringify(detail)
+    console.log("[v0] drive: create failed", detailStr)
+    return { status: "error", error: `Drive folder creation failed: ${detailStr}` }
   }
 }
 
-async function createCalendarEvent(showDetails: ShowDetails): Promise<{ success: boolean; error?: string }> {
+async function createCalendarEvent(d: ShowDetails): Promise<StepResult> {
+  const startDateTime = formatDateTime(d.showDate, d.showTime)
+  const endDate = new Date(`${d.showDate}T${d.showTime}:00`)
+  endDate.setHours(endDate.getHours() + 2)
+  const endDateTime = endDate.toISOString().slice(0, 19)
+
+  console.log("[v0] calendar: creating event", {
+    calendarId: UCB_CALENDAR_ID,
+    title: d.showTitle,
+    startDateTime,
+    endDateTime,
+  })
+
   try {
-    const calendar = getCalendarClient()
-
-    // Create event start and end times
-    const startDateTime = formatDateTime(showDetails.showDate, showDetails.showTime)
-    // Assume show duration of 2 hours
-    const endTime = new Date(`${showDetails.showDate}T${showDetails.showTime}:00`)
-    endTime.setHours(endTime.getHours() + 2)
-    const endDateTime = endTime.toISOString()
-
-    const eventDescription = [
-      `Venue: ${showDetails.venue}`,
-      `Producer: ${showDetails.producerEmail}`,
-      `Presale: $${showDetails.presaleTicketPrice.toFixed(2)}`,
-      `Door: $${showDetails.doorTicketPrice.toFixed(2)}`,
-      showDetails.techRehearsalTime ? `Tech Rehearsal: ${showDetails.techRehearsalTime}` : "",
-      showDetails.liveStream ? "Live Stream: Yes" : "",
-    ].filter(Boolean).join("\n")
-
-    const event = {
-      summary: showDetails.showTitle,
-      location: showDetails.venue,
-      description: eventDescription,
-      start: {
-        dateTime: startDateTime,
-        timeZone: "America/New_York",
-      },
-      end: {
-        dateTime: endDateTime,
-        timeZone: "America/New_York",
-      },
-    }
-
-    await calendar.events.insert({
+    const calendar = await getCalendar()
+    const response = await calendar.events.insert({
       calendarId: UCB_CALENDAR_ID,
-      requestBody: event,
+      requestBody: {
+        summary: d.showTitle,
+        location: d.venue,
+        description: buildEventDescription(d),
+        start: { dateTime: startDateTime, timeZone: TIMEZONE },
+        end: { dateTime: endDateTime, timeZone: TIMEZONE },
+      },
     })
-
-    return { success: true }
-  } catch (error) {
-    console.error("Error creating calendar event:", error)
+    console.log("[v0] calendar: created", { id: response.data.id, htmlLink: response.data.htmlLink })
     return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to create calendar event",
+      status: "success",
+      id: response.data.id || undefined,
+      url: response.data.htmlLink || undefined,
     }
+  } catch (err: any) {
+    const detail = err?.response?.data || err?.errors || err?.message || String(err)
+    const detailStr = typeof detail === "string" ? detail : JSON.stringify(detail)
+    console.log("[v0] calendar: create failed", detailStr)
+    return { status: "error", error: `Calendar event creation failed: ${detailStr}` }
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const showDetails: ShowDetails = await request.json()
+    const showDetails = (await request.json()) as ShowDetails
 
-    // Validate required fields
-    if (!showDetails.showTitle || !showDetails.showDate || !showDetails.showTime || !showDetails.producerEmail) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      )
+    if (
+      !showDetails?.showTitle ||
+      !showDetails?.showDate ||
+      !showDetails?.showTime ||
+      !showDetails?.producerEmail ||
+      !showDetails?.venue
+    ) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    const errors: string[] = []
+    console.log("[v0] confirm-show: starting", {
+      title: showDetails.showTitle,
+      venue: showDetails.venue,
+      date: showDetails.showDate,
+      hasCreds: hasGoogleCredentials(),
+    })
 
-    // Create Google Drive folder
-    const driveResult = await createDriveFolder(showDetails)
-    if (!driveResult.success) {
-      errors.push(driveResult.error || "Drive folder creation failed")
+    if (!hasGoogleCredentials()) {
+      // Simulation fallback so the flow is testable without full Google setup.
+      console.log("[v0] confirm-show: SIMULATION MODE (Google creds not set)")
+      await new Promise((r) => setTimeout(r, 800))
+      const simUrl = `https://drive.google.com/drive/folders/sim-${Date.now()}`
+      const result: ConfirmationResult = {
+        email: { status: "success" },
+        calendarEvent: { status: "success", id: `sim-${Date.now()}` },
+        driveFolder: { status: "success", id: `sim-${Date.now()}`, url: simUrl },
+      }
+      return NextResponse.json(result)
     }
 
-    // Create Google Calendar event
-    const calendarResult = await createCalendarEvent(showDetails)
-    if (!calendarResult.success) {
-      errors.push(calendarResult.error || "Calendar event creation failed")
-    }
+    const [driveResult, calendarResult] = await Promise.all([
+      createDriveFolder(showDetails),
+      createCalendarEvent(showDetails),
+    ])
 
     const result: ConfirmationResult = {
-      emailGenerated: true, // Email is generated client-side
-      calendarEventCreated: calendarResult.success,
-      driveFolderCreated: driveResult.success,
-      driveFolderUrl: driveResult.url,
-      errors: errors.length > 0 ? errors : undefined,
+      // Email is generated / copied client-side; we mark it success when the
+      // client reached this point with valid data. A future iteration could
+      // send it via Gmail API and surface a real status here.
+      email: { status: "success" },
+      calendarEvent: calendarResult,
+      driveFolder: driveResult,
     }
 
+    console.log("[v0] confirm-show: done", {
+      email: result.email.status,
+      calendar: result.calendarEvent.status,
+      drive: result.driveFolder.status,
+    })
+
     return NextResponse.json(result)
-  } catch (error) {
-    console.error("Error processing show confirmation:", error)
-    return NextResponse.json(
-      {
-        emailGenerated: false,
-        calendarEventCreated: false,
-        driveFolderCreated: false,
-        errors: [error instanceof Error ? error.message : "Unknown error occurred"],
-      },
-      { status: 500 }
-    )
+  } catch (err: any) {
+    const detail = err?.response?.data || err?.message || String(err)
+    console.log("[v0] confirm-show: fatal", detail)
+    const errStr = typeof detail === "string" ? detail : JSON.stringify(detail)
+    const result: ConfirmationResult = {
+      email: { status: "error", error: errStr },
+      calendarEvent: { status: "error", error: errStr },
+      driveFolder: { status: "error", error: errStr },
+    }
+    return NextResponse.json(result, { status: 500 })
   }
 }

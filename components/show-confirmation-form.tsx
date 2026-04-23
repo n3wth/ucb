@@ -8,31 +8,33 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
-import { Spinner } from "@/components/ui/spinner"
-import { Calendar, Clock, DollarSign, Mail, Video, Theater } from "lucide-react"
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
+import { Calendar, Clock, DollarSign, Mail, Monitor, Theater } from "lucide-react"
 import type { ShowDetails } from "@/lib/types"
 
 interface ShowConfirmationFormProps {
-  onSubmit: (data: ShowDetails) => Promise<void>
-  isLoading: boolean
+  initialValue?: ShowDetails | null
+  onSubmit: (data: ShowDetails) => void
 }
 
-export function ShowConfirmationForm({ onSubmit, isLoading }: ShowConfirmationFormProps) {
-  const [formData, setFormData] = useState<ShowDetails>({
-    showTitle: "",
-    showDate: "",
-    venue: "UCB Franklin",
-    showTime: "",
-    techRehearsalTime: "",
-    presaleTicketPrice: 0,
-    doorTicketPrice: 0,
-    liveStream: false,
-    producerEmail: "",
-  })
+const DEFAULT_FORM: ShowDetails = {
+  showTitle: "",
+  showDate: "",
+  venue: "UCB Franklin",
+  showTime: "",
+  techRehearsalTime: "",
+  presaleTicketPrice: 0,
+  doorTicketPrice: 0,
+  digitalTicket: { enabled: false, price: 10 },
+  producerEmail: "",
+}
 
-  const handleSubmit = async (e: React.FormEvent) => {
+export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmationFormProps) {
+  const [formData, setFormData] = useState<ShowDetails>(initialValue ?? DEFAULT_FORM)
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    await onSubmit(formData)
+    onSubmit(formData)
   }
 
   const updateField = <K extends keyof ShowDetails>(field: K, value: ShowDetails[K]) => {
@@ -42,9 +44,9 @@ export function ShowConfirmationForm({ onSubmit, isLoading }: ShowConfirmationFo
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-semibold text-balance">New Show Confirmation</CardTitle>
+        <CardTitle className="text-2xl font-semibold text-balance">Show Details</CardTitle>
         <CardDescription className="text-pretty">
-          Enter the show details below to automatically generate confirmation emails, calendar events, and Drive folders.
+          Enter the show info below. You&apos;ll review everything before anything is sent or created.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -132,16 +134,19 @@ export function ShowConfirmationForm({ onSubmit, isLoading }: ShowConfirmationFo
                   <DollarSign className="inline-block h-4 w-4 mr-1.5 -mt-0.5" />
                   Presale Ticket Price
                 </FieldLabel>
-                <Input
-                  id="presaleTicketPrice"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={formData.presaleTicketPrice || ""}
-                  onChange={(e) => updateField("presaleTicketPrice", parseFloat(e.target.value) || 0)}
-                  required
-                />
+                <InputGroup>
+                  <InputGroupAddon>$</InputGroupAddon>
+                  <InputGroupInput
+                    id="presaleTicketPrice"
+                    type="number"
+                    min="0"
+                    step="0.50"
+                    placeholder="0.00"
+                    value={formData.presaleTicketPrice || ""}
+                    onChange={(e) => updateField("presaleTicketPrice", parseFloat(e.target.value) || 0)}
+                    required
+                  />
+                </InputGroup>
               </Field>
 
               <Field>
@@ -149,16 +154,19 @@ export function ShowConfirmationForm({ onSubmit, isLoading }: ShowConfirmationFo
                   <DollarSign className="inline-block h-4 w-4 mr-1.5 -mt-0.5" />
                   Door Ticket Price
                 </FieldLabel>
-                <Input
-                  id="doorTicketPrice"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={formData.doorTicketPrice || ""}
-                  onChange={(e) => updateField("doorTicketPrice", parseFloat(e.target.value) || 0)}
-                  required
-                />
+                <InputGroup>
+                  <InputGroupAddon>$</InputGroupAddon>
+                  <InputGroupInput
+                    id="doorTicketPrice"
+                    type="number"
+                    min="0"
+                    step="0.50"
+                    placeholder="0.00"
+                    value={formData.doorTicketPrice || ""}
+                    onChange={(e) => updateField("doorTicketPrice", parseFloat(e.target.value) || 0)}
+                    required
+                  />
+                </InputGroup>
               </Field>
             </div>
 
@@ -177,33 +185,54 @@ export function ShowConfirmationForm({ onSubmit, isLoading }: ShowConfirmationFo
               />
             </Field>
 
-            <Field className="flex items-center justify-between rounded-lg border border-border p-4 bg-muted/30">
-              <div className="space-y-0.5">
-                <Label htmlFor="liveStream" className="text-base flex items-center gap-2">
-                  <Video className="h-4 w-4" />
-                  Digital Option
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Do you want to add a digital option for $10?
-                </p>
+            <Field className="rounded-lg border border-border p-4 bg-muted/30 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="digitalEnabled" className="text-base flex items-center gap-2">
+                    <Monitor className="h-4 w-4" />
+                    Digital Ticket
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Add an online viewing option. The livestream team handles setup separately.
+                  </p>
+                </div>
+                <Switch
+                  id="digitalEnabled"
+                  checked={formData.digitalTicket.enabled}
+                  onCheckedChange={(checked) =>
+                    updateField("digitalTicket", { ...formData.digitalTicket, enabled: checked })
+                  }
+                />
               </div>
-              <Switch
-                id="liveStream"
-                checked={formData.liveStream}
-                onCheckedChange={(checked) => updateField("liveStream", checked)}
-              />
+
+              {formData.digitalTicket.enabled && (
+                <div className="pt-2 border-t border-border">
+                  <Label htmlFor="digitalPrice" className="text-sm mb-2 block">
+                    Digital ticket price
+                  </Label>
+                  <InputGroup className="max-w-[180px]">
+                    <InputGroupAddon>$</InputGroupAddon>
+                    <InputGroupInput
+                      id="digitalPrice"
+                      type="number"
+                      min="0"
+                      step="0.50"
+                      value={formData.digitalTicket.price}
+                      onChange={(e) =>
+                        updateField("digitalTicket", {
+                          ...formData.digitalTicket,
+                          price: parseFloat(e.target.value) || 0,
+                        })
+                      }
+                    />
+                  </InputGroup>
+                </div>
+              )}
             </Field>
           </FieldGroup>
 
-          <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Spinner className="mr-2" />
-                Processing...
-              </>
-            ) : (
-              "Generate Confirmation"
-            )}
+          <Button type="submit" className="w-full" size="lg">
+            Review Preview
           </Button>
         </form>
       </CardContent>

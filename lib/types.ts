@@ -1,3 +1,8 @@
+export interface DigitalTicket {
+  enabled: boolean
+  price: number
+}
+
 export interface ShowDetails {
   showTitle: string
   showDate: string
@@ -6,15 +11,21 @@ export interface ShowDetails {
   techRehearsalTime: string
   presaleTicketPrice: number
   doorTicketPrice: number
-  liveStream: boolean
+  digitalTicket: DigitalTicket
   producerEmail: string
 }
 
+export type StepStatus = "idle" | "pending" | "success" | "error"
+
+export interface StepResult {
+  status: StepStatus
+  id?: string
+  url?: string
+  error?: string
+}
+
 export interface ConfirmationResult {
-  emailGenerated: boolean
-  calendarEventCreated: boolean
-  driveFolderCreated: boolean
-  driveFolderUrl?: string
-  emailContent?: string
-  errors?: string[]
+  email: StepResult
+  calendarEvent: StepResult
+  driveFolder: StepResult
 }

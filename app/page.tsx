@@ -1,163 +1,134 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { ShowConfirmationForm } from "@/components/show-confirmation-form"
-import { EmailPreview } from "@/components/email-preview"
+import { PreviewStage } from "@/components/preview-stage"
 import { ConfirmationResults } from "@/components/confirmation-results"
-import { GoogleSetup } from "@/components/google-setup"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Settings, FileText } from "lucide-react"
+import { StageProgress } from "@/components/stage-progress"
+import { Button } from "@/components/ui/button"
+import { LogOut, Theater } from "lucide-react"
+import { generateEmailContent } from "@/components/email-preview"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
-type AppState = "form" | "preview" | "results"
+type Stage = "compose" | "preview" | "result"
+
+const PENDING_RESULT: ConfirmationResult = {
+  email: { status: "pending" },
+  calendarEvent: { status: "pending" },
+  driveFolder: { status: "pending" },
+}
 
 export default function Home() {
-  const [appState, setAppState] = useState<AppState>("form")
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+  const [stage, setStage] = useState<Stage>("compose")
   const [showDetails, setShowDetails] = useState<ShowDetails | null>(null)
+  const [emailContent, setEmailContent] = useState<string>("")
   const [result, setResult] = useState<ConfirmationResult | null>(null)
-  const [isGoogleConnected, setIsGoogleConnected] = useState(false)
-  const [useSimulation, setUseSimulation] = useState(true)
+  const [isConfirming, setIsConfirming] = useState(false)
 
-  // Check if Google credentials are available
-  useEffect(() => {
-    // In a real app, this would check the server for OAuth status
-    // For the prototype, we'll assume simulation mode
-    const checkAuth = async () => {
-      try {
-        const res = await fetch("/api/auth/status")
-        if (res.ok) {
-          const data = await res.json()
-          setIsGoogleConnected(data.connected)
-          setUseSimulation(!data.connected)
-        }
-      } catch {
-        // Default to simulation mode
-        setUseSimulation(true)
-      }
-    }
-    checkAuth()
-  }, [])
-
-  const handleFormSubmit = async (data: ShowDetails) => {
-    setIsLoading(true)
+  const handleComposeSubmit = (data: ShowDetails) => {
     setShowDetails(data)
+    setEmailContent(generateEmailContent(data))
+    setStage("preview")
+  }
 
-    let confirmationResult: ConfirmationResult
+  const handleConfirm = async () => {
+    if (!showDetails) return
+    setIsConfirming(true)
+    setResult(PENDING_RESULT)
+    setStage("result")
 
-    if (useSimulation) {
-      // Simulate API call delay for prototype demo
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      const response = await fetch("/api/confirm-show", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(showDetails),
+      })
+      const data = (await response.json()) as ConfirmationResult
+      setResult(data)
 
-      confirmationResult = {
-        emailGenerated: true,
-        calendarEventCreated: true,
-        driveFolderCreated: true,
-        driveFolderUrl: `https://drive.google.com/drive/folders/example-${data.showTitle.toLowerCase().replace(/\s+/g, "-")}`,
+      // If drive folder succeeded, update email to include the link
+      if (data.driveFolder.status === "success" && data.driveFolder.url) {
+        setEmailContent(generateEmailContent(showDetails, data.driveFolder.url))
       }
-    } else {
-      // Call real API
-      try {
-        const response = await fetch("/api/confirm-show", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        })
-        confirmationResult = await response.json()
-      } catch (error) {
-        confirmationResult = {
-          emailGenerated: false,
-          calendarEventCreated: false,
-          driveFolderCreated: false,
-          errors: [error instanceof Error ? error.message : "Network error"],
-        }
-      }
+    } catch (err: any) {
+      const msg = err?.message || "Network error"
+      setResult({
+        email: { status: "error", error: msg },
+        calendarEvent: { status: "error", error: msg },
+        driveFolder: { status: "error", error: msg },
+      })
+    } finally {
+      setIsConfirming(false)
     }
+  }
 
-    setResult(confirmationResult)
-    setIsLoading(false)
-    setAppState("preview")
+  const handleBackToCompose = () => {
+    setStage("compose")
   }
 
   const handleReset = () => {
-    setAppState("form")
     setShowDetails(null)
     setResult(null)
+    setEmailContent("")
+    setStage("compose")
   }
 
-  const handleConfirmEmail = () => {
-    setAppState("results")
-  }
-
-  const handleGoogleConnect = () => {
-    window.location.href = "/api/auth/google"
+  const handleSignOut = async () => {
+    await fetch("/api/auth/logout", { method: "POST" })
+    router.push("/login")
+    router.refresh()
   }
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <header className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold tracking-tight text-balance">
-              UCB Show Confirmation
-            </h1>
-            <Badge variant={useSimulation ? "secondary" : "default"}>
-              {useSimulation ? "Prototype Mode" : "Live"}
-            </Badge>
+      <header className="border-b border-border">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
+              <Theater className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="font-semibold leading-none">UCB Show Confirmation</div>
+              <div className="text-xs text-muted-foreground mt-1">Every show, confirmed in 300 clicks.</div>
+            </div>
           </div>
-          <p className="text-muted-foreground max-w-xl mx-auto text-pretty">
-            Streamline show confirmations by automatically generating emails, calendar events, and Drive folders in one workflow.
-          </p>
-        </header>
+          <Button variant="ghost" size="sm" onClick={handleSignOut}>
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign out
+          </Button>
+        </div>
+      </header>
 
+      <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col items-center gap-6">
-          {!isGoogleConnected && appState === "form" && (
-            <GoogleSetup 
-              isConnected={isGoogleConnected} 
-              onConnect={handleGoogleConnect} 
+          <StageProgress current={stage} />
+
+          {stage === "compose" && (
+            <ShowConfirmationForm initialValue={showDetails} onSubmit={handleComposeSubmit} />
+          )}
+
+          {stage === "preview" && showDetails && (
+            <PreviewStage
+              showDetails={showDetails}
+              emailContent={emailContent}
+              onEmailContentChange={setEmailContent}
+              onBack={handleBackToCompose}
+              onConfirm={handleConfirm}
+              isConfirming={isConfirming}
             />
           )}
 
-          {appState === "form" && (
-            <ShowConfirmationForm onSubmit={handleFormSubmit} isLoading={isLoading} />
-          )}
-
-          {appState === "preview" && showDetails && result && (
-            <div className="space-y-6 w-full max-w-2xl">
-              <EmailPreview 
-                showDetails={showDetails} 
-                driveFolderUrl={result.driveFolderUrl} 
-              />
-              <div className="flex gap-4">
-                <button
-                  onClick={handleReset}
-                  className="flex-1 py-3 px-4 border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors"
-                >
-                  Back to Form
-                </button>
-                <button
-                  onClick={handleConfirmEmail}
-                  className="flex-1 py-3 px-4 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
-                >
-                  Complete Confirmation
-                </button>
-              </div>
-            </div>
-          )}
-
-          {appState === "results" && showDetails && result && (
+          {stage === "result" && showDetails && result && (
             <ConfirmationResults
               result={result}
               showDetails={showDetails}
               onReset={handleReset}
+              onRetry={handleConfirm}
             />
           )}
         </div>
-
-        <footer className="mt-12 text-center text-sm text-muted-foreground">
-          <p>UCB Show Confirmation Tool - Reduces confirmation time from 5 minutes to under 1 minute</p>
-        </footer>
       </div>
     </main>
   )
