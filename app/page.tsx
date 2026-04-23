@@ -2,12 +2,13 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { ShowConfirmationForm } from "@/components/show-confirmation-form"
 import { PreviewStage } from "@/components/preview-stage"
 import { ConfirmationResults } from "@/components/confirmation-results"
 import { StageProgress } from "@/components/stage-progress"
 import { Button } from "@/components/ui/button"
-import { LogOut, Theater } from "lucide-react"
+import { LogOut } from "lucide-react"
 import { generateEmailContent } from "@/components/email-preview"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
@@ -17,6 +18,10 @@ const PENDING_RESULT: ConfirmationResult = {
   email: { status: "pending" },
   calendarEvent: { status: "pending" },
   driveFolder: { status: "pending" },
+}
+
+function buildSubject(d: ShowDetails): string {
+  return `Your show at ${d.venue} is confirmed — ${d.showTitle}`
 }
 
 export default function Home() {
@@ -43,12 +48,15 @@ export default function Home() {
       const response = await fetch("/api/confirm-show", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(showDetails),
+        body: JSON.stringify({
+          ...showDetails,
+          emailSubject: buildSubject(showDetails),
+          emailBody: emailContent,
+        }),
       })
       const data = (await response.json()) as ConfirmationResult
       setResult(data)
 
-      // If drive folder succeeded, update email to include the link
       if (data.driveFolder.status === "success" && data.driveFolder.url) {
         setEmailContent(generateEmailContent(showDetails, data.driveFolder.url))
       }
@@ -86,9 +94,14 @@ export default function Home() {
       <header className="border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
-              <Theater className="h-5 w-5" />
-            </div>
+            <Image
+              src="/ucb.svg"
+              alt="UCB"
+              width={36}
+              height={36}
+              className="h-9 w-9"
+              priority
+            />
             <div>
               <div className="font-semibold leading-none">UCB Show Confirmation</div>
               <div className="text-xs text-muted-foreground mt-1">Every show, confirmed in 300 clicks.</div>
