@@ -1,0 +1,167 @@
+/* Logo FX - Psychedelic effects for the UCB logo */
+/* Respects prefers-reduced-motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-fx-wrapper,
+  .logo-fx-wrapper * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.logo-fx-wrapper {
+  position: relative;
+  display: inline-flex;
+  will-change: transform, filter;
+}
+
+/* Ensure the logo itself has no background */
+.logo-fx-wrapper img,
+.logo-fx-wrapper svg {
+  background: transparent !important;
+}
+
+/* ============================================
+   1. GLITCH RGB
+   ============================================ */
+.logo-fx-glitch {
+  animation: logo-glitch-jitter 0.08s infinite steps(1);
+}
+
+.logo-fx-glitch::before,
+.logo-fx-glitch::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.logo-fx-glitch::before {
+  animation: logo-glitch-r 0.08s infinite steps(1);
+  filter: url(#logo-fx-red);
+}
+
+.logo-fx-glitch::after {
+  animation: logo-glitch-b 0.08s infinite steps(1);
+  filter: url(#logo-fx-blue);
+}
+
+@keyframes logo-glitch-jitter {
+  0%, 100% { transform: translate(0); }
+  25% { transform: translate(-1px, 1px); }
+  50% { transform: translate(1px, -1px); }
+  75% { transform: translate(-1px, -1px); }
+}
+
+@keyframes logo-glitch-r {
+  0%, 100% { transform: translate(-2px, 0); opacity: 0.8; }
+  25% { transform: translate(2px, 1px); opacity: 0.6; }
+  50% { transform: translate(-1px, -1px); opacity: 0.7; }
+  75% { transform: translate(3px, 0); opacity: 0.8; }
+}
+
+@keyframes logo-glitch-b {
+  0%, 100% { transform: translate(2px, 0); opacity: 0.8; }
+  25% { transform: translate(-2px, -1px); opacity: 0.7; }
+  50% { transform: translate(1px, 1px); opacity: 0.6; }
+  75% { transform: translate(-3px, 0); opacity: 0.8; }
+}
+
+/* ============================================
+   2. RIPPLES (uses SVG filter)
+   ============================================ */
+.logo-fx-ripples {
+  animation: logo-ripple-distort 2s ease-in-out;
+  filter: url(#logo-fx-ripple);
+}
+
+@keyframes logo-ripple-distort {
+  0% { filter: url(#logo-fx-ripple-0); }
+  25% { filter: url(#logo-fx-ripple-25); }
+  50% { filter: url(#logo-fx-ripple-50); }
+  75% { filter: url(#logo-fx-ripple-75); }
+  100% { filter: url(#logo-fx-ripple-100); }
+}
+
+/* ============================================
+   3. RAINBOW SWEEP
+   ============================================ */
+.logo-fx-rainbow {
+  position: relative;
+}
+
+.logo-fx-rainbow::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(
+    90deg,
+    #ff0000,
+    #ff8000,
+    #ffff00,
+    #00ff00,
+    #00ffff,
+    #0080ff,
+    #8000ff,
+    #ff00ff,
+    #ff0000
+  );
+  background-size: 200% 100%;
+  mix-blend-mode: overlay;
+  opacity: 0.8;
+  animation: logo-rainbow-sweep 2s linear;
+  pointer-events: none;
+  mask: inherit;
+  -webkit-mask: inherit;
+}
+
+@keyframes logo-rainbow-sweep {
+  0% { background-position: 200% 0; opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { background-position: -100% 0; opacity: 0; }
+}
+
+/* ============================================
+   4. NEON PULSE
+   ============================================ */
+.logo-fx-neon {
+  animation: logo-neon-pulse 2s ease-in-out;
+}
+
+@keyframes logo-neon-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px hsl(60, 100%, 50%)) invert(1);
+    transform: scale(1);
+  }
+  25% {
+    filter: drop-shadow(0 0 8px hsl(120, 100%, 50%)) drop-shadow(0 0 16px hsl(120, 100%, 50%)) invert(1);
+    transform: scale(1.02);
+  }
+  50% {
+    filter: drop-shadow(0 0 12px hsl(200, 100%, 50%)) drop-shadow(0 0 24px hsl(200, 100%, 50%)) invert(1);
+    transform: scale(1.04);
+  }
+  75% {
+    filter: drop-shadow(0 0 8px hsl(280, 100%, 50%)) drop-shadow(0 0 16px hsl(280, 100%, 50%)) invert(1);
+    transform: scale(1.02);
+  }
+}
+
+/* ============================================
+   5. HUE CYCLE
+   ============================================ */
+.logo-fx-hue {
+  animation: logo-hue-rotate 2s linear;
+}
+
+@keyframes logo-hue-rotate {
+  0% {
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(0deg);
+  }
+  100% {
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(360deg);
+  }
+}

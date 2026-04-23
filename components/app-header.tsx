@@ -1,6 +1,6 @@
 "use client"
 
-import Image from "next/image"
+import { LogoFx } from "@/components/logo-fx"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
@@ -25,13 +25,12 @@ export function AppHeader({ showSignOut = true }: AppHeaderProps) {
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image
+            <LogoFx
               src="/ucb.svg"
               alt="UCB"
               width={36}
               height={36}
               className="h-9 w-9 invert"
-              priority
             />
             <div>
               <div className="font-display text-sm uppercase tracking-wider leading-none">

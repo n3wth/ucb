@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import Image from "next/image"
+import { LogoFx } from "@/components/logo-fx"
 import { LoginForm } from "@/components/login-form"
 import { APP_NAME, APP_TAGLINE } from "@/lib/config"
 
@@ -14,13 +14,13 @@ export default function LoginPage() {
           <div className="flex flex-col items-center gap-6 mb-8">
             <div className="relative">
               <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-150" aria-hidden="true" />
-              <Image
+              <LogoFx
                 src="/ucb.svg"
                 alt="UCB"
                 width={72}
                 height={72}
                 className="relative h-18 w-18 invert"
-                priority
+                effectInterval={[8, 20]}
               />
             </div>
             <div className="text-center space-y-2">
