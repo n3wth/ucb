@@ -1,127 +1,62 @@
-"use client"
+import Link from "next/link"
+import { UcbLogo } from "@/components/ucb-logo"
+import { Button } from "@/components/ui/button"
+import { ArrowRight } from "lucide-react"
+import { APP_NAME } from "@/lib/config"
 
-import { useState } from "react"
-import { ShowConfirmationForm } from "@/components/show-confirmation-form"
-import { PreviewStage } from "@/components/preview-stage"
-import { ConfirmationResults } from "@/components/confirmation-results"
-import { StageProgress } from "@/components/stage-progress"
-import { AppHeader } from "@/components/app-header"
-import { generateEmailContent } from "@/components/email-preview"
-import type { ShowDetails, ConfirmationResult } from "@/lib/types"
-
-type Stage = "compose" | "preview" | "result"
-
-const PENDING_RESULT: ConfirmationResult = {
-  email: { status: "pending" },
-  calendarEvent: { status: "pending" },
-  driveFolder: { status: "pending" },
-}
-
-function buildSubject(d: ShowDetails): string {
-  return `Your show at ${d.venue} is confirmed - ${d.showTitle}`
-}
-
-export default function Home() {
-  const [stage, setStage] = useState<Stage>("compose")
-  const [showDetails, setShowDetails] = useState<ShowDetails | null>(null)
-  const [emailContent, setEmailContent] = useState<string>("")
-  const [result, setResult] = useState<ConfirmationResult | null>(null)
-  const [isConfirming, setIsConfirming] = useState(false)
-
-  const handleComposeSubmit = (data: ShowDetails) => {
-    setShowDetails(data)
-    setEmailContent(generateEmailContent(data))
-    setStage("preview")
-  }
-
-  const handleConfirm = async () => {
-    if (!showDetails) return
-    setIsConfirming(true)
-    setResult(PENDING_RESULT)
-    setStage("result")
-
-    try {
-      const response = await fetch("/api/confirm-show", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...showDetails,
-          emailSubject: buildSubject(showDetails),
-          emailBody: emailContent,
-        }),
-      })
-      const data = (await response.json()) as ConfirmationResult
-      setResult(data)
-
-      if (data.driveFolder.status === "success" && data.driveFolder.url) {
-        setEmailContent(generateEmailContent(showDetails, data.driveFolder.url))
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Network error"
-      setResult({
-        email: { status: "error", error: msg },
-        calendarEvent: { status: "error", error: msg },
-        driveFolder: { status: "error", error: msg },
-      })
-    } finally {
-      setIsConfirming(false)
-    }
-  }
-
-  const handleBackToCompose = () => {
-    setStage("compose")
-  }
-
-  const handleReset = () => {
-    setShowDetails(null)
-    setResult(null)
-    setEmailContent("")
-    setStage("compose")
-  }
-
+export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-background">
-      <AppHeader />
+    <main className="min-h-screen bg-background flex flex-col">
+      {/* Top bar */}
+      <div className="bg-sidebar border-b border-sidebar-border">
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <UcbLogo size={32} showEyes={false} className="invert" />
+            <span className="font-display text-base uppercase tracking-wide text-sidebar-foreground">
+              {APP_NAME}
+            </span>
+          </div>
+          <a
+            href="https://ucbcomedy.com"
+            className="text-[10px] uppercase tracking-[0.2em] text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors"
+          >
+            ucbcomedy.com
+          </a>
+        </div>
+      </div>
 
-      <div className="container mx-auto px-6 py-12">
-        <div className="flex flex-col items-center gap-10 max-w-2xl mx-auto">
-          {/* Progress indicator */}
-          <StageProgress current={stage} />
-
-          {/* Stage content */}
-          <div className="w-full">
-            {stage === "compose" && (
-              <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
-                <ShowConfirmationForm initialValue={showDetails} onSubmit={handleComposeSubmit} />
-              </div>
-            )}
-
-            {stage === "preview" && showDetails && (
-              <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
-                <PreviewStage
-                  showDetails={showDetails}
-                  emailContent={emailContent}
-                  onEmailContentChange={setEmailContent}
-                  onBack={handleBackToCompose}
-                  onConfirm={handleConfirm}
-                  isConfirming={isConfirming}
-                />
-              </div>
-            )}
-
-            {stage === "result" && showDetails && result && (
-              <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
-                <ConfirmationResults
-                  result={result}
-                  showDetails={showDetails}
-                  onReset={handleReset}
-                  onRetry={handleConfirm}
-                />
-              </div>
-            )}
+      {/* Hero */}
+      <div className="flex-1 flex items-center justify-center px-6 py-20">
+        <div className="max-w-xl w-full text-center space-y-8">
+          <h1 className="font-display text-4xl sm:text-5xl uppercase leading-[0.95] tracking-tight text-balance">
+            Internal tools for the <span className="text-primary">UCB artistic team</span>.
+          </h1>
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
+            Sign in to access booking tools, producer confirmations, and the rest of the artistic
+            team&apos;s workflow.
+          </p>
+          <div className="flex items-center justify-center">
+            <Button asChild size="lg" className="h-11 px-6 font-display uppercase tracking-wide text-sm group">
+              <Link href="/login">
+                Staff sign in
+                <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="border-t border-border py-5">
+        <div className="container mx-auto px-6 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            © {new Date().getFullYear()} Upright Citizens Brigade
+          </p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            ucbbookings.com
+          </p>
+        </div>
+      </footer>
     </main>
   )
 }

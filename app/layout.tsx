@@ -18,8 +18,11 @@ const archivoBlack = Archivo_Black({
 })
 
 export const metadata: Metadata = {
-  title: 'UCB Show Confirmation',
-  description: 'Every show, confirmed in 300 clicks.',
+  title: {
+    default: 'UCB Bookings',
+    template: '%s · UCB Bookings',
+  },
+  description: 'Internal tools for the UCB artistic team.',
   generator: 'v0.app',
   icons: {
     icon: [

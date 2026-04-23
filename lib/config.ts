@@ -3,8 +3,8 @@
  * Add new venues or change defaults here instead of scattering magic strings.
  */
 
-export const APP_NAME = "UCB Show Confirmation"
-export const APP_TAGLINE = "Every show, confirmed in 300 clicks."
+export const APP_NAME = "UCB Bookings"
+export const APP_TAGLINE = "Internal tools for the UCB artistic team."
 
 export interface Venue {
   id: string

@@ -13,7 +13,7 @@ import { Lock, AlertCircle, ArrowRight } from "lucide-react"
 export function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const nextPath = searchParams.get("next") || "/"
+  const nextPath = searchParams.get("next") || "/tools"
 
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
