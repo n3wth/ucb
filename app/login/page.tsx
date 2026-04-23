@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { LogoFx } from "@/components/logo-fx"
+import { UcbLogo } from "@/components/ucb-logo"
 import { LoginForm } from "@/components/login-form"
 import { APP_NAME, APP_TAGLINE } from "@/lib/config"
 
@@ -14,14 +14,7 @@ export default function LoginPage() {
           <div className="flex flex-col items-center gap-6 mb-8">
             <div className="relative">
               <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-150" aria-hidden="true" />
-              <LogoFx
-                src="/ucb.svg"
-                alt="UCB"
-                width={72}
-                height={72}
-                className="relative h-18 w-18 invert"
-                effectInterval={[8, 20]}
-              />
+              <UcbLogo size={72} className="relative" />
             </div>
             <div className="text-center space-y-2">
               <h1 className="font-display text-2xl uppercase tracking-wider text-balance">
