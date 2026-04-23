@@ -21,20 +21,17 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Centered login */}
-      <div className="flex-1 flex items-center justify-center px-6 py-16">
+      {/* Anchored login — not dead-center, offset toward top */}
+      <div className="flex-1 flex items-start justify-center px-6 pt-20 sm:pt-28 pb-16">
         <div className="w-full max-w-sm space-y-6">
-          <div className="flex justify-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card shadow-ambient-sm">
-              <span className="status-dot" aria-hidden="true" />
-              <span className="text-[10px] uppercase tracking-[0.2em] text-foreground">
-                Staff access
-              </span>
-            </div>
-          </div>
           <Suspense fallback={<LoginFormSkeleton />}>
             <LoginForm />
           </Suspense>
+          <p className="text-center text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+            <Link href="/" className="hover:text-foreground transition-colors">
+              ← Back to ucbbookings.com
+            </Link>
+          </p>
         </div>
       </div>
 
