@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
-import { Calendar, Clock, DollarSign, Mail, Monitor, Theater, ArrowRight } from "lucide-react"
+import { Calendar, Clock, DollarSign, Mail, Monitor, ArrowRight } from "lucide-react"
 import { VENUES, DEFAULT_VENUE, DEFAULT_DIGITAL_PRICE, type VenueName } from "@/lib/config"
 import type { ShowDetails } from "@/lib/types"
 
@@ -42,214 +42,221 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
+  const inputClasses = "bg-input/60 border-border/60 focus:bg-input focus:border-primary/50 transition-all h-10"
+
   return (
-    <Card className="w-full max-w-2xl shadow-xl shadow-black/20 border-border/50">
-      <CardHeader className="space-y-2 pb-6">
-        <CardTitle className="font-display text-xl uppercase tracking-wider text-balance flex items-center gap-2">
-          <Theater className="h-5 w-5 text-primary" />
+    <Card className="w-full card-floating">
+      <CardHeader className="pb-2">
+        <CardTitle className="font-display text-lg uppercase tracking-wide flex items-center gap-2">
           Show Details
         </CardTitle>
-        <CardDescription className="text-pretty text-sm">
+        <CardDescription className="text-sm text-muted-foreground leading-relaxed">
           Enter the show info below. You&apos;ll review everything before anything is sent or created.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <FieldGroup>
+      
+      <CardContent className="pt-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Show title - full width, emphasized */}
+          <Field>
+            <FieldLabel htmlFor="showTitle" className="text-xs">Show Title</FieldLabel>
+            <Input
+              id="showTitle"
+              placeholder="e.g. The Harold Night"
+              value={formData.showTitle}
+              onChange={(e) => updateField("showTitle", e.target.value)}
+              className={`${inputClasses} h-12 text-base`}
+              required
+            />
+          </Field>
+
+          {/* Date, Venue row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Field>
-              <FieldLabel htmlFor="showTitle">Show Title</FieldLabel>
-              <Input
-                id="showTitle"
-                placeholder="Enter show title"
-                value={formData.showTitle}
-                onChange={(e) => updateField("showTitle", e.target.value)}
-                className="bg-input/50 focus:bg-input transition-colors"
-                required
-              />
-            </Field>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel htmlFor="showDate">
-                  <Calendar className="inline-block h-4 w-4 mr-1.5 -mt-0.5 text-muted-foreground" />
-                  Show Date
-                </FieldLabel>
-                <Input
-                  id="showDate"
-                  type="date"
-                  value={formData.showDate}
-                  onChange={(e) => updateField("showDate", e.target.value)}
-                  className="bg-input/50 focus:bg-input transition-colors"
-                  required
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="venue">Venue</FieldLabel>
-                <Select
-                  value={formData.venue}
-                  onValueChange={(value: VenueName) => updateField("venue", value)}
-                >
-                  <SelectTrigger id="venue" className="bg-input/50">
-                    <SelectValue placeholder="Select venue" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {VENUES.map((venue) => (
-                      <SelectItem key={venue.id} value={venue.name}>
-                        {venue.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel htmlFor="showTime">
-                  <Clock className="inline-block h-4 w-4 mr-1.5 -mt-0.5 text-muted-foreground" />
-                  Show Time
-                </FieldLabel>
-                <Input
-                  id="showTime"
-                  type="time"
-                  value={formData.showTime}
-                  onChange={(e) => updateField("showTime", e.target.value)}
-                  className="bg-input/50 focus:bg-input transition-colors"
-                  required
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="techRehearsalTime">
-                  <Clock className="inline-block h-4 w-4 mr-1.5 -mt-0.5 text-muted-foreground" />
-                  Tech Rehearsal
-                  <span className="text-muted-foreground font-normal ml-1 text-xs">(optional)</span>
-                </FieldLabel>
-                <Input
-                  id="techRehearsalTime"
-                  type="time"
-                  value={formData.techRehearsalTime}
-                  onChange={(e) => updateField("techRehearsalTime", e.target.value)}
-                  className="bg-input/50 focus:bg-input transition-colors"
-                />
-              </Field>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel htmlFor="presaleTicketPrice">
-                  <DollarSign className="inline-block h-4 w-4 mr-1.5 -mt-0.5 text-muted-foreground" />
-                  Presale Price
-                </FieldLabel>
-                <InputGroup>
-                  <InputGroupAddon className="bg-muted/50">$</InputGroupAddon>
-                  <InputGroupInput
-                    id="presaleTicketPrice"
-                    type="number"
-                    min="0"
-                    step="0.50"
-                    placeholder="0.00"
-                    value={formData.presaleTicketPrice || ""}
-                    onChange={(e) => updateField("presaleTicketPrice", parseFloat(e.target.value) || 0)}
-                    className="bg-input/50 focus:bg-input transition-colors"
-                    required
-                  />
-                </InputGroup>
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="doorTicketPrice">
-                  <DollarSign className="inline-block h-4 w-4 mr-1.5 -mt-0.5 text-muted-foreground" />
-                  Door Price
-                </FieldLabel>
-                <InputGroup>
-                  <InputGroupAddon className="bg-muted/50">$</InputGroupAddon>
-                  <InputGroupInput
-                    id="doorTicketPrice"
-                    type="number"
-                    min="0"
-                    step="0.50"
-                    placeholder="0.00"
-                    value={formData.doorTicketPrice || ""}
-                    onChange={(e) => updateField("doorTicketPrice", parseFloat(e.target.value) || 0)}
-                    className="bg-input/50 focus:bg-input transition-colors"
-                    required
-                  />
-                </InputGroup>
-              </Field>
-            </div>
-
-            <Field>
-              <FieldLabel htmlFor="producerEmail">
-                <Mail className="inline-block h-4 w-4 mr-1.5 -mt-0.5 text-muted-foreground" />
-                Producer Email
+              <FieldLabel htmlFor="showDate" className="text-xs">
+                <Calendar className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-60" />
+                Date
               </FieldLabel>
               <Input
-                id="producerEmail"
-                type="email"
-                placeholder="producer@example.com"
-                value={formData.producerEmail}
-                onChange={(e) => updateField("producerEmail", e.target.value)}
-                className="bg-input/50 focus:bg-input transition-colors"
+                id="showDate"
+                type="date"
+                value={formData.showDate}
+                onChange={(e) => updateField("showDate", e.target.value)}
+                className={inputClasses}
                 required
               />
             </Field>
 
-            <Field className="rounded-xl border border-border p-4 bg-muted/20 space-y-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <Label htmlFor="digitalEnabled" className="text-sm font-medium flex items-center gap-2">
-                    <Monitor className="h-4 w-4 text-primary" />
-                    Digital Ticket
-                  </Label>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Add an online viewing option. The livestream team handles setup separately.
-                  </p>
-                </div>
-                <Switch
-                  id="digitalEnabled"
-                  checked={formData.digitalTicket.enabled}
-                  onCheckedChange={(checked) =>
-                    updateField("digitalTicket", { ...formData.digitalTicket, enabled: checked })
-                  }
-                />
-              </div>
-
-              {formData.digitalTicket.enabled && (
-                <div className="pt-3 border-t border-border/50 animate-in fade-in slide-in-from-top-1 duration-200">
-                  <Label htmlFor="digitalPrice" className="text-xs mb-2 block text-muted-foreground">
-                    Digital ticket price
-                  </Label>
-                  <InputGroup className="max-w-[160px]">
-                    <InputGroupAddon className="bg-muted/50">$</InputGroupAddon>
-                    <InputGroupInput
-                      id="digitalPrice"
-                      type="number"
-                      min="0"
-                      step="0.50"
-                      value={formData.digitalTicket.price}
-                      onChange={(e) =>
-                        updateField("digitalTicket", {
-                          ...formData.digitalTicket,
-                          price: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      className="bg-input/50 focus:bg-input transition-colors"
-                    />
-                  </InputGroup>
-                </div>
-              )}
+            <Field>
+              <FieldLabel htmlFor="venue" className="text-xs">Venue</FieldLabel>
+              <Select
+                value={formData.venue}
+                onValueChange={(value: VenueName) => updateField("venue", value)}
+              >
+                <SelectTrigger id="venue" className={inputClasses}>
+                  <SelectValue placeholder="Select venue" />
+                </SelectTrigger>
+                <SelectContent>
+                  {VENUES.map((venue) => (
+                    <SelectItem key={venue.id} value={venue.name}>
+                      {venue.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
-          </FieldGroup>
+          </div>
 
+          {/* Show time, Tech rehearsal row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <Field>
+              <FieldLabel htmlFor="showTime" className="text-xs">
+                <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-60" />
+                Show Time
+              </FieldLabel>
+              <Input
+                id="showTime"
+                type="time"
+                value={formData.showTime}
+                onChange={(e) => updateField("showTime", e.target.value)}
+                className={inputClasses}
+                required
+              />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="techRehearsalTime" className="text-xs">
+                <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-60" />
+                Tech Rehearsal
+                <span className="text-muted-foreground/70 font-normal ml-1">(optional)</span>
+              </FieldLabel>
+              <Input
+                id="techRehearsalTime"
+                type="time"
+                value={formData.techRehearsalTime}
+                onChange={(e) => updateField("techRehearsalTime", e.target.value)}
+                className={inputClasses}
+              />
+            </Field>
+          </div>
+
+          {/* Pricing row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <Field>
+              <FieldLabel htmlFor="presaleTicketPrice" className="text-xs">
+                <DollarSign className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-60" />
+                Presale Price
+              </FieldLabel>
+              <InputGroup>
+                <InputGroupAddon className="bg-muted/60 border-border/60">$</InputGroupAddon>
+                <InputGroupInput
+                  id="presaleTicketPrice"
+                  type="number"
+                  min="0"
+                  step="0.50"
+                  placeholder="0.00"
+                  value={formData.presaleTicketPrice || ""}
+                  onChange={(e) => updateField("presaleTicketPrice", parseFloat(e.target.value) || 0)}
+                  className={inputClasses}
+                  required
+                />
+              </InputGroup>
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="doorTicketPrice" className="text-xs">
+                <DollarSign className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-60" />
+                Door Price
+              </FieldLabel>
+              <InputGroup>
+                <InputGroupAddon className="bg-muted/60 border-border/60">$</InputGroupAddon>
+                <InputGroupInput
+                  id="doorTicketPrice"
+                  type="number"
+                  min="0"
+                  step="0.50"
+                  placeholder="0.00"
+                  value={formData.doorTicketPrice || ""}
+                  onChange={(e) => updateField("doorTicketPrice", parseFloat(e.target.value) || 0)}
+                  className={inputClasses}
+                  required
+                />
+              </InputGroup>
+            </Field>
+          </div>
+
+          {/* Producer email */}
+          <Field>
+            <FieldLabel htmlFor="producerEmail" className="text-xs">
+              <Mail className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-60" />
+              Producer Email
+            </FieldLabel>
+            <Input
+              id="producerEmail"
+              type="email"
+              placeholder="producer@example.com"
+              value={formData.producerEmail}
+              onChange={(e) => updateField("producerEmail", e.target.value)}
+              className={inputClasses}
+              required
+            />
+          </Field>
+
+          {/* Digital ticket option */}
+          <div className="rounded-xl border border-border/60 bg-muted/20 p-5 space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="digitalEnabled" className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                  <Monitor className="h-4 w-4 text-primary" />
+                  Digital Ticket
+                </Label>
+                <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
+                  Add an online viewing option for $10. The livestream team handles setup separately.
+                </p>
+              </div>
+              <Switch
+                id="digitalEnabled"
+                checked={formData.digitalTicket.enabled}
+                onCheckedChange={(checked) =>
+                  updateField("digitalTicket", { ...formData.digitalTicket, enabled: checked })
+                }
+              />
+            </div>
+
+            {formData.digitalTicket.enabled && (
+              <div className="pt-4 border-t border-border/40 animate-in fade-in slide-in-from-top-1 duration-200">
+                <Label htmlFor="digitalPrice" className="text-xs text-muted-foreground mb-2 block">
+                  Digital ticket price
+                </Label>
+                <InputGroup className="max-w-32">
+                  <InputGroupAddon className="bg-muted/60 border-border/60">$</InputGroupAddon>
+                  <InputGroupInput
+                    id="digitalPrice"
+                    type="number"
+                    min="0"
+                    step="0.50"
+                    value={formData.digitalTicket.price}
+                    onChange={(e) =>
+                      updateField("digitalTicket", {
+                        ...formData.digitalTicket,
+                        price: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                    className={inputClasses}
+                  />
+                </InputGroup>
+              </div>
+            )}
+          </div>
+
+          {/* Submit button */}
           <Button
             type="submit"
-            className="w-full font-display uppercase tracking-wider text-sm group"
+            className="w-full h-12 font-display uppercase tracking-wide text-sm group"
             size="lg"
           >
             Review Preview
-            <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
         </form>
       </CardContent>

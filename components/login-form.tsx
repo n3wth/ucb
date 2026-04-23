@@ -44,10 +44,10 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="shadow-xl shadow-black/20 border-border/50">
-      <CardHeader>
-        <CardTitle className="font-display uppercase tracking-wider text-base">Sign In</CardTitle>
-        <CardDescription className="text-xs">Enter the shared team password to continue.</CardDescription>
+    <Card className="card-floating bg-card/95 backdrop-blur-sm">
+      <CardHeader className="pb-4">
+        <CardTitle className="font-display text-base uppercase tracking-wide">Sign In</CardTitle>
+        <CardDescription className="text-xs text-muted-foreground">Enter the shared team password to continue.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">
@@ -69,7 +69,8 @@ export function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
-                className="bg-input/50 focus:bg-input transition-colors"
+                className="bg-input/60 border-border/60 focus:bg-input focus:border-primary/50 transition-all h-11"
+                placeholder="Enter password"
                 required
                 autoFocus
               />
@@ -77,17 +78,17 @@ export function LoginForm() {
           </FieldGroup>
           <Button
             type="submit"
-            className="w-full font-display uppercase tracking-wider text-sm group"
+            className="w-full h-11 font-display uppercase tracking-wide text-sm group"
             disabled={loading || !password}
           >
             {loading ? (
               <>
-                <Spinner className="mr-2" />
+                <Spinner className="mr-2 h-4 w-4" />
                 Signing in...
               </>
             ) : (
               <>
-                Sign in
+                Continue
                 <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
               </>
             )}

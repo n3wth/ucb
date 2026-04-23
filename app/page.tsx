@@ -6,7 +6,6 @@ import { PreviewStage } from "@/components/preview-stage"
 import { ConfirmationResults } from "@/components/confirmation-results"
 import { StageProgress } from "@/components/stage-progress"
 import { AppHeader } from "@/components/app-header"
-import { PageContainer } from "@/components/page-container"
 import { generateEmailContent } from "@/components/email-preview"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
@@ -84,19 +83,21 @@ export default function Home() {
     <main className="min-h-screen bg-background">
       <AppHeader />
 
-      <PageContainer className="py-10">
-        <div className="flex flex-col items-center gap-8">
+      <div className="container mx-auto px-6 py-12">
+        <div className="flex flex-col items-center gap-10 max-w-2xl mx-auto">
+          {/* Progress indicator */}
           <StageProgress current={stage} />
 
-          <div className="w-full transition-opacity duration-200">
+          {/* Stage content */}
+          <div className="w-full">
             {stage === "compose" && (
-              <div className="flex justify-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
                 <ShowConfirmationForm initialValue={showDetails} onSubmit={handleComposeSubmit} />
               </div>
             )}
 
             {stage === "preview" && showDetails && (
-              <div className="flex justify-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
                 <PreviewStage
                   showDetails={showDetails}
                   emailContent={emailContent}
@@ -109,7 +110,7 @@ export default function Home() {
             )}
 
             {stage === "result" && showDetails && result && (
-              <div className="flex justify-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
                 <ConfirmationResults
                   result={result}
                   showDetails={showDetails}
@@ -120,7 +121,7 @@ export default function Home() {
             )}
           </div>
         </div>
-      </PageContainer>
+      </div>
     </main>
   )
 }

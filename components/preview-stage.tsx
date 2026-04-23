@@ -29,25 +29,28 @@ export function PreviewStage({
   const folderName = `${showDetails.showTitle} - ${showDetails.showDate}`
 
   return (
-    <div className="w-full max-w-2xl space-y-5">
-      <div className="space-y-2 text-center">
-        <h2 className="font-display text-xl uppercase tracking-wider text-balance">
+    <div className="w-full space-y-6">
+      {/* Header */}
+      <div className="text-center space-y-2">
+        <h2 className="font-display text-lg uppercase tracking-wide">
           Review Before Confirming
         </h2>
-        <p className="text-sm text-muted-foreground text-pretty max-w-md mx-auto">
-          Nothing is sent or created yet. Confirm below to send the email, add the calendar event, and create the Drive folder.
+        <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+          Nothing is sent or created yet. Confirm below to send the email, create the calendar event, and set up the Drive folder.
         </p>
       </div>
 
+      {/* Email preview */}
       <EmailPreview
         showDetails={showDetails}
         emailContent={emailContent}
         onEmailContentChange={onEmailContentChange}
       />
 
-      <Card className="shadow-lg shadow-black/10 border-border/50">
+      {/* Calendar event card */}
+      <Card className="card-elevated">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
             <Calendar className="h-4 w-4 text-primary" />
             Calendar Event
           </CardTitle>
@@ -56,40 +59,33 @@ export function PreviewStage({
         <CardContent>
           <div className="space-y-4">
             <div>
-              <div className="text-xs text-muted-foreground mb-1">Event Title</div>
+              <div className="text-label mb-1">Event Title</div>
               <div className="font-medium">{showDetails.showTitle || <span className="text-muted-foreground">-</span>}</div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <DetailRow icon={<Calendar className="h-3.5 w-3.5" />} label="Date" value={formatDate(showDetails.showDate)} />
-              <DetailRow icon={<Clock className="h-3.5 w-3.5" />} label="Time" value={formatTime(showDetails.showTime)} />
-              <DetailRow icon={<MapPin className="h-3.5 w-3.5" />} label="Venue" value={showDetails.venue} />
+              <DetailItem icon={<Calendar className="h-3.5 w-3.5" />} label="Date" value={formatDate(showDetails.showDate)} />
+              <DetailItem icon={<Clock className="h-3.5 w-3.5" />} label="Time" value={formatTime(showDetails.showTime)} />
+              <DetailItem icon={<MapPin className="h-3.5 w-3.5" />} label="Venue" value={showDetails.venue} />
               {showDetails.techRehearsalTime && (
-                <DetailRow
-                  icon={<Clock className="h-3.5 w-3.5" />}
-                  label="Tech"
-                  value={formatTime(showDetails.techRehearsalTime)}
-                />
+                <DetailItem icon={<Clock className="h-3.5 w-3.5" />} label="Tech" value={formatTime(showDetails.techRehearsalTime)} />
               )}
-              <DetailRow
+              <DetailItem
                 icon={<DollarSign className="h-3.5 w-3.5" />}
                 label="Tickets"
                 value={`${formatPrice(showDetails.presaleTicketPrice)} / ${formatPrice(showDetails.doorTicketPrice)}`}
               />
               {showDetails.digitalTicket.enabled && (
-                <DetailRow
-                  icon={<Monitor className="h-3.5 w-3.5" />}
-                  label="Digital"
-                  value={formatPrice(showDetails.digitalTicket.price)}
-                />
+                <DetailItem icon={<Monitor className="h-3.5 w-3.5" />} label="Digital" value={formatPrice(showDetails.digitalTicket.price)} />
               )}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="shadow-lg shadow-black/10 border-border/50">
+      {/* Drive folder card */}
+      <Card className="card-elevated">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
             <FolderOpen className="h-4 w-4 text-primary" />
             Drive Folder
           </CardTitle>
@@ -97,35 +93,41 @@ export function PreviewStage({
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 flex-wrap text-sm">
-            <Badge variant="secondary" className="font-normal text-xs">
+            <Badge variant="secondary" className="font-normal text-xs bg-muted/80">
               {showDetails.venue}
             </Badge>
-            <span className="text-muted-foreground">/</span>
+            <span className="text-muted-foreground/60">/</span>
             <span className="font-medium">{folderName}</span>
           </div>
         </CardContent>
       </Card>
 
-      <div className="sticky bottom-4 z-10">
-        <div className="flex gap-3 rounded-xl border border-border bg-card/95 backdrop-blur-sm p-3 shadow-xl shadow-black/20">
-          <Button variant="ghost" onClick={onBack} disabled={isConfirming} className="flex-1">
+      {/* Action bar */}
+      <div className="sticky bottom-4 z-10 pt-2">
+        <div className="flex gap-3 rounded-xl border border-border/60 bg-card/95 backdrop-blur-md p-3 card-floating">
+          <Button 
+            variant="ghost" 
+            onClick={onBack} 
+            disabled={isConfirming} 
+            className="flex-1 h-11"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
           <Button
             onClick={onConfirm}
             disabled={isConfirming}
-            className="flex-1 font-display uppercase tracking-wider text-sm"
+            className="flex-1 h-11 font-display uppercase tracking-wide text-sm"
           >
             {isConfirming ? (
               <>
-                <Spinner className="mr-2" />
+                <Spinner className="mr-2 h-4 w-4" />
                 Confirming...
               </>
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />
-                Confirm
+                Confirm Show
               </>
             )}
           </Button>
@@ -135,11 +137,11 @@ export function PreviewStage({
   )
 }
 
-function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function DetailItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="min-w-0">
       <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 flex items-center gap-1.5">
-        {icon}
+        <span className="opacity-60">{icon}</span>
         {label}
       </div>
       <div className="text-sm font-medium truncate">{value || <span className="text-muted-foreground">-</span>}</div>
