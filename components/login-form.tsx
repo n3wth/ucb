@@ -69,7 +69,7 @@ export function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
-                className="bg-input/60 border-border/60 focus:bg-input focus:border-primary/50 transition-all h-11"
+                className="bg-input border-border focus:bg-input focus:border-primary/70 focus:ring-1 focus:ring-primary/30 transition-all h-11 placeholder:text-muted-foreground/60"
                 placeholder="Enter password"
                 required
                 autoFocus

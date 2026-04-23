@@ -42,7 +42,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const inputClasses = "bg-input/60 border-border/60 focus:bg-input focus:border-primary/50 transition-all h-10"
+  const inputClasses = "bg-input border-border focus:bg-input focus:border-primary/70 focus:ring-1 focus:ring-primary/30 transition-all h-10 placeholder:text-muted-foreground/60"
 
   return (
     <Card className="w-full card-floating">
@@ -74,8 +74,8 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Field>
               <FieldLabel htmlFor="showDate" className="text-xs">
-                <Calendar className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-60" />
-                Date
+                <Calendar className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                Show Date
               </FieldLabel>
               <Input
                 id="showDate"
@@ -111,7 +111,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Field>
               <FieldLabel htmlFor="showTime" className="text-xs">
-                <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-60" />
+                <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
                 Show Time
               </FieldLabel>
               <Input
@@ -126,7 +126,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
 
             <Field>
               <FieldLabel htmlFor="techRehearsalTime" className="text-xs">
-                <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-60" />
+                <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
                 Tech Rehearsal
                 <span className="text-muted-foreground/70 font-normal ml-1">(optional)</span>
               </FieldLabel>
@@ -144,11 +144,11 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Field>
               <FieldLabel htmlFor="presaleTicketPrice" className="text-xs">
-                <DollarSign className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-60" />
+                <DollarSign className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
                 Presale Price
               </FieldLabel>
               <InputGroup>
-                <InputGroupAddon className="bg-muted/60 border-border/60">$</InputGroupAddon>
+                <InputGroupAddon className="bg-muted border-border text-muted-foreground">$</InputGroupAddon>
                 <InputGroupInput
                   id="presaleTicketPrice"
                   type="number"
@@ -165,11 +165,11 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
 
             <Field>
               <FieldLabel htmlFor="doorTicketPrice" className="text-xs">
-                <DollarSign className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-60" />
+                <DollarSign className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
                 Door Price
               </FieldLabel>
               <InputGroup>
-                <InputGroupAddon className="bg-muted/60 border-border/60">$</InputGroupAddon>
+                <InputGroupAddon className="bg-muted border-border text-muted-foreground">$</InputGroupAddon>
                 <InputGroupInput
                   id="doorTicketPrice"
                   type="number"
@@ -188,7 +188,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
           {/* Producer email */}
           <Field>
             <FieldLabel htmlFor="producerEmail" className="text-xs">
-              <Mail className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-60" />
+              <Mail className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
               Producer Email
             </FieldLabel>
             <Input
@@ -203,15 +203,15 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
           </Field>
 
           {/* Digital ticket option */}
-          <div className="rounded-xl border border-border/60 bg-muted/20 p-5 space-y-4">
+          <div className="rounded-xl border border-border bg-input/50 p-5 space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="digitalEnabled" className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                <Label htmlFor="digitalEnabled" className="text-sm font-medium flex items-center gap-2 cursor-pointer text-foreground">
                   <Monitor className="h-4 w-4 text-primary" />
                   Digital Ticket
                 </Label>
                 <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
-                  Add an online viewing option for $10. The livestream team handles setup separately.
+                  Add an online viewing option. The livestream team handles setup separately.
                 </p>
               </div>
               <Switch
@@ -220,6 +220,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
                 onCheckedChange={(checked) =>
                   updateField("digitalTicket", { ...formData.digitalTicket, enabled: checked })
                 }
+                className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted-foreground/30"
               />
             </div>
 
@@ -229,7 +230,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
                   Digital ticket price
                 </Label>
                 <InputGroup className="max-w-32">
-                  <InputGroupAddon className="bg-muted/60 border-border/60">$</InputGroupAddon>
+                  <InputGroupAddon className="bg-muted border-border text-muted-foreground">$</InputGroupAddon>
                   <InputGroupInput
                     id="digitalPrice"
                     type="number"
