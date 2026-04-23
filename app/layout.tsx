@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono, Archivo_Black } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
@@ -17,30 +17,42 @@ const archivoBlack = Archivo_Black({
   variable: '--font-archivo-black',
 })
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ucb-bookings.vercel.app'
+const title = 'UCB Bookings'
+const description = 'Staff tools for confirming shows.'
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
-    default: 'UCB Bookings',
+    default: title,
     template: '%s · UCB Bookings',
   },
-  description: 'Internal tools for the UCB artistic team.',
-  generator: 'v0.app',
-  icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
+  description,
+  applicationName: title,
+  openGraph: {
+    type: 'website',
+    url: '/',
+    siteName: title,
+    title,
+    description,
   },
+  twitter: {
+    card: 'summary_large_image',
+    title,
+    description,
+  },
+  icons: {
+    other: [
+      { rel: 'icon', url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#fbf9f5' },
+    { media: '(prefers-color-scheme: dark)', color: '#1a0a0c' },
+  ],
 }
 
 export default function RootLayout({
