@@ -43,8 +43,10 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
 
   return (
     <Card className="w-full max-w-2xl">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-semibold text-balance">Show Details</CardTitle>
+      <CardHeader className="space-y-2">
+        <CardTitle className="font-display text-2xl uppercase tracking-wider text-balance">
+          Show Details
+        </CardTitle>
         <CardDescription className="text-pretty">
           Enter the show info below. You&apos;ll review everything before anything is sent or created.
         </CardDescription>
@@ -231,7 +233,11 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             </Field>
           </FieldGroup>
 
-          <Button type="submit" className="w-full" size="lg">
+          <Button
+            type="submit"
+            className="w-full font-display uppercase tracking-wider text-sm"
+            size="lg"
+          >
             Review Preview
           </Button>
         </form>

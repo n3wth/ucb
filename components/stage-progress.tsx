@@ -39,7 +39,7 @@ export function StageProgress({ current }: StageProgressProps) {
                 </div>
                 <span
                   className={cn(
-                    "text-sm font-medium truncate",
+                    "font-display text-xs uppercase tracking-widest truncate",
                     (done || active) ? "text-foreground" : "text-muted-foreground",
                   )}
                 >

@@ -91,30 +91,35 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background">
+      <div className="h-1 w-full bg-primary" aria-hidden="true" />
       <header className="border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image
               src="/ucb.svg"
               alt="UCB"
-              width={36}
-              height={36}
-              className="h-9 w-9"
+              width={40}
+              height={40}
+              className="h-10 w-10 invert"
               priority
             />
             <div>
-              <div className="font-semibold leading-none">UCB Show Confirmation</div>
-              <div className="text-xs text-muted-foreground mt-1">Every show, confirmed in 300 clicks.</div>
+              <div className="font-display text-base uppercase tracking-wider leading-none">
+                Show Confirmation
+              </div>
+              <div className="text-xs text-muted-foreground mt-1.5 uppercase tracking-widest">
+                Every show, confirmed in 300 clicks.
+              </div>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleSignOut}>
+          <Button variant="ghost" size="sm" onClick={handleSignOut} className="uppercase tracking-wider text-xs">
             <LogOut className="h-4 w-4 mr-2" />
             Sign out
           </Button>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-10">
         <div className="flex flex-col items-center gap-6">
           <StageProgress current={stage} />
 
