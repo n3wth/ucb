@@ -126,14 +126,14 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
       <CardContent className="space-y-5">
         <div className="space-y-3">
           <StatusItem
-            label="Confirmation Email"
+            label="Confirmation email"
             description={`Sent to ${showDetails.producerEmail}`}
             status={result.email.status}
             icon={<Mail className="h-4 w-4" />}
             error={result.email.error}
           />
           <StatusItem
-            label="Calendar Event"
+            label="Calendar event"
             description={`${showDetails.venue} shared calendar`}
             status={result.calendarEvent.status}
             icon={<Calendar className="h-4 w-4" />}
@@ -142,7 +142,7 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
             error={result.calendarEvent.error}
           />
           <StatusItem
-            label="Drive Folder"
+            label="Drive folder"
             description={`${showDetails.showTitle} - ${showDetails.showDate}`}
             status={result.driveFolder.status}
             icon={<FolderOpen className="h-4 w-4" />}

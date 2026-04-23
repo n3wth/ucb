@@ -1,11 +1,12 @@
 /**
- * Tools registry.
+ * Tools registry — the single source of truth for every internal tool.
  *
- * Adding a new tool to UCB Bookings is as simple as:
- *   1. Create a new route under `app/tools/<id>/page.tsx`
- *   2. Add an entry below with matching `id`
+ * To add a new tool:
+ *   1. Create `app/tools/<id>/page.tsx` (use <ToolPage> for the shell).
+ *   2. Add an entry below with a matching `href`.
  *
- * The tools hub and navigation will pick it up automatically.
+ * The hub page, header breadcrumb, and page metadata will pick it up
+ * automatically — nothing else to wire.
  */
 
 import type { LucideIcon } from "lucide-react"
@@ -20,8 +21,6 @@ export interface Tool {
   href: string
   icon: LucideIcon
   status: ToolStatus
-  /** Short eyebrow label shown above the card title, e.g. "Bookings" */
-  category: string
 }
 
 export const TOOLS: Tool[] = [
@@ -33,10 +32,19 @@ export const TOOLS: Tool[] = [
     href: "/tools/show-confirmation",
     icon: CalendarCheck,
     status: "available",
-    category: "Bookings",
   },
 ]
 
 export function getToolById(id: string): Tool | undefined {
   return TOOLS.find((t) => t.id === id)
+}
+
+/**
+ * Next.js metadata derived from the registry.
+ * Use as: `export const metadata = getToolMeta("show-confirmation")`
+ */
+export function getToolMeta(id: string): { title: string; description: string } | undefined {
+  const tool = getToolById(id)
+  if (!tool) return undefined
+  return { title: tool.name, description: tool.description }
 }

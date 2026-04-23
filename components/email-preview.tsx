@@ -75,15 +75,15 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
   }, [driveFolderUrl])
 
   return (
-    <Card className="shadow-sm border-border">
+    <Card className="border-border">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="space-y-1">
-            <CardTitle className="text-base flex items-center gap-2 text-foreground">
-              <Mail className="h-4 w-4 text-primary" />
-              Confirmation Email
+            <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              Confirmation email
             </CardTitle>
-            <CardDescription className="text-xs">Will be sent to the producer after confirming</CardDescription>
+            <CardDescription className="text-xs">Will be sent to the producer after confirming.</CardDescription>
           </div>
           <Badge variant="secondary" className="font-normal text-xs">
             To: {showDetails.producerEmail}
@@ -96,7 +96,7 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
             <TabsTrigger value="preview" className="text-xs">Preview</TabsTrigger>
             <TabsTrigger value="edit" className="text-xs">
               <Edit2 className="h-3 w-3 mr-1.5" />
-              Edit Email
+              Edit email
             </TabsTrigger>
           </TabsList>
           <TabsContent value="preview" className="mt-4">
@@ -126,7 +126,7 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
           ) : (
             <>
               <Copy className="h-3.5 w-3.5 mr-2" />
-              Copy to Clipboard
+              Copy to clipboard
             </>
           )}
         </Button>

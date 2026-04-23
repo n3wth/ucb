@@ -59,7 +59,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Show title - full width, emphasized */}
           <Field>
-            <FieldLabel htmlFor="showTitle" className="text-xs">Show Title</FieldLabel>
+            <FieldLabel htmlFor="showTitle" className="text-xs">Show title</FieldLabel>
             <Input
               id="showTitle"
               placeholder="The Harold Night"
@@ -75,7 +75,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             <Field>
               <FieldLabel htmlFor="showDate" className="text-xs">
                 <Calendar className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
-                Show Date
+                Show date
               </FieldLabel>
               <Input
                 id="showDate"
@@ -112,7 +112,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             <Field>
               <FieldLabel htmlFor="showTime" className="text-xs">
                 <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
-                Show Time
+                Show time
               </FieldLabel>
               <Input
                 id="showTime"
@@ -127,7 +127,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             <Field>
               <FieldLabel htmlFor="techRehearsalTime" className="text-xs">
                 <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
-                Tech Rehearsal
+                Tech rehearsal
                 <span className="text-muted-foreground/70 font-normal ml-1">(optional)</span>
               </FieldLabel>
               <Input
@@ -145,7 +145,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             <Field>
               <FieldLabel htmlFor="presaleTicketPrice" className="text-xs">
                 <DollarSign className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
-                Presale Ticket
+                Presale ticket
               </FieldLabel>
               <InputGroup>
                 <InputGroupAddon className="bg-muted border-border text-muted-foreground">$</InputGroupAddon>
@@ -166,7 +166,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             <Field>
               <FieldLabel htmlFor="doorTicketPrice" className="text-xs">
                 <DollarSign className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
-                Door Ticket
+                Door ticket
               </FieldLabel>
               <InputGroup>
                 <InputGroupAddon className="bg-muted border-border text-muted-foreground">$</InputGroupAddon>
@@ -189,7 +189,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
           <Field>
             <FieldLabel htmlFor="producerEmail" className="text-xs">
               <Mail className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
-              Producer Email
+              Producer email
             </FieldLabel>
             <Input
               id="producerEmail"
@@ -207,8 +207,8 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="digitalEnabled" className="text-sm font-medium flex items-center gap-2 cursor-pointer text-foreground">
-                  <Monitor className="h-4 w-4 text-primary" />
-                  Digital Ticket
+                  <Monitor className="h-4 w-4 text-muted-foreground" />
+                  Digital ticket
                 </Label>
                 <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
                   Add a livestream option for remote viewers. The stream setup is handled separately.
