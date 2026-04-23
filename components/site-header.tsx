@@ -3,6 +3,7 @@ import { APP_NAME } from "@/lib/config"
 import { UcbLogo } from "@/components/ucb-logo"
 
 export type SiteHeaderProps = {
+  // Landing page only — do not enable on tool routes.
   subStrip?: boolean
   toolName?: string
   authSlot?: ReactNode
