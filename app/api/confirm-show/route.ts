@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { hasGoogleCredentials } from "@/lib/google"
 import { createDriveFolder, createCalendarEvent, sendEmail } from "@/lib/google-actions"
+import { renderShowConfirmationSubject } from "@/lib/emails"
 import { createLogger } from "@/lib/logger"
 import { RateLimiter, hashKey } from "@/lib/rate-limit"
 import { SESSION_COOKIE } from "@/lib/session"
@@ -65,10 +66,6 @@ function computeStartEnd(d: ShowDetails): { startISO: string; endISO: string } {
   const pad = (n: number) => String(n).padStart(2, "0")
   const endISO = `${end.getFullYear()}-${pad(end.getMonth() + 1)}-${pad(end.getDate())}T${pad(end.getHours())}:${pad(end.getMinutes())}:00`
   return { startISO, endISO }
-}
-
-function defaultEmailSubject(d: ShowDetails): string {
-  return `Your show at ${d.venue} is confirmed — ${d.showTitle}`
 }
 
 function validate(body: ConfirmShowRequest): string | null {
@@ -146,7 +143,7 @@ export async function POST(request: NextRequest) {
   const { startISO, endISO } = computeStartEnd(body)
   const parentFolderId = VENUE_FOLDER_IDS[body.venue] || ""
 
-  const subject = body.emailSubject?.trim() || defaultEmailSubject(body)
+  const subject = body.emailSubject?.trim() || renderShowConfirmationSubject(body)
   const emailBody = body.emailBody?.trim() || ""
 
   const [driveFolder, calendarEvent, email] = await Promise.all([

@@ -5,7 +5,7 @@ import { ShowConfirmationForm } from "@/components/show-confirmation-form"
 import { PreviewStage } from "@/components/preview-stage"
 import { ConfirmationResults } from "@/components/confirmation-results"
 import { StageProgress } from "@/components/stage-progress"
-import { generateEmailContent } from "@/components/email-preview"
+import { renderShowConfirmationBody, renderShowConfirmationSubject } from "@/lib/emails"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
 type Stage = "compose" | "preview" | "result"
@@ -14,10 +14,6 @@ const PENDING_RESULT: ConfirmationResult = {
   email: { status: "pending" },
   calendarEvent: { status: "pending" },
   driveFolder: { status: "pending" },
-}
-
-function buildSubject(d: ShowDetails): string {
-  return `Your show at ${d.venue} is confirmed - ${d.showTitle}`
 }
 
 export function ShowConfirmationApp() {
@@ -29,7 +25,7 @@ export function ShowConfirmationApp() {
 
   const handleComposeSubmit = (data: ShowDetails) => {
     setShowDetails(data)
-    setEmailContent(generateEmailContent(data))
+    setEmailContent(renderShowConfirmationBody({ showDetails: data }))
     setStage("preview")
   }
 
@@ -45,7 +41,7 @@ export function ShowConfirmationApp() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...showDetails,
-          emailSubject: buildSubject(showDetails),
+          emailSubject: renderShowConfirmationSubject(showDetails),
           emailBody: emailContent,
         }),
       })
@@ -65,7 +61,7 @@ export function ShowConfirmationApp() {
       setResult(data)
 
       if (data.driveFolder.status === "success" && data.driveFolder.url) {
-        setEmailContent(generateEmailContent(showDetails, data.driveFolder.url))
+        setEmailContent(renderShowConfirmationBody({ showDetails, driveFolderUrl: data.driveFolder.url }))
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Network error"
