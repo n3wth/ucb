@@ -92,12 +92,12 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
   const allSuccess = statuses.every((s) => s === "success")
 
   return (
-    <Card className="w-full shadow-ambient-md border-border">
+    <Card className="w-full border-border">
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1.5">
-            <CardTitle className="font-display text-xl uppercase tracking-[-0.01em] text-foreground">
-              {anyPending ? "Confirming..." : allSuccess ? "Confirmed" : "Needs Attention"}
+            <CardTitle className="text-lg font-medium text-foreground">
+              {anyPending ? "Confirming..." : allSuccess ? "Confirmed" : "Needs attention"}
             </CardTitle>
             <CardDescription className="text-sm">
               {showDetails.showTitle} &middot; {formatShortDate(showDetails.showDate)}
@@ -164,7 +164,7 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
 
         <div className="flex gap-3 pt-1">
           {anyError && !anyPending && (
-            <Button onClick={onRetry} className="flex-1 h-11 font-display uppercase tracking-wide text-xs">
+            <Button onClick={onRetry} className="flex-1 h-10">
               <RefreshCw className="h-4 w-4 mr-2" />
               Retry
             </Button>
@@ -172,10 +172,10 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
           <Button
             onClick={onReset}
             variant={anyError ? "outline" : "default"}
-            className={`flex-1 h-11 ${!anyError ? "font-display uppercase tracking-wide text-xs" : ""}`}
+            className="flex-1 h-10"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Start New
+            Start new
           </Button>
         </div>
       </CardContent>

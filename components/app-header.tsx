@@ -31,12 +31,12 @@ export function AppHeader({ showSignOut = true, toolName }: AppHeaderProps) {
         >
           <UcbLogo size={32} showEyes={false} className="invert" />
           <div className="flex items-baseline gap-2 leading-none min-w-0">
-            <span className="font-display text-base uppercase tracking-wide text-sidebar-foreground shrink-0">
+            <span className="text-sm font-semibold text-sidebar-foreground shrink-0">
               {APP_NAME}
             </span>
             {toolName && (
               <>
-                <span className="text-sidebar-foreground/30 font-display text-sm" aria-hidden="true">
+                <span className="text-sidebar-foreground/40 text-sm" aria-hidden="true">
                   /
                 </span>
                 <span className="text-sm text-sidebar-foreground/80 truncate">{toolName}</span>

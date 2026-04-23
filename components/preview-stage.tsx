@@ -31,12 +31,10 @@ export function PreviewStage({
   return (
     <div className="w-full space-y-6">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <h2 className="font-display text-lg uppercase tracking-wide text-foreground">
-          Review &amp; Confirm
-        </h2>
-        <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-          Nothing is created until you confirm. Review the email, calendar event, and Drive folder details below.
+      <div className="space-y-1.5">
+        <h2 className="text-lg font-medium text-foreground">Review &amp; confirm</h2>
+        <p className="text-sm text-muted-foreground max-w-lg">
+          Nothing is created until you confirm. Review the email, calendar event, and Drive folder below.
         </p>
       </div>
 
@@ -48,18 +46,18 @@ export function PreviewStage({
       />
 
       {/* Calendar event card */}
-      <Card className="shadow-ambient-sm border-border">
+      <Card className="border-border">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
-            <Calendar className="h-4 w-4 text-primary" />
-            Calendar Event
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            Calendar event
           </CardTitle>
-          <CardDescription className="text-xs">Will be added to the shared UCB calendar</CardDescription>
+          <CardDescription className="text-xs">Will be added to the shared UCB calendar.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div>
-              <div className="text-label mb-1">Event Title</div>
+              <div className="text-xs text-muted-foreground mb-1">Event title</div>
               <div className="font-medium text-foreground">{showDetails.showTitle || <span className="text-muted-foreground">-</span>}</div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -83,13 +81,13 @@ export function PreviewStage({
       </Card>
 
       {/* Drive folder card */}
-      <Card className="shadow-ambient-sm border-border">
+      <Card className="border-border">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
-            <FolderOpen className="h-4 w-4 text-primary" />
-            Drive Folder
+            <FolderOpen className="h-4 w-4 text-muted-foreground" />
+            Drive folder
           </CardTitle>
-          <CardDescription className="text-xs">Will be created in the venue&apos;s Google Drive</CardDescription>
+          <CardDescription className="text-xs">Will be created in the venue&apos;s Google Drive.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 flex-wrap text-sm">
@@ -104,12 +102,12 @@ export function PreviewStage({
 
       {/* Action bar */}
       <div className="sticky bottom-4 z-10 pt-2">
-        <div className="flex gap-3 rounded-2xl border border-border bg-card shadow-ambient-lg p-3">
-          <Button 
-            variant="ghost" 
-            onClick={onBack} 
-            disabled={isConfirming} 
-            className="flex-1 h-11"
+        <div className="flex gap-2 rounded-lg border border-border bg-card shadow-lg p-2">
+          <Button
+            variant="ghost"
+            onClick={onBack}
+            disabled={isConfirming}
+            className="flex-1 h-10"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
@@ -117,7 +115,7 @@ export function PreviewStage({
           <Button
             onClick={onConfirm}
             disabled={isConfirming}
-            className="flex-1 h-11 font-display uppercase tracking-wide text-sm shadow-brand"
+            className="flex-1 h-10"
           >
             {isConfirming ? (
               <>
@@ -127,7 +125,7 @@ export function PreviewStage({
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />
-                Confirm Show
+                Confirm show
               </>
             )}
           </Button>
@@ -140,7 +138,7 @@ export function PreviewStage({
 function DetailItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="min-w-0">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 flex items-center gap-1.5">
+      <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1.5">
         <span className="opacity-70">{icon}</span>
         {label}
       </div>

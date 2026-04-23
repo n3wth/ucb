@@ -1,92 +1,59 @@
 import Link from "next/link"
-import { ArrowUpRight } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import type { Tool } from "@/lib/tools"
 import { cn } from "@/lib/utils"
 
 interface ToolRowProps {
   tool: Tool
-  /** 1-indexed position used as a decorative numeric label */
-  index: number
 }
 
 /**
- * Editorial list row for the tools hub.
- * Typographic, asymmetric, no icon tiles, no SaaS "card" chrome.
- * Scales from 1 → N tools without looking padded or empty.
+ * Tool list row. Quiet, functional, scales for any number of tools.
+ * Hover reveals the arrow; non-available tools render as static, muted rows.
  */
-export function ToolRow({ tool, index }: ToolRowProps) {
+export function ToolRow({ tool }: ToolRowProps) {
+  const Icon = tool.icon
   const available = tool.status === "available"
-  const indexLabel = String(index).padStart(2, "0")
 
-  const inner = (
-    <div className="grid grid-cols-12 gap-4 sm:gap-6 py-8 sm:py-10 items-start">
-      {/* Numeric index — mono, muted, tabular */}
-      <div className="col-span-2 sm:col-span-1 numeric-index text-xs text-muted-foreground pt-2">
-        {indexLabel}
+  const content = (
+    <div className="flex items-start gap-4 py-4">
+      <div className="shrink-0 mt-0.5">
+        <Icon className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
       </div>
-
-      {/* Name + meta + description */}
-      <div className="col-span-10 sm:col-span-8 space-y-3">
-        <h3 className="font-display uppercase tracking-[-0.025em] leading-[0.95] text-3xl sm:text-4xl md:text-5xl text-foreground text-balance">
-          {tool.name}
-        </h3>
-        <div className="flex items-center gap-3 flex-wrap text-[10px] uppercase tracking-[0.25em]">
-          <span className="text-muted-foreground">{tool.category}</span>
-          <span aria-hidden="true" className="h-px w-4 bg-border" />
-          {available ? (
-            <span className="inline-flex items-center gap-1.5 text-foreground">
-              <span className="status-dot" aria-hidden="true" />
-              Live
-            </span>
-          ) : (
-            <span className="text-muted-foreground">In development</span>
-          )}
-        </div>
-        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-xl pt-1 text-pretty">
+      <div className="flex-1 min-w-0">
+        <h3 className="text-sm font-medium text-foreground">{tool.name}</h3>
+        <p className="mt-1 text-sm text-muted-foreground leading-relaxed line-clamp-2">
           {tool.description}
         </p>
       </div>
-
-      {/* Right-edge affordance — desktop only */}
-      <div className="hidden sm:flex col-span-3 justify-end pt-3">
-        {available ? (
-          <span
-            className={cn(
-              "inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-foreground",
-              "transition-transform group-hover:translate-x-1",
-            )}
-          >
-            Open
-            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-          </span>
-        ) : (
-          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-            Soon
-          </span>
-        )}
-      </div>
+      {available && (
+        <ArrowRight
+          className="h-4 w-4 text-muted-foreground shrink-0 mt-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all"
+          aria-hidden="true"
+        />
+      )}
     </div>
   )
 
   if (!available) {
     return (
-      <li className="border-b border-border opacity-60">
-        <div className="px-2 sm:px-4">{inner}</div>
+      <li className="opacity-50">
+        <div className="px-1">{content}</div>
       </li>
     )
   }
 
   return (
-    <li className="border-b border-border">
+    <li>
       <Link
         href={tool.href}
         className={cn(
-          "group block px-2 sm:px-4 -mx-2 sm:-mx-4 rounded-md",
-          "transition-colors hover:bg-foreground/[0.02]",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          "group block px-1 -mx-1 rounded-md transition-colors",
+          "hover:bg-muted/50",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         )}
       >
-        {inner}
+        {content}
       </Link>
     </li>
   )
