@@ -14,39 +14,46 @@ export default function ToolsHubPage() {
   const comingSoon = TOOLS.filter((t) => t.status === "coming-soon")
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background bg-grain">
       <AppHeader />
 
-      <div className="container mx-auto px-6 py-12">
-        <div className="max-w-5xl mx-auto space-y-10">
-          {/* Page heading */}
-          <div className="space-y-2">
-            <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-              Dashboard
+      <div className="container mx-auto px-6 pt-16 pb-24">
+        <div className="max-w-6xl mx-auto space-y-16">
+          {/* Hero heading — editorial scale */}
+          <header className="space-y-6">
+            <div className="tag">
+              <span className="status-dot" aria-hidden="true" />
+              Dashboard · Signed in
             </div>
-            <h1 className="font-display text-2xl sm:text-3xl uppercase tracking-tight text-foreground">
-              Tools
-            </h1>
-            <p className="text-sm text-muted-foreground max-w-xl leading-relaxed pt-1">
-              Pick a tool to get started. New tools are added here as the artistic team&apos;s
-              workflow grows.
-            </p>
-          </div>
+            <div className="flex items-end justify-between gap-6 flex-wrap">
+              <h1 className="font-display uppercase tracking-[-0.02em] text-5xl sm:text-6xl text-foreground leading-[0.95]">
+                Tools
+              </h1>
+              <p className="text-sm text-muted-foreground max-w-sm leading-relaxed pb-2">
+                Pick a tool to get started. New ones show up here as the
+                artistic team&apos;s workflow grows.
+              </p>
+            </div>
+            <div className="h-px bg-border" />
+          </header>
 
           {/* Available tools */}
           {available.length > 0 && (
-            <section className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                  Available
-                </h2>
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
-                  {available.length} tool{available.length === 1 ? "" : "s"}
+            <section className="space-y-6">
+              <div className="flex items-baseline justify-between">
+                <div className="flex items-baseline gap-4">
+                  <span className="numeric-index text-xs text-muted-foreground">01</span>
+                  <h2 className="font-display text-base uppercase tracking-wide text-foreground">
+                    Available
+                  </h2>
+                </div>
+                <span className="text-eyebrow">
+                  {available.length} {available.length === 1 ? "tool" : "tools"}
                 </span>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {available.map((tool) => (
-                  <ToolCard key={tool.id} tool={tool} />
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {available.map((tool, i) => (
+                  <ToolCard key={tool.id} tool={tool} index={i + 1} />
                 ))}
               </div>
             </section>
@@ -54,16 +61,28 @@ export default function ToolsHubPage() {
 
           {/* Coming soon tools */}
           {comingSoon.length > 0 && (
-            <section className="space-y-4">
-              <h2 className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                Coming soon
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {comingSoon.map((tool) => (
-                  <ToolCard key={tool.id} tool={tool} />
+            <section className="space-y-6">
+              <div className="flex items-baseline gap-4">
+                <span className="numeric-index text-xs text-muted-foreground">02</span>
+                <h2 className="font-display text-base uppercase tracking-wide text-foreground">
+                  In the wings
+                </h2>
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {comingSoon.map((tool, i) => (
+                  <ToolCard key={tool.id} tool={tool} index={available.length + i + 1} />
                 ))}
               </div>
             </section>
+          )}
+
+          {/* Empty state fallback */}
+          {available.length === 0 && comingSoon.length === 0 && (
+            <div className="rounded-2xl border border-dashed border-border bg-card/50 p-12 text-center">
+              <p className="text-sm text-muted-foreground">
+                No tools configured yet.
+              </p>
+            </div>
           )}
         </div>
       </div>

@@ -44,9 +44,9 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="shadow-sm border-border">
+    <Card className="shadow-ambient-md border-border">
       <CardHeader className="pb-4">
-        <CardTitle className="font-display text-base uppercase tracking-wide text-foreground">Sign In</CardTitle>
+        <CardTitle className="font-display text-xl uppercase tracking-[-0.01em] text-foreground">Sign in</CardTitle>
         <CardDescription className="text-sm text-muted-foreground">Enter the shared team password to continue.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -78,7 +78,7 @@ export function LoginForm() {
           </FieldGroup>
           <Button
             type="submit"
-            className="w-full h-11 font-display uppercase tracking-wide text-sm group"
+            className="w-full h-11 font-display uppercase tracking-wide text-sm shadow-brand group"
             disabled={loading || !password}
           >
             {loading ? (

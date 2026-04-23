@@ -3,50 +3,89 @@ import { ArrowUpRight, Clock } from "lucide-react"
 import type { Tool } from "@/lib/tools"
 import { cn } from "@/lib/utils"
 
-export function ToolCard({ tool }: { tool: Tool }) {
+interface ToolCardProps {
+  tool: Tool
+  /** 1-indexed position used as a decorative numeric label */
+  index?: number
+}
+
+export function ToolCard({ tool, index }: ToolCardProps) {
   const available = tool.status === "available"
   const Icon = tool.icon
+  const indexLabel = typeof index === "number" ? String(index).padStart(2, "0") : undefined
 
   const content = (
-    <div
+    <article
       className={cn(
-        "group relative h-full rounded-xl border bg-card p-6 transition-all",
+        "group relative h-full rounded-2xl border bg-card p-6 transition-all duration-200 ease-out",
         available
-          ? "border-border hover:border-primary/60 hover:shadow-md cursor-pointer"
-          : "border-border/60 opacity-70",
+          ? "border-border hover:border-primary/40 hover:-translate-y-0.5 hover:shadow-ambient-md cursor-pointer shadow-ambient-sm"
+          : "border-dashed border-border/70 opacity-80",
       )}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
-          <Icon className="h-5 w-5" />
-        </div>
+      {/* Top row: numeric index + status */}
+      <div className="flex items-center justify-between">
+        {indexLabel && (
+          <span className="numeric-index text-[11px] text-muted-foreground/80">
+            / {indexLabel}
+          </span>
+        )}
         {available ? (
-          <ArrowUpRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
+          <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-foreground">
+            <span className="status-dot" aria-hidden="true" />
+            Live
+          </span>
         ) : (
-          <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground border border-border rounded-full px-2 py-0.5">
-            <Clock className="h-2.5 w-2.5" />
+          <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+            <Clock className="h-2.5 w-2.5" aria-hidden="true" />
             Soon
           </span>
         )}
       </div>
-      <div className="mt-5 space-y-1.5">
-        <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-          {tool.category}
-        </div>
-        <h3 className="font-display text-base uppercase tracking-wide text-foreground">
+
+      {/* Icon tile */}
+      <div
+        className={cn(
+          "mt-6 h-12 w-12 rounded-xl flex items-center justify-center transition-colors",
+          available
+            ? "bg-primary text-primary-foreground shadow-brand group-hover:scale-[1.03]"
+            : "bg-muted text-muted-foreground border border-border",
+        )}
+        aria-hidden="true"
+      >
+        <Icon className="h-6 w-6" />
+      </div>
+
+      {/* Body */}
+      <div className="mt-6 space-y-2">
+        <div className="text-eyebrow">{tool.category}</div>
+        <h3 className="font-display text-xl uppercase tracking-[-0.01em] text-foreground leading-tight text-balance">
           {tool.name}
         </h3>
-        <p className="text-sm text-muted-foreground leading-relaxed pt-1">
+        <p className="text-sm text-muted-foreground leading-relaxed pt-1 text-pretty">
           {tool.description}
         </p>
       </div>
-    </div>
+
+      {/* Footer cue */}
+      {available && (
+        <div className="mt-6 pt-4 border-t border-border/60 flex items-center justify-between">
+          <span className="text-xs font-medium text-foreground">Open tool</span>
+          <span className="h-7 w-7 rounded-full bg-foreground text-background flex items-center justify-center group-hover:bg-primary group-hover:rotate-45 transition-all">
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </span>
+        </div>
+      )}
+    </article>
   )
 
   if (!available) return content
 
   return (
-    <Link href={tool.href} className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl">
+    <Link
+      href={tool.href}
+      className="block rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    >
       {content}
     </Link>
   )

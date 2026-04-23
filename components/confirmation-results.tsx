@@ -92,11 +92,11 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
   const allSuccess = statuses.every((s) => s === "success")
 
   return (
-    <Card className="w-full shadow-sm border-border">
+    <Card className="w-full shadow-ambient-md border-border">
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1.5">
-            <CardTitle className="font-display text-lg uppercase tracking-wide text-foreground">
+            <CardTitle className="font-display text-xl uppercase tracking-[-0.01em] text-foreground">
               {anyPending ? "Confirming..." : allSuccess ? "Confirmed" : "Needs Attention"}
             </CardTitle>
             <CardDescription className="text-sm">

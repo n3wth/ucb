@@ -48,7 +48,7 @@ export function PreviewStage({
       />
 
       {/* Calendar event card */}
-      <Card className="shadow-sm border-border">
+      <Card className="shadow-ambient-sm border-border">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
             <Calendar className="h-4 w-4 text-primary" />
@@ -83,7 +83,7 @@ export function PreviewStage({
       </Card>
 
       {/* Drive folder card */}
-      <Card className="shadow-sm border-border">
+      <Card className="shadow-ambient-sm border-border">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
             <FolderOpen className="h-4 w-4 text-primary" />
@@ -104,7 +104,7 @@ export function PreviewStage({
 
       {/* Action bar */}
       <div className="sticky bottom-4 z-10 pt-2">
-        <div className="flex gap-3 rounded-xl border border-border bg-card shadow-lg p-3">
+        <div className="flex gap-3 rounded-2xl border border-border bg-card shadow-ambient-lg p-3">
           <Button 
             variant="ghost" 
             onClick={onBack} 
@@ -117,7 +117,7 @@ export function PreviewStage({
           <Button
             onClick={onConfirm}
             disabled={isConfirming}
-            className="flex-1 h-11 font-display uppercase tracking-wide text-sm"
+            className="flex-1 h-11 font-display uppercase tracking-wide text-sm shadow-brand"
           >
             {isConfirming ? (
               <>

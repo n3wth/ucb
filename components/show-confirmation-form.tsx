@@ -45,7 +45,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
   const inputClasses = "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
 
   return (
-    <Card className="w-full shadow-sm border-border">
+    <Card className="w-full shadow-ambient-md border-border">
       <CardHeader className="pb-2">
         <CardTitle className="font-display text-lg uppercase tracking-wide text-foreground">
           Show Details
@@ -253,7 +253,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
           {/* Submit button */}
           <Button
             type="submit"
-            className="w-full h-12 font-display uppercase tracking-wide text-sm group"
+            className="w-full h-12 font-display uppercase tracking-wide text-sm shadow-brand group"
             size="lg"
           >
             Continue to Review

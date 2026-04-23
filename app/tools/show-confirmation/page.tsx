@@ -13,9 +13,9 @@ export default function ShowConfirmationPage() {
   const tool = getToolById("show-confirmation")
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background bg-grain">
       <AppHeader toolName={tool?.name} />
-      <div className="container mx-auto px-6 py-12">
+      <div className="container mx-auto px-6 py-10 sm:py-14">
         <ShowConfirmationApp />
       </div>
     </main>
