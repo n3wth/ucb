@@ -42,9 +42,13 @@ export function getToolById(id: string): Tool | undefined {
 /**
  * Next.js metadata derived from the registry.
  * Use as: `export const metadata = getToolMeta("show-confirmation")`
+ *
+ * Throws if the id isn't in TOOLS so typos fail at build time.
  */
-export function getToolMeta(id: string): { title: string; description: string } | undefined {
+export function getToolMeta(id: string): { title: string; description: string } {
   const tool = getToolById(id)
-  if (!tool) return undefined
+  if (!tool) {
+    throw new Error(`getToolMeta: unknown tool id "${id}". Add it to TOOLS in lib/tools.ts.`)
+  }
   return { title: tool.name, description: tool.description }
 }
