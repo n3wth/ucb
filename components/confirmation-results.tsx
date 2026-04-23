@@ -97,7 +97,7 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1.5">
             <CardTitle className="font-display text-lg uppercase tracking-wide">
-              {anyPending ? "Confirming..." : allSuccess ? "Confirmed" : "Partially Failed"}
+              {anyPending ? "Confirming..." : allSuccess ? "Confirmed" : "Needs Attention"}
             </CardTitle>
             <CardDescription className="text-sm">
               {showDetails.showTitle} &middot; {formatShortDate(showDetails.showDate)}
@@ -155,9 +155,9 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
         {anyError && !anyPending && (
           <Alert variant="destructive" className="bg-destructive/10 border-destructive/30">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle className="text-sm font-medium">Some steps failed</AlertTitle>
+            <AlertTitle className="text-sm font-medium">Some steps need attention</AlertTitle>
             <AlertDescription className="text-xs">
-              You can retry the confirmation or start fresh with a new show.
+              You can retry to complete the failed steps, or start fresh with a new show.
             </AlertDescription>
           </Alert>
         )}
@@ -175,7 +175,7 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
             className={`flex-1 h-11 ${!anyError ? "font-display uppercase tracking-wide text-xs" : ""}`}
           >
             <Plus className="h-4 w-4 mr-2" />
-            New Show
+            Start New
           </Button>
         </div>
       </CardContent>

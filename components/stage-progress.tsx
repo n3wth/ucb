@@ -11,8 +11,8 @@ interface StageProgressProps {
 
 const STEPS: { key: Stage; label: string }[] = [
   { key: "compose", label: "Details" },
-  { key: "preview", label: "Preview" },
-  { key: "result", label: "Done" },
+  { key: "preview", label: "Review" },
+  { key: "result", label: "Confirmed" },
 ]
 
 export function StageProgress({ current }: StageProgressProps) {
@@ -34,8 +34,8 @@ export function StageProgress({ current }: StageProgressProps) {
                   className={cn(
                     "relative h-9 w-9 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300",
                     done && "bg-primary text-primary-foreground",
-                    active && "bg-primary text-primary-foreground",
-                    !done && !active && "bg-muted/80 text-muted-foreground",
+                    active && "bg-primary text-primary-foreground shadow-md",
+                    !done && !active && "bg-muted text-muted-foreground border border-border",
                   )}
                 >
                   {/* Active ring */}

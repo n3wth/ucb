@@ -20,35 +20,35 @@ interface EmailPreviewProps {
 export function generateEmailContent(showDetails: ShowDetails, driveFolderUrl?: string): string {
   const formattedDate = formatDate(showDetails.showDate)
   const formattedShowTime = formatTime(showDetails.showTime)
-  const formattedTechTime = showDetails.techRehearsalTime ? formatTime(showDetails.techRehearsalTime) : "N/A"
+  const formattedTechTime = showDetails.techRehearsalTime ? formatTime(showDetails.techRehearsalTime) : "Not scheduled"
 
   const ticketLines = [
     `Presale: ${formatPrice(showDetails.presaleTicketPrice)}`,
     `Door: ${formatPrice(showDetails.doorTicketPrice)}`,
-    showDetails.digitalTicket.enabled ? `Digital: ${formatPrice(showDetails.digitalTicket.price)}` : "",
+    showDetails.digitalTicket.enabled ? `Digital stream: ${formatPrice(showDetails.digitalTicket.price)}` : "",
   ]
     .filter(Boolean)
     .join("\n")
 
   return `Hi there,
 
-We're excited to confirm "${showDetails.showTitle}" at ${showDetails.venue}!
+Your show "${showDetails.showTitle}" at ${showDetails.venue} is confirmed.
 
 SHOW DETAILS
 Date: ${formattedDate}
-Show Time: ${formattedShowTime}
-Tech Rehearsal: ${formattedTechTime}
+Show time: ${formattedShowTime}
+Tech rehearsal: ${formattedTechTime}
 Venue: ${showDetails.venue}
 
 TICKET PRICING
 ${ticketLines}
 
 SHOW FOLDER
-${driveFolderUrl ? `Access your show folder here: ${driveFolderUrl}` : "A Google Drive folder will be created for this show."}
+${driveFolderUrl ? `Your show folder: ${driveFolderUrl}` : "A Google Drive folder will be created for your show materials."}
 
-Please review these details and let us know if any changes are needed.
+Please review these details and reply if anything needs to be changed.
 
-Best,
+Thanks,
 UCB Artistic Team`
 }
 
@@ -75,7 +75,7 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
   }, [driveFolderUrl])
 
   return (
-    <Card className="shadow-lg shadow-black/10 border-border/50">
+    <Card className="card-elevated">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="space-y-1">
@@ -83,7 +83,7 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
               <Mail className="h-4 w-4 text-primary" />
               Confirmation Email
             </CardTitle>
-            <CardDescription className="text-xs">Review and customize before sending</CardDescription>
+            <CardDescription className="text-xs">Will be sent to the producer after confirming</CardDescription>
           </div>
           <Badge variant="secondary" className="font-normal text-xs">
             To: {showDetails.producerEmail}
@@ -96,7 +96,7 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
             <TabsTrigger value="preview" className="text-xs">Preview</TabsTrigger>
             <TabsTrigger value="edit" className="text-xs">
               <Edit2 className="h-3 w-3 mr-1.5" />
-              Edit
+              Edit Email
             </TabsTrigger>
           </TabsList>
           <TabsContent value="preview" className="mt-4">
@@ -110,9 +110,9 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
               onChange={(e) => onEmailContentChange(e.target.value)}
               className="min-h-[280px] font-sans text-sm leading-relaxed bg-input/50 focus:bg-input transition-colors resize-none"
             />
-            <Button variant="ghost" size="sm" onClick={handleReset} className="text-xs">
+            <Button variant="ghost" size="sm" onClick={handleReset} className="text-xs text-muted-foreground hover:text-foreground">
               <RotateCcw className="h-3 w-3 mr-1.5" />
-              Reset to default
+              Reset email
             </Button>
           </TabsContent>
         </Tabs>

@@ -44,10 +44,10 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="card-floating bg-card/95 backdrop-blur-sm">
+    <Card className="shadow-md border-border">
       <CardHeader className="pb-4">
-        <CardTitle className="font-display text-base uppercase tracking-wide">Sign In</CardTitle>
-        <CardDescription className="text-xs text-muted-foreground">Enter the shared team password to continue.</CardDescription>
+        <CardTitle className="font-display text-base uppercase tracking-wide text-foreground">Sign In</CardTitle>
+        <CardDescription className="text-sm text-muted-foreground">Enter the shared team password to continue.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">
@@ -69,7 +69,7 @@ export function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
-                className="bg-input border-border focus:bg-input focus:border-primary/70 focus:ring-1 focus:ring-primary/30 transition-all h-11 placeholder:text-muted-foreground/60"
+                className="bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-11 placeholder:text-muted-foreground"
                 placeholder="Enter password"
                 required
                 autoFocus

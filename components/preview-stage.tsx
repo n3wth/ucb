@@ -33,10 +33,10 @@ export function PreviewStage({
       {/* Header */}
       <div className="text-center space-y-2">
         <h2 className="font-display text-lg uppercase tracking-wide">
-          Review Before Confirming
+          Review &amp; Confirm
         </h2>
         <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-          Nothing is sent or created yet. Confirm below to send the email, create the calendar event, and set up the Drive folder.
+          Nothing is created until you confirm. Review the email, calendar event, and Drive folder details below.
         </p>
       </div>
 
@@ -54,7 +54,7 @@ export function PreviewStage({
             <Calendar className="h-4 w-4 text-primary" />
             Calendar Event
           </CardTitle>
-          <CardDescription className="text-xs">Will be added to the UCB shared calendar</CardDescription>
+          <CardDescription className="text-xs">Will be added to the shared UCB calendar</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -89,7 +89,7 @@ export function PreviewStage({
             <FolderOpen className="h-4 w-4 text-primary" />
             Drive Folder
           </CardTitle>
-          <CardDescription className="text-xs">Will be created inside the venue&apos;s show folder</CardDescription>
+          <CardDescription className="text-xs">Will be created in the venue&apos;s Google Drive</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 flex-wrap text-sm">

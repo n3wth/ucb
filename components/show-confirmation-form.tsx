@@ -42,16 +42,16 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const inputClasses = "bg-input border-border focus:bg-input focus:border-primary/70 focus:ring-1 focus:ring-primary/30 transition-all h-10 placeholder:text-muted-foreground/60"
+  const inputClasses = "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
 
   return (
-    <Card className="w-full card-floating">
+    <Card className="w-full shadow-md border-border">
       <CardHeader className="pb-2">
         <CardTitle className="font-display text-lg uppercase tracking-wide flex items-center gap-2">
           Show Details
         </CardTitle>
         <CardDescription className="text-sm text-muted-foreground leading-relaxed">
-          Enter the show info below. You&apos;ll review everything before anything is sent or created.
+          Fill in the show details below. You&apos;ll review everything before confirming.
         </CardDescription>
       </CardHeader>
       
@@ -62,7 +62,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             <FieldLabel htmlFor="showTitle" className="text-xs">Show Title</FieldLabel>
             <Input
               id="showTitle"
-              placeholder="e.g. The Harold Night"
+              placeholder="The Harold Night"
               value={formData.showTitle}
               onChange={(e) => updateField("showTitle", e.target.value)}
               className={`${inputClasses} h-12 text-base`}
@@ -145,7 +145,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             <Field>
               <FieldLabel htmlFor="presaleTicketPrice" className="text-xs">
                 <DollarSign className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
-                Presale Price
+                Presale Ticket
               </FieldLabel>
               <InputGroup>
                 <InputGroupAddon className="bg-muted border-border text-muted-foreground">$</InputGroupAddon>
@@ -166,7 +166,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             <Field>
               <FieldLabel htmlFor="doorTicketPrice" className="text-xs">
                 <DollarSign className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
-                Door Price
+                Door Ticket
               </FieldLabel>
               <InputGroup>
                 <InputGroupAddon className="bg-muted border-border text-muted-foreground">$</InputGroupAddon>
@@ -211,7 +211,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
                   Digital Ticket
                 </Label>
                 <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
-                  Add an online viewing option. The livestream team handles setup separately.
+                  Add a livestream option for remote viewers. The stream setup is handled separately.
                 </p>
               </div>
               <Switch
@@ -227,7 +227,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             {formData.digitalTicket.enabled && (
               <div className="pt-4 border-t border-border/40 animate-in fade-in slide-in-from-top-1 duration-200">
                 <Label htmlFor="digitalPrice" className="text-xs text-muted-foreground mb-2 block">
-                  Digital ticket price
+                  Stream ticket price
                 </Label>
                 <InputGroup className="max-w-32">
                   <InputGroupAddon className="bg-muted border-border text-muted-foreground">$</InputGroupAddon>

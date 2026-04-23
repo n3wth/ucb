@@ -90,7 +90,7 @@ export function UcbLogo({ size = 36, className = "", showEyes = true }: UcbLogoP
         alt="UCB"
         width={size}
         height={size}
-        className="invert object-contain"
+        className="object-contain"
         style={{ width: size, height: size }}
         priority
       />
