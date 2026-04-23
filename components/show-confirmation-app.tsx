@@ -49,6 +49,18 @@ export function ShowConfirmationApp() {
           emailBody: emailContent,
         }),
       })
+
+      if (response.status === 429) {
+        const retryAfter = Number(response.headers.get("Retry-After")) || 10
+        const msg = `Too many requests. Please wait ${retryAfter}s and try again.`
+        setResult({
+          email: { status: "error", error: msg },
+          calendarEvent: { status: "error", error: msg },
+          driveFolder: { status: "error", error: msg },
+        })
+        return
+      }
+
       const data = (await response.json()) as ConfirmationResult
       setResult(data)
 

@@ -2,9 +2,29 @@ import { type NextRequest, NextResponse } from "next/server"
 import { hasGoogleCredentials } from "@/lib/google"
 import { createDriveFolder, createCalendarEvent, sendEmail } from "@/lib/google-actions"
 import { createLogger } from "@/lib/logger"
+import { RateLimiter, hashKey } from "@/lib/rate-limit"
+import { SESSION_COOKIE } from "@/lib/session"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
 const log = createLogger("confirm-show")
+
+// Per-user token bucket. Keyed on hashed session cookie — the auth middleware
+// guarantees an authed session by the time we reach here. Fallback key uses
+// forwarded IP so an unexpectedly missing cookie still gets limited.
+const confirmShowLimiter = new RateLimiter({
+  rules: [
+    { windowMs: 10_000, max: 1 },
+    { windowMs: 60 * 60 * 1000, max: 30 },
+  ],
+})
+
+async function rateLimitKey(request: NextRequest): Promise<string> {
+  const token = request.cookies.get(SESSION_COOKIE)?.value
+  if (token) return `s:${await hashKey(token)}`
+  const fwd = request.headers.get("x-forwarded-for") ?? ""
+  const ip = fwd.split(",")[0]?.trim() || "unknown"
+  return `ip:${ip}`
+}
 
 const VENUE_FOLDER_IDS: Record<string, string | undefined> = {
   "UCB Franklin": process.env.UCB_FRANKLIN_FOLDER_ID,
@@ -64,6 +84,25 @@ function validate(body: ConfirmShowRequest): string | null {
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
   const reqLog = log.child(requestId.slice(0, 8))
+
+  const limitCheck = confirmShowLimiter.check(await rateLimitKey(request))
+  if (!limitCheck.allowed) {
+    reqLog.warn("rate limited", { retryAfter: limitCheck.retryAfterSeconds })
+    return NextResponse.json(
+      {
+        error: "Too many requests. Please wait before trying again.",
+        retryAfter: limitCheck.retryAfterSeconds,
+      },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(limitCheck.retryAfterSeconds),
+          "X-RateLimit-Limit": String(limitCheck.limit),
+          "X-RateLimit-Remaining": "0",
+        },
+      },
+    )
+  }
 
   let body: ConfirmShowRequest
   try {
