@@ -75,11 +75,11 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
   }, [driveFolderUrl])
 
   return (
-    <Card className="card-elevated">
+    <Card className="shadow-sm border-border">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="space-y-1">
-            <CardTitle className="text-base flex items-center gap-2">
+            <CardTitle className="text-base flex items-center gap-2 text-foreground">
               <Mail className="h-4 w-4 text-primary" />
               Confirmation Email
             </CardTitle>
@@ -100,15 +100,15 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
             </TabsTrigger>
           </TabsList>
           <TabsContent value="preview" className="mt-4">
-            <div className="rounded-lg border border-border bg-muted/20 p-4 max-h-80 overflow-y-auto">
-              <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">{emailContent}</pre>
+            <div className="rounded-lg border border-border bg-muted/30 p-4 max-h-80 overflow-y-auto">
+              <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-foreground">{emailContent}</pre>
             </div>
           </TabsContent>
           <TabsContent value="edit" className="mt-4 space-y-3">
             <Textarea
               value={emailContent}
               onChange={(e) => onEmailContentChange(e.target.value)}
-              className="min-h-[280px] font-sans text-sm leading-relaxed bg-input/50 focus:bg-input transition-colors resize-none"
+              className="min-h-[280px] font-sans text-sm leading-relaxed bg-input focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors resize-none"
             />
             <Button variant="ghost" size="sm" onClick={handleReset} className="text-xs text-muted-foreground hover:text-foreground">
               <RotateCcw className="h-3 w-3 mr-1.5" />

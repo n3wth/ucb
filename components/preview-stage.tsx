@@ -32,7 +32,7 @@ export function PreviewStage({
     <div className="w-full space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h2 className="font-display text-lg uppercase tracking-wide">
+        <h2 className="font-display text-lg uppercase tracking-wide text-foreground">
           Review &amp; Confirm
         </h2>
         <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
@@ -48,9 +48,9 @@ export function PreviewStage({
       />
 
       {/* Calendar event card */}
-      <Card className="card-elevated">
+      <Card className="shadow-sm border-border">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
             <Calendar className="h-4 w-4 text-primary" />
             Calendar Event
           </CardTitle>
@@ -60,7 +60,7 @@ export function PreviewStage({
           <div className="space-y-4">
             <div>
               <div className="text-label mb-1">Event Title</div>
-              <div className="font-medium">{showDetails.showTitle || <span className="text-muted-foreground">-</span>}</div>
+              <div className="font-medium text-foreground">{showDetails.showTitle || <span className="text-muted-foreground">-</span>}</div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               <DetailItem icon={<Calendar className="h-3.5 w-3.5" />} label="Date" value={formatDate(showDetails.showDate)} />
@@ -83,9 +83,9 @@ export function PreviewStage({
       </Card>
 
       {/* Drive folder card */}
-      <Card className="card-elevated">
+      <Card className="shadow-sm border-border">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
             <FolderOpen className="h-4 w-4 text-primary" />
             Drive Folder
           </CardTitle>
@@ -93,18 +93,18 @@ export function PreviewStage({
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 flex-wrap text-sm">
-            <Badge variant="secondary" className="font-normal text-xs bg-muted/80">
+            <Badge variant="secondary" className="font-normal text-xs">
               {showDetails.venue}
             </Badge>
-            <span className="text-muted-foreground/60">/</span>
-            <span className="font-medium">{folderName}</span>
+            <span className="text-muted-foreground">/</span>
+            <span className="font-medium text-foreground">{folderName}</span>
           </div>
         </CardContent>
       </Card>
 
       {/* Action bar */}
       <div className="sticky bottom-4 z-10 pt-2">
-        <div className="flex gap-3 rounded-xl border border-border/60 bg-card/95 backdrop-blur-md p-3 card-floating">
+        <div className="flex gap-3 rounded-lg border border-border bg-card shadow-md p-3">
           <Button 
             variant="ghost" 
             onClick={onBack} 
@@ -141,10 +141,10 @@ function DetailItem({ icon, label, value }: { icon: React.ReactNode; label: stri
   return (
     <div className="min-w-0">
       <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1 flex items-center gap-1.5">
-        <span className="opacity-60">{icon}</span>
+        <span className="opacity-70">{icon}</span>
         {label}
       </div>
-      <div className="text-sm font-medium truncate">{value || <span className="text-muted-foreground">-</span>}</div>
+      <div className="text-sm font-medium truncate text-foreground">{value || <span className="text-muted-foreground">-</span>}</div>
     </div>
   )
 }

@@ -28,7 +28,7 @@ interface StatusItemProps {
 
 function StatusItem({ label, description, status, icon, actionUrl, actionLabel, error }: StatusItemProps) {
   return (
-    <div className="p-4 rounded-lg border border-border/60 bg-card/50 space-y-3 transition-all hover:bg-card/80">
+    <div className="p-4 rounded-lg border border-border bg-muted/30 space-y-3 transition-all hover:bg-muted/50">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3 min-w-0">
           <div
@@ -43,7 +43,7 @@ function StatusItem({ label, description, status, icon, actionUrl, actionLabel, 
             {icon}
           </div>
           <div className="min-w-0">
-            <div className="font-medium text-sm">{label}</div>
+            <div className="font-medium text-sm text-foreground">{label}</div>
             {description && <div className="text-xs text-muted-foreground truncate">{description}</div>}
           </div>
         </div>
@@ -92,11 +92,11 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
   const allSuccess = statuses.every((s) => s === "success")
 
   return (
-    <Card className="w-full card-floating">
+    <Card className="w-full shadow-md border-border">
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1.5">
-            <CardTitle className="font-display text-lg uppercase tracking-wide">
+            <CardTitle className="font-display text-lg uppercase tracking-wide text-foreground">
               {anyPending ? "Confirming..." : allSuccess ? "Confirmed" : "Needs Attention"}
             </CardTitle>
             <CardDescription className="text-sm">

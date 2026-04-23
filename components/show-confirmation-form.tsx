@@ -47,7 +47,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
   return (
     <Card className="w-full shadow-md border-border">
       <CardHeader className="pb-2">
-        <CardTitle className="font-display text-lg uppercase tracking-wide flex items-center gap-2">
+        <CardTitle className="font-display text-lg uppercase tracking-wide text-foreground">
           Show Details
         </CardTitle>
         <CardDescription className="text-sm text-muted-foreground leading-relaxed">
@@ -203,7 +203,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
           </Field>
 
           {/* Digital ticket option */}
-          <div className="rounded-xl border border-border bg-input/50 p-5 space-y-4">
+          <div className="rounded-lg border border-border bg-muted/40 p-5 space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="digitalEnabled" className="text-sm font-medium flex items-center gap-2 cursor-pointer text-foreground">
