@@ -1,5 +1,8 @@
+import { Suspense } from "react"
 import { LoginForm } from "@/components/login-form"
 import { Theater } from "lucide-react"
+
+export const dynamic = "force-dynamic"
 
 export default function LoginPage() {
   return (
@@ -14,7 +17,9 @@ export default function LoginPage() {
             <p className="text-sm text-muted-foreground text-pretty">Every show, confirmed in 300 clicks.</p>
           </div>
         </div>
-        <LoginForm />
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
       </div>
     </main>
   )
