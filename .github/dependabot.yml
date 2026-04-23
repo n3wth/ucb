@@ -1,0 +1,30 @@
+# Dependabot configuration — disabled in favor of Renovate (see renovate.json).
+# To switch back to Dependabot: uncomment this file and remove renovate.json.
+#
+# version: 2
+# updates:
+#   - package-ecosystem: "npm"
+#     directory: "/"
+#     schedule:
+#       interval: "weekly"
+#     open-pull-requests-limit: 10
+#     labels:
+#       - "dependencies"
+#     groups:
+#       radix-ui:
+#         patterns:
+#           - "@radix-ui/*"
+#       next-react:
+#         patterns:
+#           - "next"
+#           - "react"
+#           - "react-dom"
+#           - "@types/react"
+#           - "@types/react-dom"
+#   - package-ecosystem: "github-actions"
+#     directory: "/"
+#     schedule:
+#       interval: "weekly"
+#     labels:
+#       - "dependencies"
+#       - "github-actions"
