@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { AlertCircle, Pencil, Plus, Trash2, X, Check } from "lucide-react"
+import { cn } from "@/lib/utils"
 import {
   ASSSSCAT_PERFORMER_CATEGORIES,
   type AsssscatPerformer,
@@ -25,6 +26,16 @@ import {
   removePerformer,
   updatePerformer,
 } from "@/lib/asssscat-performers"
+
+type GroupFilter = "All" | AsssscatPerformerCategory
+
+const GROUP_LABELS: Record<AsssscatPerformerCategory, string> = {
+  "Core Cast": "Core",
+  "Wild Cards": "Wild",
+  "Subs": "Subs",
+  "Drop-Ins": "Drop-Ins",
+  "Test Group": "Test",
+}
 
 interface PerformerPanelProps {
   performers: AsssscatPerformer[]
@@ -51,9 +62,18 @@ export function AsssscatPerformerPanel({
   const [draftCategory, setDraftCategory] =
     useState<AsssscatPerformerCategory>("Core Cast")
   const [error, setError] = useState<string | null>(null)
+  const [activeGroup, setActiveGroup] = useState<GroupFilter>("All")
 
   const grouped = useMemo(() => groupByCategory(performers), [performers])
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds])
+
+  const visibleCategories = useMemo(
+    () =>
+      activeGroup === "All"
+        ? ASSSSCAT_PERFORMER_CATEGORIES
+        : ([activeGroup] as AsssscatPerformerCategory[]),
+    [activeGroup],
+  )
 
   const resetForm = () => {
     setShowForm(false)
@@ -132,6 +152,36 @@ export function AsssscatPerformerPanel({
         </Button>
       </div>
 
+      <div className="flex items-center gap-1 px-4 py-2 border-b border-border overflow-x-auto">
+        <button
+          type="button"
+          onClick={() => setActiveGroup("All")}
+          className={cn(
+            "shrink-0 text-[11px] font-medium px-2.5 py-1 rounded-md transition-colors",
+            activeGroup === "All"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted",
+          )}
+        >
+          All
+        </button>
+        {ASSSSCAT_PERFORMER_CATEGORIES.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setActiveGroup(cat)}
+            className={cn(
+              "shrink-0 text-[11px] font-medium px-2.5 py-1 rounded-md transition-colors",
+              activeGroup === cat
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted",
+            )}
+          >
+            {GROUP_LABELS[cat]}
+          </button>
+        ))}
+      </div>
+
       {showForm && (
         <div className="px-4 py-3 border-b border-border space-y-2.5 bg-muted/40">
           <div className="space-y-1">
@@ -205,7 +255,7 @@ export function AsssscatPerformerPanel({
             into shows.
           </p>
         ) : (
-          ASSSSCAT_PERFORMER_CATEGORIES.map((category) => {
+          visibleCategories.map((category) => {
             const group = grouped[category]
             if (group.length === 0) return null
             return (
