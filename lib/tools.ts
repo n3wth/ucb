@@ -10,7 +10,7 @@
  */
 
 import type { LucideIcon } from "lucide-react"
-import { CalendarCheck, CalendarDays, ScrollText } from "lucide-react"
+import { CalendarCheck, CalendarDays, ScrollText, Users } from "lucide-react"
 
 export type ToolStatus = "available" | "coming-soon"
 
@@ -49,6 +49,15 @@ export const TOOLS: Tool[] = [
       "Last 100 confirm, edit, and cancel actions. Producer emails shown as domain only.",
     href: "/tools/audit",
     icon: ScrollText,
+    status: "available",
+  },
+  {
+    id: "contacts",
+    name: "ASSSSCAT Contacts",
+    description:
+      "Full performer roster organized by group. Search by name or email. Missing emails flagged.",
+    href: "/tools/contacts",
+    icon: Users,
     status: "available",
   },
 ]
