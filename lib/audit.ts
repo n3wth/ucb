@@ -1,8 +1,4 @@
-// In-memory audit log. Records the last N confirm/edit/cancel actions taken
-// by staff. The store is process-local and not persisted — this mirrors the
-// existing in-memory rate-limit approach (lib/rate-limit.ts). Restarts and
-// multi-instance deploys will not share entries. Swap for a durable store
-// (KV, Postgres) when the tool graduates past single-tenant use.
+import { getSupabaseClient } from "@/lib/supabase"
 
 export type AuditAction =
   | "confirm-show"
@@ -20,7 +16,8 @@ export interface AuditEntry {
 
 const MAX_ENTRIES = 100
 
-// Ring buffer: newest entry at index 0.
+// Ring buffer: newest entry at index 0. Used as a write-through cache and
+// fallback when Supabase is unavailable.
 const entries: AuditEntry[] = []
 
 // Best-effort email redaction. Keep the domain so admins can tell staff apart
@@ -54,6 +51,46 @@ function newId(): string {
   return crypto.randomUUID()
 }
 
+async function persistToDb(entry: AuditEntry): Promise<void> {
+  const client = getSupabaseClient()
+  if (!client) return
+  try {
+    await client.from("audit_log").insert({
+      id: entry.id,
+      timestamp: entry.timestamp,
+      actor: entry.actor,
+      action: entry.action,
+      target_id: entry.targetId,
+      payload: entry.payload ?? null,
+    })
+  } catch {
+    // Best-effort — in-memory entry already recorded
+  }
+}
+
+async function listFromDb(limit: number): Promise<AuditEntry[] | null> {
+  const client = getSupabaseClient()
+  if (!client) return null
+  try {
+    const { data, error } = await client
+      .from("audit_log")
+      .select("id, timestamp, actor, action, target_id, payload")
+      .order("timestamp", { ascending: false })
+      .limit(limit)
+    if (error || !data) return null
+    return data.map((row) => ({
+      id: row.id as string,
+      timestamp: row.timestamp as string,
+      actor: row.actor as string,
+      action: row.action as AuditAction,
+      targetId: row.target_id as string,
+      payload: row.payload as Record<string, unknown> | undefined,
+    }))
+  } catch {
+    return null
+  }
+}
+
 export const audit = {
   log(
     actorEmail: string,
@@ -73,9 +110,19 @@ export const audit = {
     }
     entries.unshift(entry)
     if (entries.length > MAX_ENTRIES) entries.length = MAX_ENTRIES
+    // Fire-and-forget: don't block the caller on DB I/O
+    persistToDb(entry).catch(() => {})
     return entry
   },
 
+  async listAsync(limit: number = MAX_ENTRIES): Promise<AuditEntry[]> {
+    const capped = Math.max(0, Math.min(limit, MAX_ENTRIES))
+    const dbRows = await listFromDb(capped)
+    if (dbRows !== null) return dbRows
+    return entries.slice(0, capped)
+  },
+
+  // Synchronous path for callers that can't await. Returns in-memory only.
   list(limit: number = MAX_ENTRIES): AuditEntry[] {
     return entries.slice(0, Math.max(0, Math.min(limit, MAX_ENTRIES)))
   },

@@ -12,6 +12,8 @@ export const env = createEnv({
     UCB_FRANKLIN_FOLDER_ID: z.string().min(1).optional(),
     UCB_ANNEX_FOLDER_ID: z.string().min(1).optional(),
     UCB_CALENDAR_ID: z.string().min(1).optional(),
+    SUPABASE_URL: z.string().url().optional(),
+    SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
   },
   client: {
     NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
@@ -26,6 +28,8 @@ export const env = createEnv({
     UCB_FRANKLIN_FOLDER_ID: process.env.UCB_FRANKLIN_FOLDER_ID,
     UCB_ANNEX_FOLDER_ID: process.env.UCB_ANNEX_FOLDER_ID,
     UCB_CALENDAR_ID: process.env.UCB_CALENDAR_ID,
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   },
   skipValidation:
