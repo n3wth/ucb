@@ -134,6 +134,26 @@
     @apply bg-primary/30 text-foreground;
   }
 
+  /* Native date/time inputs render their picker icon in the user-agent's
+     default color, which is near-black on Chromium. Our inputs sit on a dark
+     background, so invert the indicator so it reads as white/light. */
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator,
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  input[type="month"]::-webkit-calendar-picker-indicator,
+  input[type="week"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.1);
+    opacity: 0.9;
+    cursor: pointer;
+  }
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  input[type="month"],
+  input[type="week"] {
+    color-scheme: dark;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

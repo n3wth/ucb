@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,7 +22,7 @@ import {
   MAX_SHOW_DURATION_MINUTES,
   type VenueName,
 } from "@/lib/config"
-import { CcEmailList } from "@/components/cc-email-list"
+import { CcEmailList, type CcEmailListHandle } from "@/components/cc-email-list"
 import { loadDefaultCcEmails } from "@/lib/cc-preferences"
 import type { ShowDetails } from "@/lib/types"
 
@@ -72,6 +72,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
   const [techDurationChoice, setTechDurationChoice] = useState<TechDurationChoice>(() =>
     initialTechDurationChoice((initialValue ?? DEFAULT_FORM).techRehearsalDurationMinutes),
   )
+  const ccListRef = useRef<CcEmailListHandle>(null)
 
   // When opening a fresh form (no initialValue), pre-fill CCs from saved defaults.
   // If the user navigated back to edit, keep whatever they already had.
@@ -86,7 +87,10 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(formData)
+    // Commit any in-flight CC draft that the user typed but didn't confirm
+    // with Enter/Tab/blur before clicking submit.
+    const finalCcEmails = ccListRef.current?.flush() ?? formData.ccEmails
+    onSubmit({ ...formData, ccEmails: finalCcEmails })
   }
 
   const updateField = <K extends keyof ShowDetails>(field: K, value: ShowDetails[K]) => {
@@ -247,9 +251,8 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
                 Tech rehearsal
                 <span className="text-muted-foreground/70 font-normal text-xs">(optional)</span>
               </Label>
-              <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
-                If a time is set, a tech rehearsal calendar event will be created titled
-                &quot;{formData.showTitle || "SHOW TITLE"} - TECH&quot;.
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                If a time is set, a tech rehearsal calendar event will be created titled &quot;{formData.showTitle || "SHOW TITLE"} - TECH&quot;.
               </p>
             </div>
 
@@ -389,6 +392,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
               <span className="text-muted-foreground/70 font-normal ml-1">(optional)</span>
             </FieldLabel>
             <CcEmailList
+              ref={ccListRef}
               inputId="ccInput"
               emails={formData.ccEmails}
               onChange={(next) => updateField("ccEmails", next)}

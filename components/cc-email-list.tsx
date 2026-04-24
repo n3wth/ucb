@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { forwardRef, useImperativeHandle, useState } from "react"
 import { X, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,7 +17,16 @@ interface CcEmailListProps {
   emptyHint?: string
 }
 
-export function CcEmailList({
+export interface CcEmailListHandle {
+  /**
+   * Commits any pending draft in the input to the emails list synchronously
+   * and returns the resulting array. Used on form submit to avoid losing a
+   * CC the user typed but never confirmed with Enter/Tab/blur.
+   */
+  flush: () => string[]
+}
+
+export const CcEmailList = forwardRef<CcEmailListHandle, CcEmailListProps>(function CcEmailList({
   emails,
   onChange,
   inputId,
@@ -25,36 +34,51 @@ export function CcEmailList({
   disabled,
   max = MAX_DEFAULT_CC,
   emptyHint,
-}: CcEmailListProps) {
+}, ref) {
   const [draft, setDraft] = useState("")
   const [error, setError] = useState<string | null>(null)
 
   const inputClasses =
     "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
 
-  const addFromDraft = () => {
+  const commitDraft = (current: string[]): { next: string[]; accepted: boolean } => {
     const candidate = normalizeEmail(draft)
-    if (!candidate) {
-      setDraft("")
-      setError(null)
-      return
-    }
+    if (!candidate) return { next: current, accepted: true }
     if (!isValidEmail(candidate)) {
       setError("Enter a valid email address.")
-      return
+      return { next: current, accepted: false }
     }
-    if (emails.some((e) => e.toLowerCase() === candidate.toLowerCase())) {
+    if (current.some((e) => e.toLowerCase() === candidate.toLowerCase())) {
       setError("That email is already on the list.")
-      return
+      return { next: current, accepted: false }
     }
-    if (emails.length >= max) {
+    if (current.length >= max) {
       setError(`Limit of ${max} addresses reached.`)
-      return
+      return { next: current, accepted: false }
     }
-    onChange([...emails, candidate])
+    return { next: [...current, candidate], accepted: true }
+  }
+
+  const addFromDraft = () => {
+    const { next, accepted } = commitDraft(emails)
+    if (!accepted) return
+    if (next !== emails) onChange(next)
     setDraft("")
     setError(null)
   }
+
+  useImperativeHandle(ref, () => ({
+    flush: () => {
+      const { next, accepted } = commitDraft(emails)
+      if (!accepted) return emails
+      if (next !== emails) {
+        onChange(next)
+        setDraft("")
+        setError(null)
+      }
+      return next
+    },
+  }), [emails, draft, max, onChange])
 
   const remove = (target: string) => {
     onChange(emails.filter((e) => e !== target))
@@ -135,4 +159,4 @@ export function CcEmailList({
       )}
     </div>
   )
-}
+})

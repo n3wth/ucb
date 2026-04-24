@@ -1,24 +1,29 @@
 /**
  * Shared formatting utilities for dates, times, and currency.
+ * All date/time display is rendered in Pacific Time — UCB is LA-based.
  */
+
+export const UCB_TIMEZONE = "America/Los_Angeles"
 
 export function formatDate(dateString: string): string {
   if (!dateString) return ""
-  const date = new Date(dateString + "T00:00:00")
+  const date = new Date(dateString + "T12:00:00Z")
   return date.toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
     day: "numeric",
     year: "numeric",
+    timeZone: UCB_TIMEZONE,
   })
 }
 
 export function formatShortDate(dateString: string): string {
   if (!dateString) return ""
-  const date = new Date(dateString + "T00:00:00")
+  const date = new Date(dateString + "T12:00:00Z")
   return date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
+    timeZone: UCB_TIMEZONE,
   })
 }
 

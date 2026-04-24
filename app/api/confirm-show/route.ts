@@ -9,6 +9,7 @@ import { RateLimiter, hashKey } from "@/lib/rate-limit"
 import { confirmShowRequestSchema, type ConfirmShowRequest } from "@/lib/schemas"
 import { SESSION_COOKIE } from "@/lib/session"
 import { computeStartEnd } from "@/lib/show-time"
+import { UCB_TIMEZONE } from "@/lib/format"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
 const log = createLogger("confirm-show")
@@ -37,7 +38,7 @@ const VENUE_FOLDER_IDS: Record<string, string | undefined> = {
 }
 
 const UCB_CALENDAR_ID = env.UCB_CALENDAR_ID || "primary"
-const TIMEZONE = "America/New_York"
+const TIMEZONE = UCB_TIMEZONE
 
 function buildFolderName(d: ShowDetails): string {
   return `${d.showTitle} – ${d.showDate}`
