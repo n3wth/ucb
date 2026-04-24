@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { MAX_SHOW_DURATION_MINUTES, MIN_SHOW_DURATION_MINUTES } from "@/lib/config"
 
 const nonEmpty = (field: string) => z.string().trim().min(1, `${field} is required`)
 
@@ -21,6 +22,11 @@ export const confirmShowRequestSchema = z.object({
   venue: z.enum(["UCB Franklin", "UCB Annex"], {
     errorMap: () => ({ message: "venue is required" }),
   }),
+  durationMinutes: z
+    .number()
+    .int("durationMinutes must be a whole number of minutes")
+    .min(MIN_SHOW_DURATION_MINUTES, `durationMinutes must be at least ${MIN_SHOW_DURATION_MINUTES}`)
+    .max(MAX_SHOW_DURATION_MINUTES, `durationMinutes must be at most ${MAX_SHOW_DURATION_MINUTES}`),
   techRehearsalTime: z.string(),
   presaleTicketPrice: z.number().finite().nonnegative(),
   doorTicketPrice: z.number().finite().nonnegative(),

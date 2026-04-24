@@ -8,6 +8,7 @@ export interface ShowDetails {
   showDate: string
   venue: "UCB Franklin" | "UCB Annex"
   showTime: string
+  durationMinutes: number
   techRehearsalTime: string
   presaleTicketPrice: number
   doorTicketPrice: number

@@ -6,6 +6,7 @@ const validBody = {
   showDate: '2026-05-01',
   showTime: '20:00',
   venue: 'UCB Franklin' as const,
+  durationMinutes: 90,
   techRehearsalTime: '',
   presaleTicketPrice: 10,
   doorTicketPrice: 15,
@@ -79,6 +80,33 @@ describe('confirmShowRequestSchema', () => {
       ...validBody,
       digitalTicket: { enabled: 'yes', price: 5 },
     })
+    expect(result.success).toBe(false)
+  })
+
+  it.each([60, 90, 120, 75, 180])('accepts durationMinutes %s', (minutes) => {
+    const result = confirmShowRequestSchema.safeParse({ ...validBody, durationMinutes: minutes })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects a missing durationMinutes', () => {
+    const { durationMinutes, ...rest } = validBody
+    void durationMinutes
+    const result = confirmShowRequestSchema.safeParse(rest)
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a non-integer durationMinutes', () => {
+    const result = confirmShowRequestSchema.safeParse({ ...validBody, durationMinutes: 90.5 })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects durationMinutes below the minimum', () => {
+    const result = confirmShowRequestSchema.safeParse({ ...validBody, durationMinutes: 5 })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects durationMinutes above the maximum', () => {
+    const result = confirmShowRequestSchema.safeParse({ ...validBody, durationMinutes: 10_000 })
     expect(result.success).toBe(false)
   })
 })

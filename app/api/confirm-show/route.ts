@@ -8,6 +8,7 @@ import { createLogger } from "@/lib/logger"
 import { RateLimiter, hashKey } from "@/lib/rate-limit"
 import { confirmShowRequestSchema, type ConfirmShowRequest } from "@/lib/schemas"
 import { SESSION_COOKIE } from "@/lib/session"
+import { computeStartEnd } from "@/lib/show-time"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
 const log = createLogger("confirm-show")
@@ -37,7 +38,6 @@ const VENUE_FOLDER_IDS: Record<string, string | undefined> = {
 
 const UCB_CALENDAR_ID = env.UCB_CALENDAR_ID || "primary"
 const TIMEZONE = "America/New_York"
-const DEFAULT_EVENT_DURATION_HOURS = 2
 
 function buildFolderName(d: ShowDetails): string {
   return `${d.showTitle} – ${d.showDate}`
@@ -54,16 +54,6 @@ function buildEventDescription(d: ShowDetails): string {
   ]
     .filter(Boolean)
     .join("\n")
-}
-
-function computeStartEnd(d: ShowDetails): { startISO: string; endISO: string } {
-  const startISO = `${d.showDate}T${d.showTime}:00`
-  const start = new Date(startISO)
-  const end = new Date(start.getTime() + DEFAULT_EVENT_DURATION_HOURS * 60 * 60 * 1000)
-  // Format as local "YYYY-MM-DDTHH:mm:ss" — Google interprets in timeZone param.
-  const pad = (n: number) => String(n).padStart(2, "0")
-  const endISO = `${end.getFullYear()}-${pad(end.getMonth() + 1)}-${pad(end.getDate())}T${pad(end.getHours())}:${pad(end.getMinutes())}:00`
-  return { startISO, endISO }
 }
 
 export async function POST(request: NextRequest) {
