@@ -642,13 +642,28 @@ export function CastDirectory({
                                 type="button"
                                 onClick={() => setAffinityTab("affinity")}
                                 className={cn(
-                                  "px-4 py-1.5 text-[11px] font-medium transition-colors",
+                                  "px-4 py-1.5 text-[11px] font-medium transition-colors flex items-center gap-1.5",
                                   affinityTab === "affinity"
                                     ? "text-foreground border-b-2 border-primary -mb-px"
                                     : "text-muted-foreground hover:text-foreground",
                                 )}
                               >
+                                <Heart className="h-3 w-3 shrink-0" />
                                 Likes / Dislikes
+                                {(() => {
+                                  const entry = compatibility?.[p.id]
+                                  const count = (entry?.likes?.length ?? 0) + (entry?.dislikes?.length ?? 0)
+                                  return count > 0 ? (
+                                    <span className={cn(
+                                      "inline-flex items-center justify-center rounded-full text-[9px] font-semibold min-w-[14px] h-[14px] px-1",
+                                      affinityTab === "affinity"
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-muted-foreground/20 text-muted-foreground",
+                                    )}>
+                                      {count}
+                                    </span>
+                                  ) : null
+                                })()}
                               </button>
                             </div>
                             {affinityTab === "profile" && (
