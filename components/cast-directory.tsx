@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -95,8 +95,10 @@ export function CastDirectory({
     lgbtq: null,
   })
   const [showDemoFilter, setShowDemoFilter] = useState(false)
-  const [affinityTab, setAffinityTab] = useState<"profile" | "affinity">("profile")
   const [affinitySearch, setAffinitySearch] = useState("")
+
+  // Ref to scroll the edit form into view (feature 1)
+  const formRef = useRef<HTMLDivElement>(null)
 
   const toggleLike = (subjectId: string, targetId: string) => {
     const entry = compatibility[subjectId] ?? { likes: [], dislikes: [] }
@@ -160,6 +162,10 @@ export function CastDirectory({
   const startAdd = () => {
     resetForm()
     setShowForm(true)
+    // Scroll form into view after render
+    requestAnimationFrame(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })
+    })
   }
 
   const startEdit = (p: AsssscatPerformer) => {
@@ -178,6 +184,11 @@ export function CastDirectory({
     })
     setError(null)
     setExpandedId(null)
+    setAffinitySearch("")
+    // Scroll form into view at current scroll position (feature 1)
+    requestAnimationFrame(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })
+    })
   }
 
   const handleSave = () => {
@@ -239,6 +250,9 @@ export function CastDirectory({
       races: f.races.includes(r) ? f.races.filter((x) => x !== r) : [...f.races, r],
     }))
   }
+
+  // The performer being edited (needed to show Likes/Dislikes inside the edit form)
+  const editingPerformer = editingId ? performers.find((p) => p.id === editingId) ?? null : null
 
   return (
     <div className="space-y-4">
@@ -391,9 +405,9 @@ export function CastDirectory({
         ))}
       </div>
 
-      {/* Add / Edit form */}
+      {/* Add / Edit form (feature 1: ref for scroll-into-view) */}
       {showForm && (
-        <div className="border border-border rounded-lg bg-muted/40 p-4 space-y-4">
+        <div ref={formRef} className="border border-border rounded-lg bg-muted/40 p-4 space-y-4">
           <h3 className="text-xs font-medium text-foreground">
             {editingId ? "Edit performer" : "Add performer"}
           </h3>
@@ -531,6 +545,82 @@ export function CastDirectory({
             </div>
           </div>
 
+          {/* Likes / Dislikes section — only visible inside the edit form (feature 2) */}
+          {editingPerformer && onCompatibilityChange && (
+            <div className="space-y-2 border-t border-border/40 pt-3">
+              <p className="text-[10px] font-medium tracking-[0.12em] uppercase text-muted-foreground flex items-center gap-1.5">
+                <Heart className="h-3 w-3" />
+                Likes / Dislikes
+                {(() => {
+                  const entry = compatibility[editingPerformer.id]
+                  const count = (entry?.likes?.length ?? 0) + (entry?.dislikes?.length ?? 0)
+                  return count > 0 ? (
+                    <span className="inline-flex items-center justify-center rounded-full text-[9px] font-semibold min-w-[14px] h-[14px] px-1 bg-muted-foreground/20 text-muted-foreground">
+                      {count}
+                    </span>
+                  ) : null
+                })()}
+              </p>
+              <Input
+                placeholder="Search performers..."
+                value={affinitySearch}
+                onChange={(e) => setAffinitySearch(e.target.value)}
+                className="h-7 text-xs bg-input border-border"
+              />
+              {(() => {
+                const q = affinitySearch.trim().toLowerCase()
+                const others = performers
+                  .filter((other) => other.id !== editingPerformer.id)
+                  .filter((other) => !q || other.name.toLowerCase().includes(q))
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                const entry = compatibility[editingPerformer.id] ?? { likes: [], dislikes: [] }
+                return others.length === 0 ? (
+                  <p className="text-xs text-muted-foreground py-1">No other performers.</p>
+                ) : (
+                  <div className="space-y-0.5 max-h-48 overflow-y-auto">
+                    {others.map((other) => {
+                      const liked = entry.likes.includes(other.id)
+                      const disliked = entry.dislikes.includes(other.id)
+                      return (
+                        <div key={other.id} className="flex items-center gap-2 py-0.5">
+                          <span className="text-xs text-foreground flex-1 truncate">{other.name}</span>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => toggleLike(editingPerformer.id, other.id)}
+                              title={liked ? "Remove like" : "Mark as liked collaborator"}
+                              className={cn(
+                                "rounded p-0.5 transition-colors",
+                                liked
+                                  ? "text-green-600 dark:text-green-400 bg-green-600/10"
+                                  : "text-muted-foreground hover:text-green-600 dark:hover:text-green-400",
+                              )}
+                            >
+                              <Heart className="h-3 w-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => toggleDislike(editingPerformer.id, other.id)}
+                              title={disliked ? "Remove conflict" : "Mark as incompatible"}
+                              className={cn(
+                                "rounded p-0.5 transition-colors",
+                                disliked
+                                  ? "text-destructive bg-destructive/10"
+                                  : "text-muted-foreground hover:text-destructive",
+                              )}
+                            >
+                              <ThumbsDown className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )
+              })()}
+            </div>
+          )}
+
           {error && <p className="text-xs text-destructive">{error}</p>}
           <div className="flex gap-2 pt-1">
             <Button type="button" size="sm" className="h-8 text-xs" onClick={handleSave}>
@@ -575,13 +665,7 @@ export function CastDirectory({
                             type="button"
                             className="flex-1 text-left min-w-0"
                             onClick={() => {
-                              if (isExpanded) {
-                                setExpandedId(null)
-                              } else {
-                                setExpandedId(p.id)
-                                setAffinityTab("profile")
-                                setAffinitySearch("")
-                              }
+                              setExpandedId(isExpanded ? null : p.id)
                             }}
                           >
                             <div className="text-sm text-foreground truncate">{p.name}</div>
@@ -624,15 +708,7 @@ export function CastDirectory({
                             <button
                               type="button"
                               className="text-muted-foreground hover:text-foreground transition-colors"
-                              onClick={() => {
-                                if (isExpanded) {
-                                  setExpandedId(null)
-                                } else {
-                                  setExpandedId(p.id)
-                                  setAffinityTab("profile")
-                                  setAffinitySearch("")
-                                }
-                              }}
+                              onClick={() => setExpandedId(isExpanded ? null : p.id)}
                               aria-label={isExpanded ? "Collapse" : "Expand"}
                             >
                               {isExpanded ? (
@@ -645,168 +721,69 @@ export function CastDirectory({
                         </div>
                         {isExpanded && (
                           <div className="border-t border-border/40 bg-muted/20">
-                            <div className="flex border-b border-border/40">
-                              <button
-                                type="button"
-                                onClick={() => setAffinityTab("profile")}
-                                className={cn(
-                                  "px-4 py-1.5 text-[11px] font-medium transition-colors",
-                                  affinityTab === "profile"
-                                    ? "text-foreground border-b-2 border-primary -mb-px"
-                                    : "text-muted-foreground hover:text-foreground",
-                                )}
-                              >
-                                Profile
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setAffinityTab("affinity")}
-                                className={cn(
-                                  "px-4 py-1.5 text-[11px] font-medium transition-colors flex items-center gap-1.5",
-                                  affinityTab === "affinity"
-                                    ? "text-foreground border-b-2 border-primary -mb-px"
-                                    : "text-muted-foreground hover:text-foreground",
-                                )}
-                              >
-                                <Heart className="h-3 w-3 shrink-0" />
-                                Likes / Dislikes
-                                {(() => {
-                                  const entry = compatibility?.[p.id]
-                                  const count = (entry?.likes?.length ?? 0) + (entry?.dislikes?.length ?? 0)
-                                  return count > 0 ? (
-                                    <span className={cn(
-                                      "inline-flex items-center justify-center rounded-full text-[9px] font-semibold min-w-[14px] h-[14px] px-1",
-                                      affinityTab === "affinity"
-                                        ? "bg-primary text-primary-foreground"
-                                        : "bg-muted-foreground/20 text-muted-foreground",
-                                    )}>
-                                      {count}
-                                    </span>
-                                  ) : null
-                                })()}
-                              </button>
+                            {/* Profile info only — Likes/Dislikes moved to edit form (feature 2) */}
+                            <div className="px-4 py-3 space-y-3 text-xs">
+                              <div>
+                                <p className="text-[10px] font-medium tracking-[0.12em] uppercase text-muted-foreground mb-1.5">
+                                  Contact
+                                </p>
+                                <dl className="grid grid-cols-2 gap-x-4 gap-y-1">
+                                  <div>
+                                    <dt className="text-muted-foreground">Email</dt>
+                                    <dd className="text-foreground">{p.email || "—"}</dd>
+                                  </div>
+                                  {p.additionalEmail && (
+                                    <div>
+                                      <dt className="text-muted-foreground">Alt email</dt>
+                                      <dd className="text-foreground">{p.additionalEmail}</dd>
+                                    </div>
+                                  )}
+                                  {p.phone && (
+                                    <div>
+                                      <dt className="text-muted-foreground">Phone</dt>
+                                      <dd className="text-foreground">{p.phone}</dd>
+                                    </div>
+                                  )}
+                                </dl>
+                              </div>
+                              <div className="border-t border-border/40 pt-3">
+                                <p className="text-[10px] font-medium tracking-[0.12em] uppercase text-muted-foreground mb-1.5">
+                                  Demographics
+                                </p>
+                                <dl className="grid grid-cols-2 gap-x-4 gap-y-1">
+                                  {p.gender && (
+                                    <div>
+                                      <dt className="text-muted-foreground">Gender</dt>
+                                      <dd className="text-foreground">{p.gender}</dd>
+                                    </div>
+                                  )}
+                                  {p.race && (
+                                    <div>
+                                      <dt className="text-muted-foreground">Race</dt>
+                                      <dd className="text-foreground">{p.race}</dd>
+                                    </div>
+                                  )}
+                                  <div>
+                                    <dt className="text-muted-foreground">LGBTQ+</dt>
+                                    <dd className="text-foreground">{p.lgbtq ? "Yes" : "No"}</dd>
+                                  </div>
+                                  <div>
+                                    <dt className="text-muted-foreground">Times booked</dt>
+                                    <dd className="text-foreground">{p.bookingCount ?? 0}</dd>
+                                  </div>
+                                </dl>
+                              </div>
+                              <div className="border-t border-border/40 pt-2">
+                                <button
+                                  type="button"
+                                  onClick={() => startEdit(p)}
+                                  className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1"
+                                >
+                                  <Pencil className="h-3 w-3" />
+                                  Edit profile &amp; likes/dislikes
+                                </button>
+                              </div>
                             </div>
-                            {affinityTab === "profile" && (
-                              <div className="px-4 py-3 space-y-3 text-xs">
-                                <div>
-                                  <p className="text-[10px] font-medium tracking-[0.12em] uppercase text-muted-foreground mb-1.5">
-                                    Contact
-                                  </p>
-                                  <dl className="grid grid-cols-2 gap-x-4 gap-y-1">
-                                    <div>
-                                      <dt className="text-muted-foreground">Email</dt>
-                                      <dd className="text-foreground">{p.email || "—"}</dd>
-                                    </div>
-                                    {p.additionalEmail && (
-                                      <div>
-                                        <dt className="text-muted-foreground">Alt email</dt>
-                                        <dd className="text-foreground">{p.additionalEmail}</dd>
-                                      </div>
-                                    )}
-                                    {p.phone && (
-                                      <div>
-                                        <dt className="text-muted-foreground">Phone</dt>
-                                        <dd className="text-foreground">{p.phone}</dd>
-                                      </div>
-                                    )}
-                                  </dl>
-                                </div>
-                                <div className="border-t border-border/40 pt-3">
-                                  <p className="text-[10px] font-medium tracking-[0.12em] uppercase text-muted-foreground mb-1.5">
-                                    Demographics
-                                  </p>
-                                  <dl className="grid grid-cols-2 gap-x-4 gap-y-1">
-                                    {p.gender && (
-                                      <div>
-                                        <dt className="text-muted-foreground">Gender</dt>
-                                        <dd className="text-foreground">{p.gender}</dd>
-                                      </div>
-                                    )}
-                                    {p.race && (
-                                      <div>
-                                        <dt className="text-muted-foreground">Race</dt>
-                                        <dd className="text-foreground">{p.race}</dd>
-                                      </div>
-                                    )}
-                                    <div>
-                                      <dt className="text-muted-foreground">LGBTQ+</dt>
-                                      <dd className="text-foreground">{p.lgbtq ? "Yes" : "No"}</dd>
-                                    </div>
-                                    <div>
-                                      <dt className="text-muted-foreground">Times booked</dt>
-                                      <dd className="text-foreground">{p.bookingCount ?? 0}</dd>
-                                    </div>
-                                  </dl>
-                                </div>
-                              </div>
-                            )}
-                            {affinityTab === "affinity" && (
-                              <div className="px-4 py-3 space-y-2">
-                                {performers.filter((other) => other.id !== p.id).length === 0 ? (
-                                  <p className="text-xs text-muted-foreground">No other performers.</p>
-                                ) : (
-                                  <>
-                                    <Input
-                                      placeholder="Search performers..."
-                                      value={affinitySearch}
-                                      onChange={(e) => setAffinitySearch(e.target.value)}
-                                      className="h-7 text-xs bg-input border-border"
-                                    />
-                                    {(() => {
-                                      const q = affinitySearch.trim().toLowerCase()
-                                      const others = performers
-                                        .filter((other) => other.id !== p.id)
-                                        .filter((other) => !q || other.name.toLowerCase().includes(q))
-                                        .sort((a, b) => a.name.localeCompare(b.name))
-                                      const entry = compatibility[p.id] ?? { likes: [], dislikes: [] }
-                                      return others.length === 0 ? (
-                                        <p className="text-xs text-muted-foreground py-1">No matches.</p>
-                                      ) : (
-                                        <div className="space-y-0.5 max-h-40 overflow-y-auto">
-                                          {others.map((other) => {
-                                            const liked = entry.likes.includes(other.id)
-                                            const disliked = entry.dislikes.includes(other.id)
-                                            return (
-                                              <div key={other.id} className="flex items-center gap-2 py-0.5">
-                                                <span className="text-xs text-foreground flex-1 truncate">{other.name}</span>
-                                                <div className="flex items-center gap-1 shrink-0">
-                                                  <button
-                                                    type="button"
-                                                    onClick={() => toggleLike(p.id, other.id)}
-                                                    title={liked ? "Remove like" : "Mark as liked collaborator"}
-                                                    className={cn(
-                                                      "rounded p-0.5 transition-colors",
-                                                      liked
-                                                        ? "text-green-600 dark:text-green-400 bg-green-600/10"
-                                                        : "text-muted-foreground hover:text-green-600 dark:hover:text-green-400",
-                                                    )}
-                                                  >
-                                                    <Heart className="h-3 w-3" />
-                                                  </button>
-                                                  <button
-                                                    type="button"
-                                                    onClick={() => toggleDislike(p.id, other.id)}
-                                                    title={disliked ? "Remove conflict" : "Mark as incompatible"}
-                                                    className={cn(
-                                                      "rounded p-0.5 transition-colors",
-                                                      disliked
-                                                        ? "text-destructive bg-destructive/10"
-                                                        : "text-muted-foreground hover:text-destructive",
-                                                    )}
-                                                  >
-                                                    <ThumbsDown className="h-3 w-3" />
-                                                  </button>
-                                                </div>
-                                              </div>
-                                            )
-                                          })}
-                                        </div>
-                                      )
-                                    })()}
-                                  </>
-                                )}
-                              </div>
-                            )}
                           </div>
                         )}
                       </li>

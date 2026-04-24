@@ -56,6 +56,8 @@ interface PerformerPanelProps {
   compatibility: CompatibilityMap
   onCompatibilityChange: (performerId: string, patch: { likes?: string[]; dislikes?: string[] }) => void
   onCompatibilitySave: (map: CompatibilityMap) => void
+  // When set, only performers whose IDs are in this set are shown (null = show all)
+  availableFilter?: Set<string> | null
 }
 
 const inputClasses =
@@ -70,6 +72,7 @@ export function AsssscatPerformerPanel({
   canAddMore,
   compatibility,
   onCompatibilityChange,
+  availableFilter,
 }: PerformerPanelProps) {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -90,14 +93,20 @@ export function AsssscatPerformerPanel({
   const hasDemoFilter = demoGenders.length > 0 || demoRaces.length > 0 || demoLgbtq !== null
 
   const filteredPerformers = useMemo(() => {
-    if (!hasDemoFilter) return performers
-    return performers.filter((p) => {
-      if (demoGenders.length > 0 && (!p.gender || !demoGenders.includes(p.gender))) return false
-      if (demoRaces.length > 0 && (!p.race || !demoRaces.includes(p.race))) return false
-      if (demoLgbtq !== null && Boolean(p.lgbtq) !== demoLgbtq) return false
-      return true
-    })
-  }, [performers, demoGenders, demoRaces, demoLgbtq, hasDemoFilter])
+    let list = performers
+    if (hasDemoFilter) {
+      list = list.filter((p) => {
+        if (demoGenders.length > 0 && (!p.gender || !demoGenders.includes(p.gender))) return false
+        if (demoRaces.length > 0 && (!p.race || !demoRaces.includes(p.race))) return false
+        if (demoLgbtq !== null && Boolean(p.lgbtq) !== demoLgbtq) return false
+        return true
+      })
+    }
+    if (availableFilter != null) {
+      list = list.filter((p) => availableFilter.has(p.id))
+    }
+    return list
+  }, [performers, demoGenders, demoRaces, demoLgbtq, hasDemoFilter, availableFilter])
 
   const grouped = useMemo(() => groupByCategory(filteredPerformers), [filteredPerformers])
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds])
