@@ -486,6 +486,16 @@
     97% { opacity: 0; }
   }
 
+  /* CTA button: slight tilt that flattens on hover */
+  .landing-cta-tilt {
+    transform: rotate(0.5deg);
+    transition: transform 150ms ease-out, color 150ms, background-color 150ms, border-color 150ms;
+  }
+  .landing-cta-tilt:hover,
+  .landing-cta-tilt:focus-visible {
+    transform: rotate(0deg);
+  }
+
   /* Pulsing live indicator */
   .landing-pulse {
     animation: live-pulse 2s ease-in-out infinite;

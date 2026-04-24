@@ -31,6 +31,15 @@ export default function LandingPage() {
         className="landing-scanlines pointer-events-none absolute inset-0 z-0"
       />
 
+      {/* Tilted background accent bar */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      >
+        <div className="absolute -left-20 top-1/3 w-[60vw] h-[2px] bg-primary/20 origin-left rotate-[-8deg]" />
+        <div className="absolute right-0 bottom-1/3 w-[40vw] h-[1px] bg-foreground/10 origin-right rotate-[6deg]" />
+      </div>
+
       <div className="relative z-10 flex flex-col flex-1">
         <SiteHeader
           subStrip
@@ -47,69 +56,85 @@ export default function LandingPage() {
         <section className="flex-1 flex flex-col justify-center">
           <div className="mx-auto max-w-6xl px-6 pt-12 pb-16 sm:pt-16 sm:pb-20">
 
-            {/* Top rule */}
-            <div className="flex items-center gap-4 mb-8">
-              <div className="h-px flex-1 bg-foreground/40" />
+            {/* Date stamp — tilted left edge */}
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-1 h-8 bg-primary rotate-[-4deg] shrink-0" />
               <span className="text-[10px] tracking-[0.4em] uppercase text-foreground/50 font-mono">
                 {todayLong}
               </span>
-              <div className="h-px flex-1 bg-foreground/40" />
+              <div className="h-px flex-1 bg-foreground/20" />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 items-stretch">
-              {/* Hero block */}
-              <div className="lg:col-span-8 border-2 border-foreground p-8 sm:p-12 relative">
-                {/* Corner marks */}
-                <span aria-hidden className="absolute top-2 left-2 text-[8px] font-mono text-foreground/30 tracking-widest">▮▮▮</span>
-                <span aria-hidden className="absolute top-2 right-2 text-[8px] font-mono text-foreground/30 tracking-widest">▮▮▮</span>
+            {/* Main content: stacked, off-axis cards */}
+            <div className="relative">
 
-                <p className="mb-5 text-[10px] tracking-[0.45em] uppercase text-primary font-mono">
+              {/* Hero headline — large, bleeds off grid */}
+              <div className="relative mb-8 sm:mb-12">
+                <p className="mb-4 text-[10px] tracking-[0.5em] uppercase text-primary font-mono">
                   ◆ IN HOUSE
                 </p>
 
-                <h1 className="font-display text-5xl sm:text-6xl lg:text-[5rem] leading-[0.92] tracking-tight uppercase">
-                  <span className="block">Internal tools for the</span>{" "}
-                  <span className="block text-primary landing-glitch" data-text="UCB">
-                    UCB
-                  </span>{" "}
-                  <span className="block italic font-serif text-3xl sm:text-4xl lg:text-[2.8rem] font-normal normal-case tracking-normal text-foreground/80 mt-2">
+                <h1 className="font-display leading-[0.88] tracking-tight uppercase">
+                  <span className="block text-4xl sm:text-6xl lg:text-[5.5rem] text-foreground">
+                    Internal tools{" "}
+                  </span>
+                  <span className="block text-4xl sm:text-6xl lg:text-[5.5rem] text-foreground/40 pl-[0.08em] sm:pl-[0.15em]">
+                    for the{" "}
+                  </span>
+                  <span
+                    className="block text-6xl sm:text-8xl lg:text-[9rem] text-primary landing-glitch"
+                    data-text="UCB"
+                  >
+                    UCB{" "}
+                  </span>
+                  <span className="block font-serif italic text-xl sm:text-2xl lg:text-3xl text-foreground/60 font-normal normal-case tracking-normal mt-3 pl-1">
                     artistic team.
                   </span>
                 </h1>
 
-                <div className="mt-10 flex items-center gap-4">
-                  <div className="h-px w-12 bg-primary" />
-                  <p className="text-xs tracking-[0.3em] uppercase text-foreground/40 font-mono">
-                    Est. MCMXCVI · NY · LA
-                  </p>
+                {/* Small tilted badge */}
+                <div className="absolute top-0 right-0 sm:right-8 hidden sm:block">
+                  <div className="rotate-[8deg] border border-foreground/20 px-3 py-2 origin-top-right">
+                    <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/30 font-mono block">
+                      Est. MCMXCVI
+                    </span>
+                    <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/30 font-mono block mt-0.5">
+                      NY · LA
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* CTA block */}
-              <div className="lg:col-span-4 border-2 border-l-0 border-foreground flex flex-col">
-                <div className="border-b-2 border-foreground px-6 py-4">
-                  <p className="text-[9px] tracking-[0.45em] uppercase text-foreground/40 font-mono">
-                    ACCESS
-                  </p>
-                </div>
+              {/* CTA strip — tilted, punchy */}
+              <div className="relative mt-2">
+                {/* Tilted accent line behind CTA */}
+                <div
+                  aria-hidden
+                  className="absolute -left-6 top-1/2 w-[calc(100%+3rem)] h-px bg-foreground/10 rotate-[-1.5deg] origin-left pointer-events-none"
+                />
 
-                <div className="flex-1 px-6 py-8 flex flex-col gap-6">
-                  <p className="text-sm leading-relaxed text-foreground/60 font-mono">
-                    Staff only.<br />
-                    Don&apos;t think. Book.
-                  </p>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
+                  {/* Staff notice */}
+                  <div className="relative">
+                    <div className="rotate-[-2deg] border border-foreground/30 px-4 py-3 bg-background inline-block">
+                      <p className="text-xs text-foreground/50 font-mono leading-relaxed">
+                        Staff only.<br />
+                        Don&apos;t think. Book.
+                      </p>
+                    </div>
+                  </div>
 
+                  {/* CTA button */}
                   <Link
                     href="/login"
-                    className="group mt-auto inline-flex w-full items-center justify-between gap-3 border-2 border-primary bg-primary px-5 py-4 text-sm font-bold tracking-[0.25em] uppercase text-primary-foreground hover:bg-foreground hover:text-background hover:border-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background cta-shimmer"
+                    className="group inline-flex items-center gap-3 border-2 border-primary bg-primary px-6 py-4 text-sm font-bold tracking-[0.25em] uppercase text-primary-foreground hover:bg-foreground hover:text-background hover:border-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background cta-shimmer landing-cta-tilt"
                   >
                     <span>Sign in</span>
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
-                </div>
 
-                <div className="border-t-2 border-foreground px-6 py-3">
-                  <div className="flex items-center gap-2">
+                  {/* Live indicator */}
+                  <div className="hidden sm:flex items-center gap-2 ml-auto">
                     <span className="inline-block w-2 h-2 rounded-full bg-primary landing-pulse" />
                     <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/40 font-mono">
                       Live
@@ -117,16 +142,17 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Bottom rule */}
-            <div className="mt-0 border-t-0 border-b-2 border-x-2 border-foreground px-8 py-3 flex items-center justify-between gap-4">
-              <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/30 font-mono">
-                ◀ UCB BOOKINGS INTERNAL
-              </span>
-              <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/30 font-mono">
-                v2 ▶
-              </span>
+              {/* Bottom rule strip — slightly tilted */}
+              <div className="mt-16 sm:mt-20">
+                <div className="flex items-center gap-6">
+                  <div className="h-px flex-1 bg-foreground/20" />
+                  <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/25 font-mono">
+                    UCB BOOKINGS INTERNAL · v2
+                  </span>
+                  <div className="h-px w-8 bg-foreground/20 rotate-[-15deg] origin-left" />
+                </div>
+              </div>
             </div>
           </div>
         </section>
