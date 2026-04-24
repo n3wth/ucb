@@ -9,9 +9,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
-import { Calendar, Clock, DollarSign, Mail, Monitor, ArrowRight } from "lucide-react"
-import { VENUES, DEFAULT_VENUE, DEFAULT_DIGITAL_PRICE, type VenueName } from "@/lib/config"
+import { Calendar, Clock, DollarSign, Mail, Monitor, ArrowRight, Timer } from "lucide-react"
+import {
+  VENUES,
+  DEFAULT_VENUE,
+  DEFAULT_DIGITAL_PRICE,
+  DEFAULT_SHOW_DURATION_MINUTES,
+  SHOW_DURATION_PRESETS,
+  MIN_SHOW_DURATION_MINUTES,
+  MAX_SHOW_DURATION_MINUTES,
+  type VenueName,
+} from "@/lib/config"
 import type { ShowDetails } from "@/lib/types"
+
+const DURATION_OTHER = "other"
+type DurationChoice = (typeof SHOW_DURATION_PRESETS)[number] | typeof DURATION_OTHER
 
 interface ShowConfirmationFormProps {
   initialValue?: ShowDetails | null
@@ -23,6 +35,7 @@ const DEFAULT_FORM: ShowDetails = {
   showDate: "",
   venue: DEFAULT_VENUE,
   showTime: "",
+  durationMinutes: DEFAULT_SHOW_DURATION_MINUTES,
   techRehearsalTime: "",
   presaleTicketPrice: 0,
   doorTicketPrice: 0,
@@ -30,8 +43,17 @@ const DEFAULT_FORM: ShowDetails = {
   producerEmail: "",
 }
 
+function initialDurationChoice(minutes: number): DurationChoice {
+  return (SHOW_DURATION_PRESETS as readonly number[]).includes(minutes)
+    ? (minutes as (typeof SHOW_DURATION_PRESETS)[number])
+    : DURATION_OTHER
+}
+
 export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmationFormProps) {
   const [formData, setFormData] = useState<ShowDetails>(initialValue ?? DEFAULT_FORM)
+  const [durationChoice, setDurationChoice] = useState<DurationChoice>(() =>
+    initialDurationChoice((initialValue ?? DEFAULT_FORM).durationMinutes),
+  )
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,6 +62,16 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
 
   const updateField = <K extends keyof ShowDetails>(field: K, value: ShowDetails[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleDurationChoiceChange = (value: string) => {
+    if (value === DURATION_OTHER) {
+      setDurationChoice(DURATION_OTHER)
+      return
+    }
+    const minutes = Number(value) as (typeof SHOW_DURATION_PRESETS)[number]
+    setDurationChoice(minutes)
+    updateField("durationMinutes", minutes)
   }
 
   const inputClasses = "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
@@ -138,6 +170,52 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
                 className={inputClasses}
               />
             </Field>
+          </div>
+
+          {/* Event duration row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <Field>
+              <FieldLabel htmlFor="durationChoice" className="text-xs">
+                <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                Event duration
+              </FieldLabel>
+              <Select value={String(durationChoice)} onValueChange={handleDurationChoiceChange}>
+                <SelectTrigger id="durationChoice" className={inputClasses}>
+                  <SelectValue placeholder="Select duration" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SHOW_DURATION_PRESETS.map((minutes) => (
+                    <SelectItem key={minutes} value={String(minutes)}>
+                      {minutes} minutes
+                    </SelectItem>
+                  ))}
+                  <SelectItem value={DURATION_OTHER}>Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+
+            {durationChoice === DURATION_OTHER && (
+              <Field>
+                <FieldLabel htmlFor="durationMinutes" className="text-xs">
+                  <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                  Custom duration
+                  <span className="text-muted-foreground/70 font-normal ml-1">(minutes)</span>
+                </FieldLabel>
+                <Input
+                  id="durationMinutes"
+                  type="number"
+                  min={MIN_SHOW_DURATION_MINUTES}
+                  max={MAX_SHOW_DURATION_MINUTES}
+                  step="5"
+                  value={formData.durationMinutes || ""}
+                  onChange={(e) =>
+                    updateField("durationMinutes", Math.floor(parseFloat(e.target.value) || 0))
+                  }
+                  className={inputClasses}
+                  required
+                />
+              </Field>
+            )}
           </div>
 
           {/* Pricing row */}

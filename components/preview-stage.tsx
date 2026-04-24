@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
-import { Calendar, Clock, FolderOpen, MapPin, Monitor, ArrowLeft, Send, DollarSign } from "lucide-react"
+import { Calendar, Clock, FolderOpen, MapPin, Monitor, ArrowLeft, Send, DollarSign, Timer } from "lucide-react"
 import { EmailPreview } from "@/components/email-preview"
 import { formatDate, formatTime, formatPrice } from "@/lib/format"
 import type { ShowDetails } from "@/lib/types"
@@ -63,6 +63,7 @@ export function PreviewStage({
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               <DetailItem icon={<Calendar className="h-3.5 w-3.5" />} label="Date" value={formatDate(showDetails.showDate)} />
               <DetailItem icon={<Clock className="h-3.5 w-3.5" />} label="Time" value={formatTime(showDetails.showTime)} />
+              <DetailItem icon={<Timer className="h-3.5 w-3.5" />} label="Duration" value={`${showDetails.durationMinutes} min`} />
               <DetailItem icon={<MapPin className="h-3.5 w-3.5" />} label="Venue" value={showDetails.venue} />
               {showDetails.techRehearsalTime && (
                 <DetailItem icon={<Clock className="h-3.5 w-3.5" />} label="Tech" value={formatTime(showDetails.techRehearsalTime)} />
