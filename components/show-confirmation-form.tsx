@@ -178,21 +178,66 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             </Field>
           </div>
 
-          {/* Show time row */}
-          <Field>
-            <FieldLabel htmlFor="showTime" className="text-xs">
-              <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
-              Show time
-            </FieldLabel>
-            <Input
-              id="showTime"
-              type="time"
-              value={formData.showTime}
-              onChange={(e) => updateField("showTime", e.target.value)}
-              className={inputClasses}
-              required
-            />
-          </Field>
+          {/* Show time and event duration row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <Field>
+              <FieldLabel htmlFor="showTime" className="text-xs">
+                <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                Show time
+              </FieldLabel>
+              <Input
+                id="showTime"
+                type="time"
+                value={formData.showTime}
+                onChange={(e) => updateField("showTime", e.target.value)}
+                className={inputClasses}
+                required
+              />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="durationChoice" className="text-xs">
+                <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                Event duration
+              </FieldLabel>
+              <Select value={String(durationChoice)} onValueChange={handleDurationChoiceChange}>
+                <SelectTrigger id="durationChoice" className={inputClasses}>
+                  <SelectValue placeholder="Select duration" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SHOW_DURATION_PRESETS.map((minutes) => (
+                    <SelectItem key={minutes} value={String(minutes)}>
+                      {minutes} minutes
+                    </SelectItem>
+                  ))}
+                  <SelectItem value={DURATION_OTHER}>Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
+
+          {durationChoice === DURATION_OTHER && (
+            <Field>
+              <FieldLabel htmlFor="durationMinutes" className="text-xs">
+                <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                Custom duration
+                <span className="text-muted-foreground/70 font-normal ml-1">(minutes)</span>
+              </FieldLabel>
+              <Input
+                id="durationMinutes"
+                type="number"
+                min={MIN_SHOW_DURATION_MINUTES}
+                max={MAX_SHOW_DURATION_MINUTES}
+                step="5"
+                value={formData.durationMinutes || ""}
+                onChange={(e) =>
+                  updateField("durationMinutes", Math.floor(parseFloat(e.target.value) || 0))
+                }
+                className={inputClasses}
+                required
+              />
+            </Field>
+          )}
 
           {/* Tech rehearsal section */}
           <div className="rounded-lg border border-border bg-muted/40 p-5 space-y-4">
@@ -266,52 +311,6 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
                       "techRehearsalDurationMinutes",
                       Math.floor(parseFloat(e.target.value) || 0),
                     )
-                  }
-                  className={inputClasses}
-                  required
-                />
-              </Field>
-            )}
-          </div>
-
-          {/* Event duration row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Field>
-              <FieldLabel htmlFor="durationChoice" className="text-xs">
-                <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
-                Event duration
-              </FieldLabel>
-              <Select value={String(durationChoice)} onValueChange={handleDurationChoiceChange}>
-                <SelectTrigger id="durationChoice" className={inputClasses}>
-                  <SelectValue placeholder="Select duration" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SHOW_DURATION_PRESETS.map((minutes) => (
-                    <SelectItem key={minutes} value={String(minutes)}>
-                      {minutes} minutes
-                    </SelectItem>
-                  ))}
-                  <SelectItem value={DURATION_OTHER}>Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-
-            {durationChoice === DURATION_OTHER && (
-              <Field>
-                <FieldLabel htmlFor="durationMinutes" className="text-xs">
-                  <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
-                  Custom duration
-                  <span className="text-muted-foreground/70 font-normal ml-1">(minutes)</span>
-                </FieldLabel>
-                <Input
-                  id="durationMinutes"
-                  type="number"
-                  min={MIN_SHOW_DURATION_MINUTES}
-                  max={MAX_SHOW_DURATION_MINUTES}
-                  step="5"
-                  value={formData.durationMinutes || ""}
-                  onChange={(e) =>
-                    updateField("durationMinutes", Math.floor(parseFloat(e.target.value) || 0))
                   }
                   className={inputClasses}
                   required
