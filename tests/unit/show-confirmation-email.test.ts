@@ -21,6 +21,12 @@ const showDetails: ShowDetails = {
   ccEmails: [],
 }
 
+const showDetailsWithTech: ShowDetails = {
+  ...showDetails,
+  techRehearsalTime: '18:00',
+  techRehearsalDurationMinutes: 60,
+}
+
 const DRIVE_URL = 'https://drive.google.com/drive/folders/abc123'
 
 describe('renderShowConfirmationBody', () => {
@@ -28,6 +34,16 @@ describe('renderShowConfirmationBody', () => {
     const body = renderShowConfirmationBody({ showDetails })
     expect(body).toContain(DRIVE_FOLDER_PLACEHOLDER)
     expect(body).not.toContain(DRIVE_URL)
+  })
+
+  it('shows "Not scheduled" when tech rehearsal time is empty', () => {
+    const body = renderShowConfirmationBody({ showDetails })
+    expect(body).toContain('Tech rehearsal: Not scheduled')
+  })
+
+  it('shows start and end time for tech rehearsal when scheduled', () => {
+    const body = renderShowConfirmationBody({ showDetails: showDetailsWithTech })
+    expect(body).toContain('Tech rehearsal: 6:00 PM – 7:00 PM')
   })
 
   it('renders the drive URL line when provided', () => {

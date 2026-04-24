@@ -1,4 +1,4 @@
-import { formatDate, formatTime, formatPrice } from "@/lib/format"
+import { formatDate, formatTime, formatPrice, addMinutesToTime } from "@/lib/format"
 import type { ShowDetails } from "@/lib/types"
 
 export interface ShowConfirmationInput {
@@ -15,7 +15,14 @@ export function renderShowConfirmationSubject(showDetails: ShowDetails): string 
 export function renderShowConfirmationBody({ showDetails, driveFolderUrl }: ShowConfirmationInput): string {
   const formattedDate = formatDate(showDetails.showDate)
   const formattedShowTime = formatTime(showDetails.showTime)
-  const formattedTechTime = showDetails.techRehearsalTime ? formatTime(showDetails.techRehearsalTime) : "Not scheduled"
+  const formattedTechTime = showDetails.techRehearsalTime
+    ? (() => {
+        const start = formatTime(showDetails.techRehearsalTime)
+        const endRaw = addMinutesToTime(showDetails.techRehearsalTime, showDetails.techRehearsalDurationMinutes)
+        const end = formatTime(endRaw)
+        return `${start} – ${end}`
+      })()
+    : "Not scheduled"
 
   const ticketLines = [
     `Presale: ${formatPrice(showDetails.presaleTicketPrice)}`,
