@@ -44,7 +44,7 @@ export function SiteHeader({
             href="https://ucbcomedy.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="link-rainbow text-[10px] sm:text-xs font-medium tracking-[0.2em] uppercase text-foreground/60 hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="hidden sm:inline link-rainbow text-[10px] sm:text-xs font-medium tracking-[0.2em] uppercase text-foreground/60 hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             ucbcomedy.com <span aria-hidden="true">↗</span>
           </a>
