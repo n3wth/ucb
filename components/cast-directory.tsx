@@ -392,127 +392,144 @@ export function CastDirectory({
 
       {/* Add / Edit form */}
       {showForm && (
-        <div className="border border-border rounded-lg bg-muted/40 p-4 space-y-3">
+        <div className="border border-border rounded-lg bg-muted/40 p-4 space-y-4">
           <h3 className="text-xs font-medium text-foreground">
             {editingId ? "Edit performer" : "Add performer"}
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label htmlFor="dirName" className="text-xs">Name *</Label>
-              <Input
-                id="dirName"
-                value={draft.name}
-                onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
-                className={inputClasses}
-                placeholder="Jane Doe"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="dirCategory" className="text-xs">Category *</Label>
-              <Select
-                value={draft.category}
-                onValueChange={(v) => setDraft((d) => ({ ...d, category: v as AsssscatPerformerCategory }))}
-              >
-                <SelectTrigger id="dirCategory" className={inputClasses}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {ASSSSCAT_PERFORMER_CATEGORIES.map((c) => (
-                    <SelectItem key={c} value={c}>{c}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="dirEmail" className="text-xs">Email *</Label>
-              <Input
-                id="dirEmail"
-                type="email"
-                value={draft.email}
-                onChange={(e) => setDraft((d) => ({ ...d, email: e.target.value }))}
-                className={inputClasses}
-                placeholder="jane@example.com"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="dirAltEmail" className="text-xs">Additional email</Label>
-              <Input
-                id="dirAltEmail"
-                type="email"
-                value={draft.additionalEmail ?? ""}
-                onChange={(e) => setDraft((d) => ({ ...d, additionalEmail: e.target.value }))}
-                className={inputClasses}
-                placeholder="alt@example.com"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="dirPhone" className="text-xs">Phone number</Label>
-              <Input
-                id="dirPhone"
-                type="tel"
-                value={draft.phone ?? ""}
-                onChange={(e) => setDraft((d) => ({ ...d, phone: e.target.value }))}
-                className={inputClasses}
-                placeholder="(555) 000-0000"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="dirGender" className="text-xs">Gender</Label>
-              <Select
-                value={draft.gender ?? NONE_VALUE}
-                onValueChange={(v) =>
-                  setDraft((d) => ({
-                    ...d,
-                    gender: v === NONE_VALUE ? undefined : (v as PerformerGender),
-                  }))
-                }
-              >
-                <SelectTrigger id="dirGender" className={inputClasses}>
-                  <SelectValue placeholder="Not specified" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NONE_VALUE}>Not specified</SelectItem>
-                  {PERFORMER_GENDERS.map((g) => (
-                    <SelectItem key={g} value={g}>{g}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="dirRace" className="text-xs">Race / Ethnicity</Label>
-              <Select
-                value={draft.race ?? NONE_VALUE}
-                onValueChange={(v) =>
-                  setDraft((d) => ({
-                    ...d,
-                    race: v === NONE_VALUE ? undefined : (v as PerformerRace),
-                  }))
-                }
-              >
-                <SelectTrigger id="dirRace" className={inputClasses}>
-                  <SelectValue placeholder="Not specified" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NONE_VALUE}>Not specified</SelectItem>
-                  {PERFORMER_RACES.map((r) => (
-                    <SelectItem key={r} value={r}>{r}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center gap-2 pt-5">
-              <Checkbox
-                id="dirLgbtq"
-                checked={draft.lgbtq ?? false}
-                onCheckedChange={(checked) =>
-                  setDraft((d) => ({ ...d, lgbtq: checked === true }))
-                }
-              />
-              <Label htmlFor="dirLgbtq" className="text-xs cursor-pointer">
-                LGBTQ+ community member
-              </Label>
+
+          {/* Contact section */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-medium tracking-[0.12em] uppercase text-muted-foreground">
+              Contact
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label htmlFor="dirName" className="text-xs">Name *</Label>
+                <Input
+                  id="dirName"
+                  value={draft.name}
+                  onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
+                  className={inputClasses}
+                  placeholder="Jane Doe"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="dirCategory" className="text-xs">Category *</Label>
+                <Select
+                  value={draft.category}
+                  onValueChange={(v) => setDraft((d) => ({ ...d, category: v as AsssscatPerformerCategory }))}
+                >
+                  <SelectTrigger id="dirCategory" className={inputClasses}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ASSSSCAT_PERFORMER_CATEGORIES.map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="dirEmail" className="text-xs">Email *</Label>
+                <Input
+                  id="dirEmail"
+                  type="email"
+                  value={draft.email}
+                  onChange={(e) => setDraft((d) => ({ ...d, email: e.target.value }))}
+                  className={inputClasses}
+                  placeholder="jane@example.com"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="dirAltEmail" className="text-xs">Additional email</Label>
+                <Input
+                  id="dirAltEmail"
+                  type="email"
+                  value={draft.additionalEmail ?? ""}
+                  onChange={(e) => setDraft((d) => ({ ...d, additionalEmail: e.target.value }))}
+                  className={inputClasses}
+                  placeholder="alt@example.com"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="dirPhone" className="text-xs">Phone number</Label>
+                <Input
+                  id="dirPhone"
+                  type="tel"
+                  value={draft.phone ?? ""}
+                  onChange={(e) => setDraft((d) => ({ ...d, phone: e.target.value }))}
+                  className={inputClasses}
+                  placeholder="(555) 000-0000"
+                />
+              </div>
             </div>
           </div>
+
+          {/* Demographics section */}
+          <div className="space-y-2 border-t border-border/40 pt-3">
+            <p className="text-[10px] font-medium tracking-[0.12em] uppercase text-muted-foreground">
+              Demographics
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label htmlFor="dirGender" className="text-xs">Gender</Label>
+                <Select
+                  value={draft.gender ?? NONE_VALUE}
+                  onValueChange={(v) =>
+                    setDraft((d) => ({
+                      ...d,
+                      gender: v === NONE_VALUE ? undefined : (v as PerformerGender),
+                    }))
+                  }
+                >
+                  <SelectTrigger id="dirGender" className={inputClasses}>
+                    <SelectValue placeholder="Not specified" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NONE_VALUE}>Not specified</SelectItem>
+                    {PERFORMER_GENDERS.map((g) => (
+                      <SelectItem key={g} value={g}>{g}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="dirRace" className="text-xs">Race / Ethnicity</Label>
+                <Select
+                  value={draft.race ?? NONE_VALUE}
+                  onValueChange={(v) =>
+                    setDraft((d) => ({
+                      ...d,
+                      race: v === NONE_VALUE ? undefined : (v as PerformerRace),
+                    }))
+                  }
+                >
+                  <SelectTrigger id="dirRace" className={inputClasses}>
+                    <SelectValue placeholder="Not specified" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NONE_VALUE}>Not specified</SelectItem>
+                    {PERFORMER_RACES.map((r) => (
+                      <SelectItem key={r} value={r}>{r}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2 pt-1">
+                <Checkbox
+                  id="dirLgbtq"
+                  checked={draft.lgbtq ?? false}
+                  onCheckedChange={(checked) =>
+                    setDraft((d) => ({ ...d, lgbtq: checked === true }))
+                  }
+                />
+                <Label htmlFor="dirLgbtq" className="text-xs cursor-pointer">
+                  LGBTQ+ community member
+                </Label>
+              </div>
+            </div>
+          </div>
+
           {error && <p className="text-xs text-destructive">{error}</p>}
           <div className="flex gap-2 pt-1">
             <Button type="button" size="sm" className="h-8 text-xs" onClick={handleSave}>
@@ -667,44 +684,58 @@ export function CastDirectory({
                               </button>
                             </div>
                             {affinityTab === "profile" && (
-                              <dl className="px-4 py-3 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                              <div className="px-4 py-3 space-y-3 text-xs">
                                 <div>
-                                  <dt className="text-muted-foreground">Email</dt>
-                                  <dd className="text-foreground">{p.email || "—"}</dd>
+                                  <p className="text-[10px] font-medium tracking-[0.12em] uppercase text-muted-foreground mb-1.5">
+                                    Contact
+                                  </p>
+                                  <dl className="grid grid-cols-2 gap-x-4 gap-y-1">
+                                    <div>
+                                      <dt className="text-muted-foreground">Email</dt>
+                                      <dd className="text-foreground">{p.email || "—"}</dd>
+                                    </div>
+                                    {p.additionalEmail && (
+                                      <div>
+                                        <dt className="text-muted-foreground">Alt email</dt>
+                                        <dd className="text-foreground">{p.additionalEmail}</dd>
+                                      </div>
+                                    )}
+                                    {p.phone && (
+                                      <div>
+                                        <dt className="text-muted-foreground">Phone</dt>
+                                        <dd className="text-foreground">{p.phone}</dd>
+                                      </div>
+                                    )}
+                                  </dl>
                                 </div>
-                                {p.additionalEmail && (
-                                  <div>
-                                    <dt className="text-muted-foreground">Alt email</dt>
-                                    <dd className="text-foreground">{p.additionalEmail}</dd>
-                                  </div>
-                                )}
-                                {p.phone && (
-                                  <div>
-                                    <dt className="text-muted-foreground">Phone</dt>
-                                    <dd className="text-foreground">{p.phone}</dd>
-                                  </div>
-                                )}
-                                {p.gender && (
-                                  <div>
-                                    <dt className="text-muted-foreground">Gender</dt>
-                                    <dd className="text-foreground">{p.gender}</dd>
-                                  </div>
-                                )}
-                                {p.race && (
-                                  <div>
-                                    <dt className="text-muted-foreground">Race</dt>
-                                    <dd className="text-foreground">{p.race}</dd>
-                                  </div>
-                                )}
-                                <div>
-                                  <dt className="text-muted-foreground">LGBTQ+</dt>
-                                  <dd className="text-foreground">{p.lgbtq ? "Yes" : "No"}</dd>
+                                <div className="border-t border-border/40 pt-3">
+                                  <p className="text-[10px] font-medium tracking-[0.12em] uppercase text-muted-foreground mb-1.5">
+                                    Demographics
+                                  </p>
+                                  <dl className="grid grid-cols-2 gap-x-4 gap-y-1">
+                                    {p.gender && (
+                                      <div>
+                                        <dt className="text-muted-foreground">Gender</dt>
+                                        <dd className="text-foreground">{p.gender}</dd>
+                                      </div>
+                                    )}
+                                    {p.race && (
+                                      <div>
+                                        <dt className="text-muted-foreground">Race</dt>
+                                        <dd className="text-foreground">{p.race}</dd>
+                                      </div>
+                                    )}
+                                    <div>
+                                      <dt className="text-muted-foreground">LGBTQ+</dt>
+                                      <dd className="text-foreground">{p.lgbtq ? "Yes" : "No"}</dd>
+                                    </div>
+                                    <div>
+                                      <dt className="text-muted-foreground">Times booked</dt>
+                                      <dd className="text-foreground">{p.bookingCount ?? 0}</dd>
+                                    </div>
+                                  </dl>
                                 </div>
-                                <div>
-                                  <dt className="text-muted-foreground">Times booked</dt>
-                                  <dd className="text-foreground">{p.bookingCount ?? 0}</dd>
-                                </div>
-                              </dl>
+                              </div>
                             )}
                             {affinityTab === "affinity" && (
                               <div className="px-4 py-3 space-y-1 max-h-48 overflow-y-auto">
