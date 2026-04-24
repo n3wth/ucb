@@ -48,8 +48,8 @@ export function ToolRow({ tool }: ToolRowProps) {
       <Link
         href={tool.href}
         className={cn(
-          "group block px-1 -mx-1 rounded-md transition-colors",
-          "hover:bg-muted/50",
+          "group block px-1 -mx-1 rounded-md transition-all duration-200",
+          "hover:bg-muted/50 hover:-translate-y-px motion-reduce:hover:translate-y-0",
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         )}
       >
