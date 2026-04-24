@@ -36,7 +36,7 @@ export function socialCard({
             top: 0,
             height: '100%',
             width: Math.round(width * 0.008),
-            background: UCB_BRAND.maroon,
+            background: UCB_BRAND.accent,
           }}
         />
 
