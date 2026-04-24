@@ -3,6 +3,8 @@
 export {
   renderShowConfirmationBody,
   renderShowConfirmationSubject,
+  injectDriveFolderUrl,
+  DRIVE_FOLDER_PLACEHOLDER,
   type ShowConfirmationInput,
 } from "./show-confirmation"
 
