@@ -60,3 +60,40 @@ export const confirmShowRequestSchema = z.object({
 })
 
 export type ConfirmShowRequest = z.infer<typeof confirmShowRequestSchema>
+
+// ---------- ASSSSCAT ----------
+
+import { ASSSSCAT_PERFORMER_CATEGORIES } from "@/lib/types"
+
+const asssscatPerformerSchema = z.object({
+  id: z.string().trim().min(1),
+  name: nonEmpty("performer name"),
+  email: z
+    .string()
+    .trim()
+    .regex(/.+@.+\..+/, "performer email is invalid"),
+  category: z.enum(ASSSSCAT_PERFORMER_CATEGORIES),
+})
+
+const asssscatMonologistSchema = z.object({
+  name: z.string().trim(),
+  link: z.string().trim(),
+  credits: z.string().trim(),
+})
+
+export const sendAsssscatRequestSchema = z.object({
+  showDate: nonEmpty("showDate"),
+  improvisers: z
+    .array(asssscatPerformerSchema)
+    .min(1, "At least one improviser is required")
+    .max(8, "A show cannot have more than 8 improvisers"),
+  monologist: asssscatMonologistSchema,
+  ticketLink: z.string().trim(),
+  oneTimeCc: z.array(ccEmail).max(20, "oneTimeCc cannot exceed 20 addresses").optional().default([]),
+  defaultCc: z.array(ccEmail).max(20, "defaultCc cannot exceed 20 addresses").optional().default([]),
+  emailSubject: z.string().optional(),
+  emailBody: z.string().optional(),
+  smallCastAcknowledged: z.boolean().optional().default(false),
+})
+
+export type SendAsssscatRequest = z.infer<typeof sendAsssscatRequestSchema>

@@ -34,6 +34,37 @@ export interface ConfirmationResult {
   driveFolder: StepResult
 }
 
+export const ASSSSCAT_PERFORMER_CATEGORIES = [
+  "Core Cast",
+  "Wild Cards",
+  "Subs",
+  "Drop-Ins",
+  "Test Group",
+] as const
+export type AsssscatPerformerCategory = (typeof ASSSSCAT_PERFORMER_CATEGORIES)[number]
+
+export interface AsssscatPerformer {
+  id: string
+  name: string
+  email: string
+  category: AsssscatPerformerCategory
+}
+
+export interface AsssscatMonologist {
+  name: string
+  link: string
+  credits: string
+}
+
+export interface AsssscatShowDetails {
+  showDate: string
+  improvisers: AsssscatPerformer[]
+  monologist: AsssscatMonologist
+  ticketLink: string
+  oneTimeCc: string[]
+  defaultCc: string[]
+}
+
 export interface ShowListItem {
   id: string
   title: string

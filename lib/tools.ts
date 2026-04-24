@@ -10,7 +10,7 @@
  */
 
 import type { LucideIcon } from "lucide-react"
-import { CalendarCheck, CalendarDays, ScrollText } from "lucide-react"
+import { CalendarCheck, CalendarDays, ScrollText, Mic2 } from "lucide-react"
 
 export type ToolStatus = "available" | "coming-soon"
 
@@ -40,6 +40,15 @@ export const TOOLS: Tool[] = [
       "Read-only list of upcoming confirmed shows from the UCB calendar.",
     href: "/tools/show-list",
     icon: CalendarDays,
+    status: "available",
+  },
+  {
+    id: "asssscat",
+    name: "ASSSSCAT",
+    description:
+      "Compose and send the cast booking email for ASSSSCAT at UCB Franklin.",
+    href: "/tools/asssscat",
+    icon: Mic2,
     status: "available",
   },
   {
