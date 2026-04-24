@@ -3,7 +3,7 @@ import { audit } from "@/lib/audit"
 import { env } from "@/lib/env"
 import { hasGoogleCredentials } from "@/lib/google"
 import { createDriveFolder, createCalendarEvent, sendEmail } from "@/lib/google-actions"
-import { renderShowConfirmationSubject } from "@/lib/emails"
+import { renderShowConfirmationSubject, injectDriveFolderUrl } from "@/lib/emails"
 import { createLogger } from "@/lib/logger"
 import { RateLimiter, hashKey } from "@/lib/rate-limit"
 import { confirmShowRequestSchema, type ConfirmShowRequest } from "@/lib/schemas"
@@ -137,18 +137,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result)
   }
 
-  // --- Live mode: run all three actions in parallel, independently -----
+  // --- Live mode -------------------------------------------------------
+  // Drive folder is created first so its URL can be injected into the email
+  // body before sending. Calendar + email still run in parallel to each other.
   const { startISO, endISO } = computeStartEnd(body)
   const parentFolderId = VENUE_FOLDER_IDS[body.venue] || ""
 
   const subject = body.emailSubject?.trim() || renderShowConfirmationSubject(body)
   const emailBody = body.emailBody?.trim() || ""
 
-  const [driveFolder, calendarEvent, email] = await Promise.all([
-    createDriveFolder({
-      name: buildFolderName(body),
-      parentFolderId,
-    }),
+  const driveFolder = await createDriveFolder({
+    name: buildFolderName(body),
+    parentFolderId,
+  })
+
+  const finalEmailBody =
+    emailBody && driveFolder.status === "success" && driveFolder.url
+      ? injectDriveFolderUrl(emailBody, driveFolder.url)
+      : emailBody
+
+  const [calendarEvent, email] = await Promise.all([
     createCalendarEvent({
       calendarId: UCB_CALENDAR_ID,
       summary: body.showTitle,
@@ -158,11 +166,11 @@ export async function POST(request: NextRequest) {
       endISO,
       timeZone: TIMEZONE,
     }),
-    emailBody
+    finalEmailBody
       ? sendEmail({
           to: body.producerEmail,
           subject,
-          body: emailBody,
+          body: finalEmailBody,
         })
       : Promise.resolve({
           status: "error",
