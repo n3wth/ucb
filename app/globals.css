@@ -494,4 +494,56 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0.2; }
   }
+
+  /* Landing page expressive typography tilts */
+
+  /* "IN HOUSE" label — tilted counter-clockwise */
+  .landing-label-tilt {
+    transform: rotate(-3deg) translateX(-2px);
+    transform-origin: left center;
+  }
+
+  /* "Internal tools" phrase — gentle negative tilt */
+  .landing-phrase-1 {
+    transform: rotate(-1.5deg);
+    transform-origin: left bottom;
+  }
+
+  /* "for the" — slight positive tilt */
+  .landing-phrase-2 {
+    transform: rotate(0.8deg);
+    transform-origin: left center;
+  }
+
+  /* UCB — the big one, tilted slightly clockwise */
+  .landing-ucb-tilt {
+    display: block;
+    transform: rotate(-2deg);
+    transform-origin: left bottom;
+    line-height: 0.88;
+  }
+
+  /* "artistic team" — counter tilted */
+  .landing-phrase-3 {
+    transform: rotate(1.2deg);
+    transform-origin: right center;
+  }
+
+  /* Est. line — rotated vertical-ish */
+  .landing-est {
+    transform: rotate(90deg) translateX(50%);
+    transform-origin: right bottom;
+    right: 0;
+    bottom: -2rem;
+    white-space: nowrap;
+  }
+
+  /* Rule under CTA — animates in from left */
+  .landing-rule-draw {
+    animation: rule-draw 0.6s ease-out 0.4s both;
+  }
+  @keyframes rule-draw {
+    from { width: 0; }
+    to { width: 5rem; }
+  }
 }

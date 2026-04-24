@@ -45,89 +45,96 @@ export default function LandingPage() {
         />
 
         <section className="flex-1 flex flex-col justify-center">
-          <div className="mx-auto max-w-6xl px-6 pt-12 pb-16 sm:pt-16 sm:pb-20">
+          <div className="mx-auto max-w-5xl px-8 pt-10 pb-16 sm:pt-14 sm:pb-20">
 
-            {/* Top rule */}
-            <div className="flex items-center gap-4 mb-8">
-              <div className="h-px flex-1 bg-foreground/40" />
-              <span className="text-[10px] tracking-[0.4em] uppercase text-foreground/50 font-mono">
-                {todayLong}
-              </span>
-              <div className="h-px flex-1 bg-foreground/40" />
+            {/* Dateline — small, quiet */}
+            <p className="text-[10px] tracking-[0.45em] uppercase text-foreground/35 font-mono mb-14 sm:mb-20">
+              {todayLong}
+            </p>
+
+            {/* Main typographic composition */}
+            <div className="relative">
+
+              {/* "IN HOUSE" — tilted label floating top-left */}
+              <p
+                className="landing-label-tilt absolute -top-6 left-0 text-[9px] tracking-[0.55em] uppercase text-primary font-mono select-none"
+                aria-hidden
+              >
+                ◆ IN HOUSE
+              </p>
+
+              {/* "Internal tools" — large serif italic, slightly rotated */}
+              <div className="landing-phrase-1 mb-2 sm:mb-4">
+                <span className="font-serif italic text-4xl sm:text-5xl lg:text-6xl text-foreground/70 font-normal">
+                  Internal tools
+                </span>
+              </div>
+
+              {/* "for the" — small offset text */}
+              <div className="landing-phrase-2 mb-1 pl-4 sm:pl-8">
+                <span className="font-mono text-sm sm:text-base tracking-[0.25em] uppercase text-foreground/40">
+                  for the
+                </span>
+              </div>
+
+              {/* "UCB" — massive display, primary, slight tilt */}
+              <div className="landing-ucb-wrap relative my-2 sm:my-4">
+                <h1
+                  className="font-display text-[5rem] sm:text-[8rem] lg:text-[12rem] leading-none tracking-tight uppercase text-primary landing-glitch landing-ucb-tilt"
+                  data-text="UCB"
+                >
+                  UCB
+                </h1>
+              </div>
+
+              {/* "artistic team" — serif italic, counter-tilted right-aligned */}
+              <div className="landing-phrase-3 flex justify-end sm:justify-start sm:pl-16 lg:pl-28">
+                <span className="font-serif italic text-2xl sm:text-3xl lg:text-4xl text-foreground/60 font-normal">
+                  artistic team.
+                </span>
+              </div>
+
+              {/* EST line — small, rotated, tucked lower */}
+              <p
+                className="landing-est absolute bottom-0 right-0 text-[9px] tracking-[0.4em] uppercase text-foreground/30 font-mono"
+                aria-hidden
+              >
+                Est. MCMXCVI · NY · LA
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 items-stretch">
-              {/* Hero block */}
-              <div className="lg:col-span-8 border-2 border-foreground p-8 sm:p-12 relative">
-                {/* Corner marks */}
-                <span aria-hidden className="absolute top-2 left-2 text-[8px] font-mono text-foreground/30 tracking-widest">▮▮▮</span>
-                <span aria-hidden className="absolute top-2 right-2 text-[8px] font-mono text-foreground/30 tracking-widest">▮▮▮</span>
+            {/* CTA area — loose, not boxed */}
+            <div className="mt-20 sm:mt-28 flex flex-col sm:flex-row items-start sm:items-end gap-8 sm:gap-16">
 
-                <p className="mb-5 text-[10px] tracking-[0.45em] uppercase text-primary font-mono">
-                  ◆ IN HOUSE
+              <div className="landing-cta-wrap flex-1 max-w-xs">
+                <p className="font-mono text-xs text-foreground/40 mb-6 leading-relaxed">
+                  Staff only.<br />
+                  Don&apos;t think. Book.
                 </p>
 
-                <h1 className="font-display text-5xl sm:text-6xl lg:text-[5rem] leading-[0.92] tracking-tight uppercase">
-                  <span className="block">Internal tools for the</span>{" "}
-                  <span className="block text-primary landing-glitch" data-text="UCB">
-                    UCB
-                  </span>{" "}
-                  <span className="block italic font-serif text-3xl sm:text-4xl lg:text-[2.8rem] font-normal normal-case tracking-normal text-foreground/80 mt-2">
-                    artistic team.
+                <Link
+                  href="/login"
+                  className="group inline-flex items-center gap-3 text-foreground hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <span className="font-display text-lg sm:text-xl uppercase tracking-[0.2em]">
+                    Sign in
                   </span>
-                </h1>
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
 
-                <div className="mt-10 flex items-center gap-4">
-                  <div className="h-px w-12 bg-primary" />
-                  <p className="text-xs tracking-[0.3em] uppercase text-foreground/40 font-mono">
-                    Est. MCMXCVI · NY · LA
-                  </p>
-                </div>
+                {/* Underline — hand-drawn feel via a short irregular rule */}
+                <div className="mt-3 h-px w-20 bg-primary landing-rule-draw" />
               </div>
 
-              {/* CTA block */}
-              <div className="lg:col-span-4 border-2 border-l-0 border-foreground flex flex-col">
-                <div className="border-b-2 border-foreground px-6 py-4">
-                  <p className="text-[9px] tracking-[0.45em] uppercase text-foreground/40 font-mono">
-                    ACCESS
-                  </p>
-                </div>
-
-                <div className="flex-1 px-6 py-8 flex flex-col gap-6">
-                  <p className="text-sm leading-relaxed text-foreground/60 font-mono">
-                    Staff only.<br />
-                    Don&apos;t think. Book.
-                  </p>
-
-                  <Link
-                    href="/login"
-                    className="group mt-auto inline-flex w-full items-center justify-between gap-3 border-2 border-primary bg-primary px-5 py-4 text-sm font-bold tracking-[0.25em] uppercase text-primary-foreground hover:bg-foreground hover:text-background hover:border-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background cta-shimmer"
-                  >
-                    <span>Sign in</span>
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </div>
-
-                <div className="border-t-2 border-foreground px-6 py-3">
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block w-2 h-2 rounded-full bg-primary landing-pulse" />
-                    <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/40 font-mono">
-                      Live
-                    </span>
-                  </div>
-                </div>
+              {/* Live badge — loose, not in a box */}
+              <div className="flex items-center gap-2 mb-1">
+                <span className="inline-block w-2 h-2 rounded-full bg-primary landing-pulse" />
+                <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/35 font-mono">
+                  Live
+                </span>
               </div>
             </div>
 
-            {/* Bottom rule */}
-            <div className="mt-0 border-t-0 border-b-2 border-x-2 border-foreground px-8 py-3 flex items-center justify-between gap-4">
-              <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/30 font-mono">
-                ◀ UCB BOOKINGS INTERNAL
-              </span>
-              <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/30 font-mono">
-                v2 ▶
-              </span>
-            </div>
           </div>
         </section>
 
