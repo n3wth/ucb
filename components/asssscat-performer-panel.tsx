@@ -11,12 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { AlertCircle, Pencil, Plus, Trash2, X, Check } from "lucide-react"
+import { AlertCircle, Heart, Pencil, Plus, Trash2, X, Check, ThumbsDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   ASSSSCAT_PERFORMER_CATEGORIES,
   type AsssscatPerformer,
   type AsssscatPerformerCategory,
+  type CompatibilityMap,
 } from "@/lib/types"
 import {
   addPerformer,
@@ -26,6 +27,10 @@ import {
   removePerformer,
   updatePerformer,
 } from "@/lib/asssscat-performers"
+import {
+  likedCollaboratorCount,
+  setPerformerCompatibility,
+} from "@/lib/asssscat-compatibility"
 
 type GroupFilter = "All" | AsssscatPerformerCategory
 
@@ -41,8 +46,12 @@ interface PerformerPanelProps {
   performers: AsssscatPerformer[]
   onChange: (next: AsssscatPerformer[]) => void
   onPickPerformer: (performer: AsssscatPerformer) => void
+  onPerformerRemoved?: (performerId: string) => void
   selectedIds: string[]
   canAddMore: boolean
+  compatibility: CompatibilityMap
+  onCompatibilityChange: (performerId: string, patch: { likes?: string[]; dislikes?: string[] }) => void
+  onCompatibilitySave: (map: CompatibilityMap) => void
 }
 
 const inputClasses =
@@ -52,8 +61,11 @@ export function AsssscatPerformerPanel({
   performers,
   onChange,
   onPickPerformer,
+  onPerformerRemoved,
   selectedIds,
   canAddMore,
+  compatibility,
+  onCompatibilityChange,
 }: PerformerPanelProps) {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -63,6 +75,8 @@ export function AsssscatPerformerPanel({
     useState<AsssscatPerformerCategory>("Core Cast")
   const [error, setError] = useState<string | null>(null)
   const [activeGroup, setActiveGroup] = useState<GroupFilter>("All")
+  // The performer whose affinity settings are currently open
+  const [affinityForId, setAffinityForId] = useState<string | null>(null)
 
   const grouped = useMemo(() => groupByCategory(performers), [performers])
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds])
@@ -133,6 +147,30 @@ export function AsssscatPerformerPanel({
   const handleRemove = (id: string) => {
     onChange(removePerformer(performers, id))
     if (editingId === id) resetForm()
+    if (affinityForId === id) setAffinityForId(null)
+    onPerformerRemoved?.(id)
+  }
+
+  const toggleLike = (subjectId: string, targetId: string) => {
+    const entry = compatibility[subjectId] ?? { likes: [], dislikes: [] }
+    const isLiked = entry.likes.includes(targetId)
+    const newLikes = isLiked
+      ? entry.likes.filter((x) => x !== targetId)
+      : [...entry.likes, targetId]
+    // Liking someone removes them from dislikes
+    const newDislikes = entry.dislikes.filter((x) => x !== targetId)
+    onCompatibilityChange(subjectId, { likes: newLikes, dislikes: newDislikes })
+  }
+
+  const toggleDislike = (subjectId: string, targetId: string) => {
+    const entry = compatibility[subjectId] ?? { likes: [], dislikes: [] }
+    const isDisliked = entry.dislikes.includes(targetId)
+    const newDislikes = isDisliked
+      ? entry.dislikes.filter((x) => x !== targetId)
+      : [...entry.dislikes, targetId]
+    // Disliking someone removes them from likes
+    const newLikes = entry.likes.filter((x) => x !== targetId)
+    onCompatibilityChange(subjectId, { likes: newLikes, dislikes: newDislikes })
   }
 
   return (
@@ -268,59 +306,147 @@ export function AsssscatPerformerPanel({
                 <ul>
                   {group.map((p) => {
                     const selected = selectedSet.has(p.id)
+                    const affinityOpen = affinityForId === p.id
+                    const likedCount = likedCollaboratorCount(p.id, selectedIds, compatibility)
+                    // Green intensity: 1 liked collab → low green, more → deeper
+                    const affinityBg =
+                      selected && likedCount > 0
+                        ? likedCount >= 4
+                          ? "bg-green-600/30 dark:bg-green-500/25"
+                          : likedCount >= 2
+                          ? "bg-green-600/20 dark:bg-green-500/15"
+                          : "bg-green-600/10 dark:bg-green-500/10"
+                        : ""
+                    const entry = compatibility[p.id] ?? { likes: [], dislikes: [] }
                     return (
                       <li
                         key={p.id}
-                        className="px-4 py-1.5 flex items-center gap-2 hover:bg-muted/60 group"
+                        className={cn("px-4 flex flex-col group", affinityBg)}
                       >
-                        <button
-                          type="button"
-                          className="flex-1 text-left disabled:opacity-50 disabled:cursor-not-allowed"
-                          onClick={() => onPickPerformer(p)}
-                          disabled={selected || !canAddMore || !p.email}
-                          title={
-                            !p.email
-                              ? "No email on file — edit to add"
-                              : selected
-                              ? "Already in cast"
-                              : canAddMore
-                              ? "Add to cast"
-                              : "Cast is full"
-                          }
-                        >
-                          <div className="text-sm text-foreground truncate flex items-center gap-1.5">
-                            {p.name}
-                            {selected && (
-                              <span className="text-[10px] text-muted-foreground">
-                                ✓ in cast
-                              </span>
+                        <div className="py-1.5 flex items-center gap-2">
+                          <button
+                            type="button"
+                            className="flex-1 text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => onPickPerformer(p)}
+                            disabled={selected || !canAddMore || !p.email}
+                            title={
+                              !p.email
+                                ? "No email on file — edit to add"
+                                : selected
+                                ? "Already in cast"
+                                : canAddMore
+                                ? "Add to cast"
+                                : "Cast is full"
+                            }
+                          >
+                            <div className="text-sm text-foreground truncate flex items-center gap-1.5">
+                              {p.name}
+                              {selected && likedCount > 0 && (
+                                <span className="text-[10px] text-green-600 dark:text-green-400 flex items-center gap-0.5">
+                                  <Heart className="h-2.5 w-2.5 fill-current" />
+                                  {likedCount}
+                                </span>
+                              )}
+                              {selected && !(likedCount > 0) && (
+                                <span className="text-[10px] text-muted-foreground">
+                                  ✓ in cast
+                                </span>
+                              )}
+                              {!p.email && !selected && (
+                                <AlertCircle className="h-3 w-3 text-amber-500 shrink-0" aria-label="No email on file" />
+                              )}
+                            </div>
+                            <div className="text-[11px] text-muted-foreground truncate">
+                              {p.email || (
+                                <span className="text-amber-500">no email on file</span>
+                              )}
+                            </div>
+                          </button>
+                          <button
+                            type="button"
+                            className={cn(
+                              "transition-opacity text-muted-foreground",
+                              affinityOpen
+                                ? "opacity-100 text-primary"
+                                : "opacity-0 group-hover:opacity-100 hover:text-foreground",
                             )}
-                            {!p.email && !selected && (
-                              <AlertCircle className="h-3 w-3 text-amber-500 shrink-0" aria-label="No email on file" />
-                            )}
+                            onClick={() => setAffinityForId(affinityOpen ? null : p.id)}
+                            aria-label={`${affinityOpen ? "Close" : "Edit"} affinity for ${p.name}`}
+                            title="Edit compatibility preferences"
+                          >
+                            <Heart className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-opacity"
+                            onClick={() => startEdit(p)}
+                            aria-label={`Edit ${p.name}`}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity"
+                            onClick={() => handleRemove(p.id)}
+                            aria-label={`Remove ${p.name}`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                        {affinityOpen && (
+                          <div className="pb-2 pt-0.5 border-t border-border/60 mt-0.5">
+                            <p className="text-[10px] text-muted-foreground mb-1.5 pt-1">
+                              Compatibility for {p.name}
+                            </p>
+                            <div className="space-y-0.5 max-h-48 overflow-y-auto">
+                              {performers
+                                .filter((other) => other.id !== p.id)
+                                .sort((a, b) => a.name.localeCompare(b.name))
+                                .map((other) => {
+                                  const liked = entry.likes.includes(other.id)
+                                  const disliked = entry.dislikes.includes(other.id)
+                                  return (
+                                    <div
+                                      key={other.id}
+                                      className="flex items-center justify-between py-0.5 gap-2"
+                                    >
+                                      <span className="text-xs text-foreground truncate flex-1">
+                                        {other.name}
+                                      </span>
+                                      <div className="flex items-center gap-1 shrink-0">
+                                        <button
+                                          type="button"
+                                          onClick={() => toggleLike(p.id, other.id)}
+                                          title={liked ? "Remove like" : "Mark as liked collaborator"}
+                                          className={cn(
+                                            "rounded p-0.5 transition-colors",
+                                            liked
+                                              ? "text-green-600 dark:text-green-400 bg-green-600/10"
+                                              : "text-muted-foreground hover:text-green-600 dark:hover:text-green-400",
+                                          )}
+                                        >
+                                          <Heart className="h-3 w-3" />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => toggleDislike(p.id, other.id)}
+                                          title={disliked ? "Remove conflict" : "Mark as incompatible"}
+                                          className={cn(
+                                            "rounded p-0.5 transition-colors",
+                                            disliked
+                                              ? "text-destructive bg-destructive/10"
+                                              : "text-muted-foreground hover:text-destructive",
+                                          )}
+                                        >
+                                          <ThumbsDown className="h-3 w-3" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )
+                                })}
+                            </div>
                           </div>
-                          <div className="text-[11px] text-muted-foreground truncate">
-                            {p.email || (
-                              <span className="text-amber-500">no email on file</span>
-                            )}
-                          </div>
-                        </button>
-                        <button
-                          type="button"
-                          className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-opacity"
-                          onClick={() => startEdit(p)}
-                          aria-label={`Edit ${p.name}`}
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity"
-                          onClick={() => handleRemove(p.id)}
-                          aria-label={`Remove ${p.name}`}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                        )}
                       </li>
                     )
                   })}

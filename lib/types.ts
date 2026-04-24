@@ -50,6 +50,16 @@ export interface AsssscatPerformer {
   category: AsssscatPerformerCategory
 }
 
+// Compatibility preferences keyed by performer ID.
+// likes: performer IDs this person enjoys working with (chip glows green in cast)
+// dislikes: performer IDs this person does NOT want to work with (warning shown)
+export interface PerformerCompatibility {
+  likes: string[]
+  dislikes: string[]
+}
+
+export type CompatibilityMap = Record<string, PerformerCompatibility>
+
 export interface AsssscatMonologist {
   name: string
   link: string

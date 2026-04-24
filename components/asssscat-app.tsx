@@ -36,12 +36,21 @@ import {
   loadAsssscatDefaultCc,
   saveAsssscatDefaultCc,
 } from "@/lib/asssscat-preferences"
+import {
+  getIncompatiblePairs,
+  loadCompatibility,
+  removePerformerCompatibility,
+  saveCompatibility,
+  setPerformerCompatibility,
+} from "@/lib/asssscat-compatibility"
 import type {
   AsssscatMonologist,
   AsssscatPerformer,
   AsssscatShowDetails,
+  CompatibilityMap,
 } from "@/lib/types"
-import { Calendar, Check, Send, Users, X } from "lucide-react"
+import { AlertTriangle, Calendar, Check, Send, Users, X } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 const inputClasses =
   "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
@@ -54,6 +63,7 @@ type SendStatus =
 
 export function AsssscatApp() {
   const [performers, setPerformers] = useState<AsssscatPerformer[]>([])
+  const [compatibility, setCompatibility] = useState<CompatibilityMap>({})
   const [cast, setCast] = useState<AsssscatPerformer[]>([])
   const [showDate, setShowDate] = useState("")
   const [monologist, setMonologist] = useState<AsssscatMonologist>({
@@ -71,6 +81,7 @@ export function AsssscatApp() {
   useEffect(() => {
     setPerformers(loadPerformers())
     setDefaultCc(loadAsssscatDefaultCc())
+    setCompatibility(loadCompatibility())
   }, [])
 
   const handlePerformersChange = (next: AsssscatPerformer[]) => {
@@ -82,6 +93,18 @@ export function AsssscatApp() {
         .map((p) => saved.find((s) => s.id === p.id) ?? null)
         .filter((p): p is AsssscatPerformer => p !== null),
     )
+  }
+
+  const handleCompatibilityChange = (performerId: string, patch: { likes?: string[]; dislikes?: string[] }) => {
+    setCompatibility((current) => setPerformerCompatibility(current, performerId, patch))
+  }
+
+  const handlePerformerRemoved = (performerId: string) => {
+    setCompatibility((current) => removePerformerCompatibility(current, performerId))
+  }
+
+  const handleCompatibilitySave = (map: CompatibilityMap) => {
+    setCompatibility(saveCompatibility(map))
   }
 
   const handleDefaultCcChange = (next: string[]) => {
@@ -136,6 +159,12 @@ export function AsssscatApp() {
     }
     setCastInput("")
   }
+
+  const castIds = useMemo(() => cast.map((p) => p.id), [cast])
+  const incompatiblePairs = useMemo(
+    () => getIncompatiblePairs(castIds, compatibility),
+    [castIds, compatibility],
+  )
 
   const isSmallCast = cast.length < ASSSSCAT_SMALL_CAST_THRESHOLD
   const canSubmit =
@@ -213,8 +242,12 @@ export function AsssscatApp() {
             performers={performers}
             onChange={handlePerformersChange}
             onPickPerformer={handlePickPerformer}
-            selectedIds={cast.map((p) => p.id)}
+            selectedIds={castIds}
             canAddMore={cast.length < ASSSSCAT_MAX_IMPROVISERS}
+            compatibility={compatibility}
+            onCompatibilityChange={handleCompatibilityChange}
+            onCompatibilitySave={handleCompatibilitySave}
+            onPerformerRemoved={handlePerformerRemoved}
           />
         </aside>
 
@@ -298,16 +331,27 @@ export function AsssscatApp() {
               <ol className="mt-2 space-y-1.5">
                 {Array.from({ length: ASSSSCAT_MAX_IMPROVISERS }).map((_, i) => {
                   const performer = cast[i]
+                  const isIncompat = performer
+                    ? incompatiblePairs.some((pair) => pair.includes(performer.id))
+                    : false
                   return (
                     <li
                       key={i}
-                      className="flex items-center gap-2 border border-border rounded-md px-3 py-2 bg-input"
+                      className={cn(
+                        "flex items-center gap-2 border rounded-md px-3 py-2",
+                        isIncompat
+                          ? "border-destructive/60 bg-destructive/10"
+                          : "border-border bg-input",
+                      )}
                     >
                       <span className="text-xs text-muted-foreground w-5">
                         {i + 1}.
                       </span>
                       {performer ? (
                         <>
+                          {isIncompat && (
+                            <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0" aria-label="Compatibility conflict" />
+                          )}
                           <span className="text-sm text-foreground flex-1 truncate">
                             {performer.name}
                           </span>
@@ -332,6 +376,21 @@ export function AsssscatApp() {
                   )
                 })}
               </ol>
+              {incompatiblePairs.length > 0 && (
+                <div className="mt-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 space-y-1">
+                  {incompatiblePairs.map(([aId, bId], idx) => {
+                    const a = cast.find((p) => p.id === aId)
+                    const b = cast.find((p) => p.id === bId)
+                    if (!a || !b) return null
+                    return (
+                      <p key={idx} className="text-xs text-destructive flex items-center gap-1.5">
+                        <AlertTriangle className="h-3 w-3 shrink-0" />
+                        {a.name} and {b.name} have a compatibility conflict.
+                      </p>
+                    )
+                  })}
+                </div>
+              )}
               {isSmallCast && cast.length > 0 && (
                 <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
                   Fewer than {ASSSSCAT_SMALL_CAST_THRESHOLD} improvisers — you'll
