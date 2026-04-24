@@ -11,6 +11,7 @@ const validBody = {
   doorTicketPrice: 15,
   digitalTicket: { enabled: false, price: 0 },
   producerEmail: 'producer@example.com',
+  ccEmails: [] as string[],
   emailSubject: 'Hi',
   emailBody: 'Body',
 }
@@ -80,5 +81,46 @@ describe('confirmShowRequestSchema', () => {
       digitalTicket: { enabled: 'yes', price: 5 },
     })
     expect(result.success).toBe(false)
+  })
+
+  it('defaults ccEmails to an empty array when absent', () => {
+    const { ccEmails, ...rest } = validBody
+    void ccEmails
+    const result = confirmShowRequestSchema.safeParse(rest)
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.ccEmails).toEqual([])
+    }
+  })
+
+  it('accepts a list of valid ccEmails', () => {
+    const result = confirmShowRequestSchema.safeParse({
+      ...validBody,
+      ccEmails: ['one@example.com', 'two@example.com'],
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects a ccEmails list containing an invalid address', () => {
+    const result = confirmShowRequestSchema.safeParse({
+      ...validBody,
+      ccEmails: ['ok@example.com', 'not-an-email'],
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe('ccEmails contains an invalid address')
+    }
+  })
+
+  it('rejects a ccEmails list exceeding the maximum length', () => {
+    const many = Array.from({ length: 21 }, (_, i) => `cc${i}@example.com`)
+    const result = confirmShowRequestSchema.safeParse({
+      ...validBody,
+      ccEmails: many,
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe('ccEmails cannot exceed 20 addresses')
+    }
   })
 })

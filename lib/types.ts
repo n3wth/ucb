@@ -13,6 +13,7 @@ export interface ShowDetails {
   doorTicketPrice: number
   digitalTicket: DigitalTicket
   producerEmail: string
+  ccEmails: string[]
 }
 
 export type StepStatus = "idle" | "pending" | "success" | "error"

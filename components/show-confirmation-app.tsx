@@ -6,6 +6,7 @@ import { PreviewStage } from "@/components/preview-stage"
 import { ConfirmationResults } from "@/components/confirmation-results"
 import { StageProgress } from "@/components/stage-progress"
 import { ToolPage } from "@/components/tool-page"
+import { DefaultCcPreferences } from "@/components/default-cc-preferences"
 import { renderShowConfirmationBody, renderShowConfirmationSubject } from "@/lib/emails"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
@@ -97,8 +98,9 @@ export function ShowConfirmationApp() {
 
         <div className="w-full">
           {stage === "compose" && (
-            <div className="animate-in fade-in slide-in-from-bottom-3 duration-400">
+            <div className="animate-in fade-in slide-in-from-bottom-3 duration-400 space-y-6">
               <ShowConfirmationForm initialValue={showDetails} onSubmit={handleComposeSubmit} />
+              <DefaultCcPreferences />
             </div>
           )}
 
