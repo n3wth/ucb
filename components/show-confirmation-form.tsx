@@ -137,7 +137,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             <FieldLabel htmlFor="showTitle" className="text-xs">Show title</FieldLabel>
             <Input
               id="showTitle"
-              placeholder="The Harold Night"
+              placeholder="Harold Night"
               value={formData.showTitle}
               onChange={(e) => updateField("showTitle", e.target.value)}
               className={`${inputClasses} h-12 text-base`}
