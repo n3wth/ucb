@@ -3,6 +3,7 @@ import { audit } from "@/lib/audit"
 import { env } from "@/lib/env"
 import { hasGoogleCredentials } from "@/lib/google"
 import { createDriveFolder, createCalendarEvent, sendEmail } from "@/lib/google-actions"
+import { buildEventSummary } from "@/lib/calendar-event"
 import { renderShowConfirmationSubject } from "@/lib/emails"
 import { createLogger } from "@/lib/logger"
 import { RateLimiter, hashKey } from "@/lib/rate-limit"
@@ -151,7 +152,7 @@ export async function POST(request: NextRequest) {
     }),
     createCalendarEvent({
       calendarId: UCB_CALENDAR_ID,
-      summary: body.showTitle,
+      summary: buildEventSummary(body),
       location: body.venue,
       description: buildEventDescription(body),
       startISO,
