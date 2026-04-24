@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import { APP_NAME } from "@/lib/config"
 import { UcbLogo } from "@/components/ucb-logo"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export type SiteHeaderProps = {
   subStrip?: boolean
@@ -47,6 +48,7 @@ export function SiteHeader({
           >
             ucbcomedy.com <span aria-hidden="true">↗</span>
           </a>
+          <ThemeToggle />
           {authSlot}
         </div>
       </div>

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono, Archivo_Black, Playfair_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { env } from '@/lib/env'
+import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
 const geist = Geist({
@@ -70,10 +71,19 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`bg-background ${geist.variable} ${geistMono.variable} ${archivoBlack.variable} ${playfair.variable}`}
     >
       <body className="font-sans antialiased">
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          themes={['light', 'dark', 'gay']}
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
