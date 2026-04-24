@@ -10,6 +10,7 @@ import { confirmShowRequestSchema, type ConfirmShowRequest } from "@/lib/schemas
 import { SESSION_COOKIE } from "@/lib/session"
 import { computeStartEnd } from "@/lib/show-time"
 import { UCB_TIMEZONE } from "@/lib/format"
+import { buildCalendarEventSummary } from "@/lib/calendar-event"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
 const log = createLogger("confirm-show")
@@ -201,7 +202,7 @@ export async function POST(request: NextRequest) {
   const [calendarEvent, email, techCalendarEvent] = await Promise.all([
     createCalendarEvent({
       calendarId: UCB_CALENDAR_ID,
-      summary: body.showTitle,
+      summary: buildCalendarEventSummary(body),
       location: body.venue,
       description: buildEventDescription(body),
       startISO,
