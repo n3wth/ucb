@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { audit } from "@/lib/audit"
 import { env } from "@/lib/env"
 import { hasGoogleCredentials } from "@/lib/google"
 import { createDriveFolder, createCalendarEvent, sendEmail } from "@/lib/google-actions"
@@ -149,14 +148,6 @@ export async function POST(request: NextRequest) {
         url: `https://drive.google.com/drive/folders/${simId}`,
       },
     }
-    audit.log("staff", "confirm-show", simId, {
-      title: body.showTitle,
-      venue: body.venue,
-      date: body.showDate,
-      producer: body.producerEmail,
-      techRehearsal: hasTechRehearsal,
-      mode: "simulation",
-    })
     return NextResponse.json(result)
   }
 
@@ -230,18 +221,6 @@ export async function POST(request: NextRequest) {
   }
 
   reqLog.info("done", {
-    email: email.status,
-    calendar: calendarEvent.status,
-    techCalendar: techCalendarEvent?.status,
-    drive: driveFolder.status,
-  })
-
-  audit.log("staff", "confirm-show", calendarEvent.id ?? driveFolder.id ?? requestId, {
-    title: body.showTitle,
-    venue: body.venue,
-    date: body.showDate,
-    producer: body.producerEmail,
-    ccCount: body.ccEmails?.length ?? 0,
     email: email.status,
     calendar: calendarEvent.status,
     techCalendar: techCalendarEvent?.status,

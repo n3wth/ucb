@@ -6,7 +6,7 @@ const PUBLIC_PATHS = ["/", "/login", "/api/auth/login"]
 
 // Pages/APIs that require an authenticated session.
 // Everything not listed above + not matching these prefixes is treated as public.
-const PROTECTED_PREFIXES = ["/tools", "/api/confirm-show", "/api/shows", "/api/audit", "/api/asssscat", "/api/auth/logout", "/api/auth/status"]
+const PROTECTED_PREFIXES = ["/tools", "/api/confirm-show", "/api/shows", "/api/asssscat", "/api/auth/logout", "/api/auth/status"]
 
 function isProtected(pathname: string): boolean {
   return PROTECTED_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"))

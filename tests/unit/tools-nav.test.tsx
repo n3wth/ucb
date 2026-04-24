@@ -17,9 +17,6 @@ describe('ToolsNav', () => {
     const showList = screen.getByRole('link', { name: /show list/i })
     expect(showList).toHaveAttribute('href', '/tools/show-list')
     expect(showList).not.toHaveAttribute('aria-current')
-
-    const audit = screen.getByRole('link', { name: /audit log/i })
-    expect(audit).toHaveAttribute('href', '/tools/audit')
   })
 
   it('labels the navigation landmark', () => {

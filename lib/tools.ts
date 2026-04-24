@@ -10,7 +10,7 @@
  */
 
 import type { LucideIcon } from "lucide-react"
-import { CalendarCheck, CalendarDays, ScrollText, Mic2 } from "lucide-react"
+import { CalendarCheck, CalendarDays, Mic2 } from "lucide-react"
 
 export type ToolStatus = "available" | "coming-soon"
 
@@ -49,15 +49,6 @@ export const TOOLS: Tool[] = [
       "Read-only list of upcoming confirmed shows from the UCB calendar.",
     href: "/tools/show-list",
     icon: CalendarDays,
-    status: "available",
-  },
-  {
-    id: "audit",
-    name: "Audit Log",
-    description:
-      "Last 100 confirm, edit, and cancel actions. Producer emails shown as domain only.",
-    href: "/tools/audit",
-    icon: ScrollText,
     status: "available",
   },
 ]
