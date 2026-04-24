@@ -10,6 +10,7 @@ export interface ShowDetails {
   showTime: string
   durationMinutes: number
   techRehearsalTime: string
+  techRehearsalDurationMinutes: number
   presaleTicketPrice: number
   doorTicketPrice: number
   digitalTicket: DigitalTicket
@@ -29,6 +30,7 @@ export interface StepResult {
 export interface ConfirmationResult {
   email: StepResult
   calendarEvent: StepResult
+  techCalendarEvent?: StepResult
   driveFolder: StepResult
 }
 

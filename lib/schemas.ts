@@ -1,5 +1,9 @@
 import { z } from "zod"
-import { MAX_SHOW_DURATION_MINUTES, MIN_SHOW_DURATION_MINUTES } from "@/lib/config"
+import {
+  DEFAULT_TECH_REHEARSAL_DURATION_MINUTES,
+  MAX_SHOW_DURATION_MINUTES,
+  MIN_SHOW_DURATION_MINUTES,
+} from "@/lib/config"
 
 const nonEmpty = (field: string) => z.string().trim().min(1, `${field} is required`)
 
@@ -33,6 +37,19 @@ export const confirmShowRequestSchema = z.object({
     .min(MIN_SHOW_DURATION_MINUTES, `durationMinutes must be at least ${MIN_SHOW_DURATION_MINUTES}`)
     .max(MAX_SHOW_DURATION_MINUTES, `durationMinutes must be at most ${MAX_SHOW_DURATION_MINUTES}`),
   techRehearsalTime: z.string(),
+  techRehearsalDurationMinutes: z
+    .number()
+    .int("techRehearsalDurationMinutes must be a whole number of minutes")
+    .min(
+      MIN_SHOW_DURATION_MINUTES,
+      `techRehearsalDurationMinutes must be at least ${MIN_SHOW_DURATION_MINUTES}`,
+    )
+    .max(
+      MAX_SHOW_DURATION_MINUTES,
+      `techRehearsalDurationMinutes must be at most ${MAX_SHOW_DURATION_MINUTES}`,
+    )
+    .optional()
+    .default(DEFAULT_TECH_REHEARSAL_DURATION_MINUTES),
   presaleTicketPrice: z.number().finite().nonnegative(),
   doorTicketPrice: z.number().finite().nonnegative(),
   digitalTicket: digitalTicketSchema,

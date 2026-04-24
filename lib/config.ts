@@ -28,6 +28,9 @@ export const DEFAULT_SHOW_DURATION_MINUTES = 90
 export const MIN_SHOW_DURATION_MINUTES = 15
 export const MAX_SHOW_DURATION_MINUTES = 600
 
+export const TECH_REHEARSAL_DURATION_PRESETS = [60, 90, 120] as const
+export const DEFAULT_TECH_REHEARSAL_DURATION_MINUTES = 90
+
 export function getVenueById(id: string): Venue | undefined {
   return VENUES.find((v) => v.id === id)
 }

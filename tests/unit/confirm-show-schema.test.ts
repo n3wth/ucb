@@ -8,6 +8,7 @@ const validBody = {
   venue: 'UCB Franklin' as const,
   durationMinutes: 90,
   techRehearsalTime: '',
+  techRehearsalDurationMinutes: 90,
   presaleTicketPrice: 10,
   doorTicketPrice: 15,
   digitalTicket: { enabled: false, price: 0 },
@@ -138,6 +139,40 @@ describe('confirmShowRequestSchema', () => {
     if (!result.success) {
       expect(result.error.issues[0]?.message).toBe('ccEmails contains an invalid address')
     }
+  })
+
+  it('defaults techRehearsalDurationMinutes to 90 when absent', () => {
+    const { techRehearsalDurationMinutes, ...rest } = validBody
+    void techRehearsalDurationMinutes
+    const result = confirmShowRequestSchema.safeParse(rest)
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.techRehearsalDurationMinutes).toBe(90)
+    }
+  })
+
+  it('accepts a custom techRehearsalDurationMinutes', () => {
+    const result = confirmShowRequestSchema.safeParse({
+      ...validBody,
+      techRehearsalDurationMinutes: 45,
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects techRehearsalDurationMinutes below the minimum', () => {
+    const result = confirmShowRequestSchema.safeParse({
+      ...validBody,
+      techRehearsalDurationMinutes: 5,
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a non-integer techRehearsalDurationMinutes', () => {
+    const result = confirmShowRequestSchema.safeParse({
+      ...validBody,
+      techRehearsalDurationMinutes: 90.5,
+    })
+    expect(result.success).toBe(false)
   })
 
   it('rejects a ccEmails list exceeding the maximum length', () => {

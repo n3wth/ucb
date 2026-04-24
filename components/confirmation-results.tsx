@@ -87,7 +87,12 @@ function StatusItem({ label, description, status, icon, actionUrl, actionLabel, 
 }
 
 export function ConfirmationResults({ result, showDetails, onReset, onRetry }: ConfirmationResultsProps) {
-  const statuses = [result.email.status, result.calendarEvent.status, result.driveFolder.status]
+  const statuses = [
+    result.email.status,
+    result.calendarEvent.status,
+    result.driveFolder.status,
+    ...(result.techCalendarEvent ? [result.techCalendarEvent.status] : []),
+  ]
   const anyPending = statuses.includes("pending")
   const anyError = statuses.includes("error")
   const allSuccess = statuses.every((s) => s === "success")
@@ -160,6 +165,17 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
             actionLabel="Open"
             error={result.calendarEvent.error}
           />
+          {result.techCalendarEvent && (
+            <StatusItem
+              label="Tech rehearsal event"
+              description={`${showDetails.showTitle} - TECH`}
+              status={result.techCalendarEvent.status}
+              icon={<Calendar className="h-4 w-4" />}
+              actionUrl={result.techCalendarEvent.url}
+              actionLabel="Open"
+              error={result.techCalendarEvent.error}
+            />
+          )}
           <StatusItem
             label="Drive folder"
             description={`${showDetails.showTitle} - ${showDetails.showDate}`}

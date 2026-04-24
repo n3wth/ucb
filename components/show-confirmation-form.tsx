@@ -15,7 +15,9 @@ import {
   DEFAULT_VENUE,
   DEFAULT_DIGITAL_PRICE,
   DEFAULT_SHOW_DURATION_MINUTES,
+  DEFAULT_TECH_REHEARSAL_DURATION_MINUTES,
   SHOW_DURATION_PRESETS,
+  TECH_REHEARSAL_DURATION_PRESETS,
   MIN_SHOW_DURATION_MINUTES,
   MAX_SHOW_DURATION_MINUTES,
   type VenueName,
@@ -26,6 +28,9 @@ import type { ShowDetails } from "@/lib/types"
 
 const DURATION_OTHER = "other"
 type DurationChoice = (typeof SHOW_DURATION_PRESETS)[number] | typeof DURATION_OTHER
+type TechDurationChoice =
+  | (typeof TECH_REHEARSAL_DURATION_PRESETS)[number]
+  | typeof DURATION_OTHER
 
 interface ShowConfirmationFormProps {
   initialValue?: ShowDetails | null
@@ -39,6 +44,7 @@ const DEFAULT_FORM: ShowDetails = {
   showTime: "",
   durationMinutes: DEFAULT_SHOW_DURATION_MINUTES,
   techRehearsalTime: "",
+  techRehearsalDurationMinutes: DEFAULT_TECH_REHEARSAL_DURATION_MINUTES,
   presaleTicketPrice: 0,
   doorTicketPrice: 0,
   digitalTicket: { enabled: false, price: DEFAULT_DIGITAL_PRICE },
@@ -52,10 +58,19 @@ function initialDurationChoice(minutes: number): DurationChoice {
     : DURATION_OTHER
 }
 
+function initialTechDurationChoice(minutes: number): TechDurationChoice {
+  return (TECH_REHEARSAL_DURATION_PRESETS as readonly number[]).includes(minutes)
+    ? (minutes as (typeof TECH_REHEARSAL_DURATION_PRESETS)[number])
+    : DURATION_OTHER
+}
+
 export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmationFormProps) {
   const [formData, setFormData] = useState<ShowDetails>(initialValue ?? DEFAULT_FORM)
   const [durationChoice, setDurationChoice] = useState<DurationChoice>(() =>
     initialDurationChoice((initialValue ?? DEFAULT_FORM).durationMinutes),
+  )
+  const [techDurationChoice, setTechDurationChoice] = useState<TechDurationChoice>(() =>
+    initialTechDurationChoice((initialValue ?? DEFAULT_FORM).techRehearsalDurationMinutes),
   )
 
   // When opening a fresh form (no initialValue), pre-fill CCs from saved defaults.
@@ -86,6 +101,16 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
     const minutes = Number(value) as (typeof SHOW_DURATION_PRESETS)[number]
     setDurationChoice(minutes)
     updateField("durationMinutes", minutes)
+  }
+
+  const handleTechDurationChoiceChange = (value: string) => {
+    if (value === DURATION_OTHER) {
+      setTechDurationChoice(DURATION_OTHER)
+      return
+    }
+    const minutes = Number(value) as (typeof TECH_REHEARSAL_DURATION_PRESETS)[number]
+    setTechDurationChoice(minutes)
+    updateField("techRehearsalDurationMinutes", minutes)
   }
 
   const inputClasses = "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
@@ -153,37 +178,100 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             </Field>
           </div>
 
-          {/* Show time, Tech rehearsal row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Field>
-              <FieldLabel htmlFor="showTime" className="text-xs">
-                <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
-                Show time
-              </FieldLabel>
-              <Input
-                id="showTime"
-                type="time"
-                value={formData.showTime}
-                onChange={(e) => updateField("showTime", e.target.value)}
-                className={inputClasses}
-                required
-              />
-            </Field>
+          {/* Show time row */}
+          <Field>
+            <FieldLabel htmlFor="showTime" className="text-xs">
+              <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+              Show time
+            </FieldLabel>
+            <Input
+              id="showTime"
+              type="time"
+              value={formData.showTime}
+              onChange={(e) => updateField("showTime", e.target.value)}
+              className={inputClasses}
+              required
+            />
+          </Field>
 
-            <Field>
-              <FieldLabel htmlFor="techRehearsalTime" className="text-xs">
-                <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+          {/* Tech rehearsal section */}
+          <div className="rounded-lg border border-border bg-muted/40 p-5 space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium flex items-center gap-2 text-foreground">
+                <Clock className="h-4 w-4 text-muted-foreground" />
                 Tech rehearsal
-                <span className="text-muted-foreground/70 font-normal ml-1">(optional)</span>
-              </FieldLabel>
-              <Input
-                id="techRehearsalTime"
-                type="time"
-                value={formData.techRehearsalTime}
-                onChange={(e) => updateField("techRehearsalTime", e.target.value)}
-                className={inputClasses}
-              />
-            </Field>
+                <span className="text-muted-foreground/70 font-normal text-xs">(optional)</span>
+              </Label>
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
+                If a time is set, a tech rehearsal calendar event will be created titled
+                &quot;{formData.showTitle || "SHOW TITLE"} - TECH&quot;.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <Field>
+                <FieldLabel htmlFor="techRehearsalTime" className="text-xs">
+                  <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                  Start time
+                </FieldLabel>
+                <Input
+                  id="techRehearsalTime"
+                  type="time"
+                  value={formData.techRehearsalTime}
+                  onChange={(e) => updateField("techRehearsalTime", e.target.value)}
+                  className={inputClasses}
+                />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="techDurationChoice" className="text-xs">
+                  <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                  Duration
+                </FieldLabel>
+                <Select
+                  value={String(techDurationChoice)}
+                  onValueChange={handleTechDurationChoiceChange}
+                >
+                  <SelectTrigger id="techDurationChoice" className={inputClasses}>
+                    <SelectValue placeholder="Select duration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TECH_REHEARSAL_DURATION_PRESETS.map((minutes) => (
+                      <SelectItem key={minutes} value={String(minutes)}>
+                        {minutes} minutes
+                      </SelectItem>
+                    ))}
+                    <SelectItem value={DURATION_OTHER}>Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+            </div>
+
+            {techDurationChoice === DURATION_OTHER && (
+              <Field>
+                <FieldLabel htmlFor="techRehearsalDurationMinutes" className="text-xs">
+                  <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                  Custom duration
+                  <span className="text-muted-foreground/70 font-normal ml-1">(minutes)</span>
+                </FieldLabel>
+                <Input
+                  id="techRehearsalDurationMinutes"
+                  type="number"
+                  min={MIN_SHOW_DURATION_MINUTES}
+                  max={MAX_SHOW_DURATION_MINUTES}
+                  step="5"
+                  value={formData.techRehearsalDurationMinutes || ""}
+                  onChange={(e) =>
+                    updateField(
+                      "techRehearsalDurationMinutes",
+                      Math.floor(parseFloat(e.target.value) || 0),
+                    )
+                  }
+                  className={inputClasses}
+                  required
+                />
+              </Field>
+            )}
           </div>
 
           {/* Event duration row */}

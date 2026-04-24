@@ -12,10 +12,13 @@ import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
 type Stage = "compose" | "preview" | "result"
 
-const PENDING_RESULT: ConfirmationResult = {
-  email: { status: "pending" },
-  calendarEvent: { status: "pending" },
-  driveFolder: { status: "pending" },
+function buildPendingResult(hasTechRehearsal: boolean): ConfirmationResult {
+  return {
+    email: { status: "pending" },
+    calendarEvent: { status: "pending" },
+    techCalendarEvent: hasTechRehearsal ? { status: "pending" } : undefined,
+    driveFolder: { status: "pending" },
+  }
 }
 
 export function ShowConfirmationApp() {
@@ -33,8 +36,9 @@ export function ShowConfirmationApp() {
 
   const handleConfirm = async () => {
     if (!showDetails) return
+    const hasTechRehearsal = showDetails.techRehearsalTime.trim().length > 0
     setIsConfirming(true)
-    setResult(PENDING_RESULT)
+    setResult(buildPendingResult(hasTechRehearsal))
     setStage("result")
 
     try {
@@ -54,6 +58,7 @@ export function ShowConfirmationApp() {
         setResult({
           email: { status: "error", error: msg },
           calendarEvent: { status: "error", error: msg },
+          techCalendarEvent: hasTechRehearsal ? { status: "error", error: msg } : undefined,
           driveFolder: { status: "error", error: msg },
         })
         return
@@ -70,6 +75,7 @@ export function ShowConfirmationApp() {
       setResult({
         email: { status: "error", error: msg },
         calendarEvent: { status: "error", error: msg },
+        techCalendarEvent: hasTechRehearsal ? { status: "error", error: msg } : undefined,
         driveFolder: { status: "error", error: msg },
       })
     } finally {

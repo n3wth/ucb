@@ -13,6 +13,7 @@ const showDetails: ShowDetails = {
   venue: 'UCB Franklin',
   durationMinutes: 90,
   techRehearsalTime: '',
+  techRehearsalDurationMinutes: 90,
   presaleTicketPrice: 10,
   doorTicketPrice: 15,
   digitalTicket: { enabled: false, price: 0 },

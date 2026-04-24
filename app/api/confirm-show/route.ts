@@ -73,6 +73,15 @@ function buildEventDescription(d: ShowDetails): string {
     .join("\n")
 }
 
+function buildTechEventDescription(d: ShowDetails): string {
+  return [
+    `Tech rehearsal for: ${d.showTitle}`,
+    `Venue: ${d.venue}`,
+    `Producer: ${d.producerEmail}`,
+    `Show time: ${d.showTime}`,
+  ].join("\n")
+}
+
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
   const reqLog = log.child(requestId.slice(0, 8))
@@ -120,6 +129,8 @@ export async function POST(request: NextRequest) {
     hasCreds: hasGoogleCredentials(),
   })
 
+  const hasTechRehearsal = body.techRehearsalTime.trim().length > 0
+
   // --- Simulation mode (no Google creds) -------------------------------
   if (!hasGoogleCredentials()) {
     reqLog.warn("SIMULATION MODE — GOOGLE_* env vars not fully set")
@@ -128,6 +139,9 @@ export async function POST(request: NextRequest) {
     const result: ConfirmationResult = {
       email: { status: "success", id: simId },
       calendarEvent: { status: "success", id: simId },
+      techCalendarEvent: hasTechRehearsal
+        ? { status: "success", id: `${simId}-tech` }
+        : undefined,
       driveFolder: {
         status: "success",
         id: simId,
@@ -139,6 +153,7 @@ export async function POST(request: NextRequest) {
       venue: body.venue,
       date: body.showDate,
       producer: body.producerEmail,
+      techRehearsal: hasTechRehearsal,
       mode: "simulation",
     })
     return NextResponse.json(result)
@@ -163,7 +178,26 @@ export async function POST(request: NextRequest) {
       ? injectDriveFolderUrl(emailBody, driveFolder.url)
       : emailBody
 
-  const [calendarEvent, email] = await Promise.all([
+  const techEventPromise = hasTechRehearsal
+    ? (() => {
+        const { startISO: techStartISO, endISO: techEndISO } = computeStartEnd({
+          showDate: body.showDate,
+          showTime: body.techRehearsalTime,
+          durationMinutes: body.techRehearsalDurationMinutes,
+        })
+        return createCalendarEvent({
+          calendarId: UCB_CALENDAR_ID,
+          summary: `${body.showTitle} - TECH`,
+          location: body.venue,
+          description: buildTechEventDescription(body),
+          startISO: techStartISO,
+          endISO: techEndISO,
+          timeZone: TIMEZONE,
+        })
+      })()
+    : Promise.resolve(undefined)
+
+  const [calendarEvent, email, techCalendarEvent] = await Promise.all([
     createCalendarEvent({
       calendarId: UCB_CALENDAR_ID,
       summary: body.showTitle,
@@ -184,13 +218,20 @@ export async function POST(request: NextRequest) {
           status: "error",
           error: "No email body was provided.",
         } as const),
+    techEventPromise,
   ])
 
-  const result: ConfirmationResult = { email, calendarEvent, driveFolder }
+  const result: ConfirmationResult = {
+    email,
+    calendarEvent,
+    techCalendarEvent,
+    driveFolder,
+  }
 
   reqLog.info("done", {
     email: email.status,
     calendar: calendarEvent.status,
+    techCalendar: techCalendarEvent?.status,
     drive: driveFolder.status,
   })
 
@@ -202,6 +243,7 @@ export async function POST(request: NextRequest) {
     ccCount: body.ccEmails?.length ?? 0,
     email: email.status,
     calendar: calendarEvent.status,
+    techCalendar: techCalendarEvent?.status,
     drive: driveFolder.status,
   })
 
