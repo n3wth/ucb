@@ -89,8 +89,7 @@ export default function LandingPage() {
                   </p>
                   <div aria-hidden className="mt-6 h-px w-full bg-foreground/20" />
                   <p className="mt-6 text-sm leading-relaxed text-foreground/70">
-                    The house lights are up, the call sheet is live. Everything
-                    the show needs, a curtain away.
+                    Don&apos;t think. Book.
                   </p>
                   <Link
                     href="/login"
