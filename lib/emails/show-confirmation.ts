@@ -29,6 +29,9 @@ export function renderShowConfirmationBody({ showDetails, driveFolderUrl }: Show
 
 Your show "${showDetails.showTitle}" at ${showDetails.venue} is confirmed.
 
+SHOW FOLDER
+${driveFolderUrl ? `Your show folder: ${driveFolderUrl}` : DRIVE_FOLDER_PLACEHOLDER}
+
 SHOW DETAILS
 Date: ${formattedDate}
 Show time: ${formattedShowTime}
@@ -37,9 +40,6 @@ Venue: ${showDetails.venue}
 
 TICKET PRICING
 ${ticketLines}
-
-SHOW FOLDER
-${driveFolderUrl ? `Your show folder: ${driveFolderUrl}` : DRIVE_FOLDER_PLACEHOLDER}
 
 Please review these details and reply if anything needs to be changed.
 

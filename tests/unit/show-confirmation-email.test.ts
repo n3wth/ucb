@@ -35,6 +35,16 @@ describe('renderShowConfirmationBody', () => {
     expect(body).toContain(`Your show folder: ${DRIVE_URL}`)
     expect(body).not.toContain(DRIVE_FOLDER_PLACEHOLDER)
   })
+
+  it('places SHOW FOLDER above SHOW DETAILS and TICKET PRICING', () => {
+    const body = renderShowConfirmationBody({ showDetails, driveFolderUrl: DRIVE_URL })
+    const folderIdx = body.indexOf('SHOW FOLDER')
+    const detailsIdx = body.indexOf('SHOW DETAILS')
+    const pricingIdx = body.indexOf('TICKET PRICING')
+    expect(folderIdx).toBeGreaterThan(-1)
+    expect(folderIdx).toBeLessThan(detailsIdx)
+    expect(folderIdx).toBeLessThan(pricingIdx)
+  })
 })
 
 describe('injectDriveFolderUrl', () => {
