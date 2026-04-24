@@ -253,7 +253,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
           {/* Submit button */}
           <Button
             type="submit"
-            className="w-full h-11 group"
+            className="w-full h-11 group cta-shimmer"
             size="lg"
           >
             Continue to review

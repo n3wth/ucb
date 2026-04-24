@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -91,8 +92,26 @@ export function ConfirmationResults({ result, showDetails, onReset, onRetry }: C
   const anyError = statuses.includes("error")
   const allSuccess = statuses.every((s) => s === "success")
 
+  const [showConfetti, setShowConfetti] = useState(false)
+  const fired = useRef(false)
+  useEffect(() => {
+    if (!allSuccess || fired.current) return
+    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      return
+    }
+    fired.current = true
+    setShowConfetti(true)
+    const t = setTimeout(() => setShowConfetti(false), 1100)
+    return () => clearTimeout(t)
+  }, [allSuccess])
+
   return (
-    <Card className="w-full border-border">
+    <Card className="relative w-full border-border">
+      {showConfetti && (
+        <div className="confetti" aria-hidden="true">
+          <span /><span /><span /><span /><span /><span />
+        </div>
+      )}
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1.5">

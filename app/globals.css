@@ -155,4 +155,157 @@
   .text-label {
     @apply text-xs font-medium text-foreground;
   }
+
+  /* Rainbow underline for playful links. Flat: no glow, no shadow —
+     just a 2px bar that slides under on hover. */
+  .link-rainbow {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
+  .link-rainbow::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      oklch(0.65 0.2 25),
+      oklch(0.75 0.18 85),
+      oklch(0.65 0.2 145),
+      oklch(0.65 0.2 210),
+      oklch(0.55 0.22 290)
+    );
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 220ms ease-out;
+  }
+  .link-rainbow:hover::after,
+  .link-rainbow:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  /* Shimmer highlight for primary CTAs. A single pass on hover only. */
+  .cta-shimmer {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .cta-shimmer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      110deg,
+      transparent 30%,
+      oklch(1 0 0 / 0.22) 50%,
+      transparent 70%
+    );
+    transform: translateX(-120%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .cta-shimmer:hover::before,
+  .cta-shimmer:focus-visible::before {
+    animation: cta-shimmer-sweep 900ms ease-out 1;
+  }
+  .cta-shimmer > * {
+    position: relative;
+    z-index: 1;
+  }
+  @keyframes cta-shimmer-sweep {
+    to {
+      transform: translateX(120%);
+    }
+  }
+
+  /* Confetti burst: six pieces fan out once, then clean up. */
+  .confetti {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+  }
+  .confetti span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 14px;
+    border-radius: 1px;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    animation: confetti-pop 900ms ease-out forwards;
+  }
+  .confetti span:nth-child(1) {
+    background: oklch(0.65 0.2 25);
+    --x: -90px;
+    --y: -70px;
+    --r: -140deg;
+    animation-delay: 0ms;
+  }
+  .confetti span:nth-child(2) {
+    background: oklch(0.75 0.18 85);
+    --x: 80px;
+    --y: -80px;
+    --r: 180deg;
+    animation-delay: 40ms;
+  }
+  .confetti span:nth-child(3) {
+    background: oklch(0.65 0.2 145);
+    --x: -120px;
+    --y: 30px;
+    --r: -60deg;
+    animation-delay: 20ms;
+  }
+  .confetti span:nth-child(4) {
+    background: oklch(0.65 0.2 210);
+    --x: 120px;
+    --y: 20px;
+    --r: 90deg;
+    animation-delay: 80ms;
+  }
+  .confetti span:nth-child(5) {
+    background: oklch(0.55 0.22 290);
+    --x: -40px;
+    --y: 90px;
+    --r: 200deg;
+    animation-delay: 60ms;
+  }
+  .confetti span:nth-child(6) {
+    background: oklch(0.4 0.16 15);
+    --x: 50px;
+    --y: 100px;
+    --r: -110deg;
+    animation-delay: 100ms;
+  }
+  @keyframes confetti-pop {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    15% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(var(--r));
+    }
+  }
+
+  /* Subtle easter-egg wiggle — used on the 404 page eye. */
+  .hover-wiggle {
+    transition: transform 200ms ease-out;
+  }
+  .hover-wiggle:hover {
+    animation: wiggle 500ms ease-in-out 1;
+  }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-6deg); }
+    75% { transform: rotate(6deg); }
+  }
 }
