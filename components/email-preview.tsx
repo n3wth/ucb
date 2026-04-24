@@ -54,9 +54,16 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
             </CardTitle>
             <CardDescription className="text-xs">Will be sent to the producer after confirming.</CardDescription>
           </div>
-          <Badge variant="secondary" className="font-normal text-xs">
-            To: {showDetails.producerEmail}
-          </Badge>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Badge variant="secondary" className="font-normal text-xs">
+              To: {showDetails.producerEmail}
+            </Badge>
+            {showDetails.ccEmails.length > 0 && (
+              <Badge variant="outline" className="font-normal text-xs">
+                CC: {showDetails.ccEmails.join(", ")}
+              </Badge>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

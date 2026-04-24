@@ -1,15 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
-import { Calendar, Clock, DollarSign, Mail, Monitor, ArrowRight, Timer } from "lucide-react"
+import { Calendar, Clock, DollarSign, Mail, Monitor, ArrowRight, Timer, Users } from "lucide-react"
 import {
   VENUES,
   DEFAULT_VENUE,
@@ -20,6 +20,8 @@ import {
   MAX_SHOW_DURATION_MINUTES,
   type VenueName,
 } from "@/lib/config"
+import { CcEmailList } from "@/components/cc-email-list"
+import { loadDefaultCcEmails } from "@/lib/cc-preferences"
 import type { ShowDetails } from "@/lib/types"
 
 const DURATION_OTHER = "other"
@@ -41,6 +43,7 @@ const DEFAULT_FORM: ShowDetails = {
   doorTicketPrice: 0,
   digitalTicket: { enabled: false, price: DEFAULT_DIGITAL_PRICE },
   producerEmail: "",
+  ccEmails: [],
 }
 
 function initialDurationChoice(minutes: number): DurationChoice {
@@ -54,6 +57,17 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
   const [durationChoice, setDurationChoice] = useState<DurationChoice>(() =>
     initialDurationChoice((initialValue ?? DEFAULT_FORM).durationMinutes),
   )
+
+  // When opening a fresh form (no initialValue), pre-fill CCs from saved defaults.
+  // If the user navigated back to edit, keep whatever they already had.
+  useEffect(() => {
+    if (initialValue) return
+    const defaults = loadDefaultCcEmails()
+    if (defaults.length === 0) return
+    setFormData((prev) =>
+      prev.ccEmails.length === 0 ? { ...prev, ccEmails: defaults } : prev,
+    )
+  }, [initialValue])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -277,6 +291,21 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
               onChange={(e) => updateField("producerEmail", e.target.value)}
               className={inputClasses}
               required
+            />
+          </Field>
+
+          {/* CC emails */}
+          <Field>
+            <FieldLabel htmlFor="ccInput" className="text-xs">
+              <Users className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+              CC
+              <span className="text-muted-foreground/70 font-normal ml-1">(optional)</span>
+            </FieldLabel>
+            <CcEmailList
+              inputId="ccInput"
+              emails={formData.ccEmails}
+              onChange={(next) => updateField("ccEmails", next)}
+              emptyHint="Add addresses to CC on this confirmation. Defaults can be managed below."
             />
           </Field>
 

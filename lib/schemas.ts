@@ -10,6 +10,11 @@ const emailLike = z
   .min(1, "producerEmail is required")
   .regex(/.+@.+\..+/, "producerEmail is invalid")
 
+const ccEmail = z
+  .string()
+  .trim()
+  .regex(/.+@.+\..+/, "ccEmails contains an invalid address")
+
 export const digitalTicketSchema = z.object({
   enabled: z.boolean(),
   price: z.number().finite().nonnegative(),
@@ -32,6 +37,7 @@ export const confirmShowRequestSchema = z.object({
   doorTicketPrice: z.number().finite().nonnegative(),
   digitalTicket: digitalTicketSchema,
   producerEmail: emailLike,
+  ccEmails: z.array(ccEmail).max(20, "ccEmails cannot exceed 20 addresses").optional().default([]),
   emailSubject: z.string().optional(),
   emailBody: z.string().optional(),
 })

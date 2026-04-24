@@ -43,6 +43,23 @@ function buildFolderName(d: ShowDetails): string {
   return `${d.showTitle} – ${d.showDate}`
 }
 
+function dedupeCc(ccEmails: string[] | undefined, producerEmail: string): string[] | undefined {
+  if (!ccEmails?.length) return undefined
+  const producer = producerEmail.trim().toLowerCase()
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const raw of ccEmails) {
+    const addr = raw.trim()
+    if (!addr) continue
+    const key = addr.toLowerCase()
+    if (key === producer) continue
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push(addr)
+  }
+  return out.length ? out : undefined
+}
+
 function buildEventDescription(d: ShowDetails): string {
   return [
     `Venue: ${d.venue}`,
@@ -161,6 +178,7 @@ export async function POST(request: NextRequest) {
           to: body.producerEmail,
           subject,
           body: finalEmailBody,
+          cc: dedupeCc(body.ccEmails, body.producerEmail),
         })
       : Promise.resolve({
           status: "error",
@@ -181,6 +199,7 @@ export async function POST(request: NextRequest) {
     venue: body.venue,
     date: body.showDate,
     producer: body.producerEmail,
+    ccCount: body.ccEmails?.length ?? 0,
     email: email.status,
     calendar: calendarEvent.status,
     drive: driveFolder.status,

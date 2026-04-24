@@ -12,14 +12,14 @@ export interface Venue {
   label: string
 }
 
-export const VENUES: Venue[] = [
+export const VENUES = [
   { id: "franklin", name: "UCB Franklin", label: "Franklin" },
   { id: "annex", name: "UCB Annex", label: "Annex" },
-] as const
+] as const satisfies readonly Venue[]
 
 export type VenueName = (typeof VENUES)[number]["name"]
 
-export const DEFAULT_VENUE = VENUES[0].name as VenueName
+export const DEFAULT_VENUE: VenueName = VENUES[0].name
 
 export const DEFAULT_DIGITAL_PRICE = 10
 
