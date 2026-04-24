@@ -96,6 +96,7 @@ export function CastDirectory({
   })
   const [showDemoFilter, setShowDemoFilter] = useState(false)
   const [affinityTab, setAffinityTab] = useState<"profile" | "affinity">("profile")
+  const [affinitySearch, setAffinitySearch] = useState("")
 
   const toggleLike = (subjectId: string, targetId: string) => {
     const entry = compatibility[subjectId] ?? { likes: [], dislikes: [] }
@@ -579,6 +580,7 @@ export function CastDirectory({
                               } else {
                                 setExpandedId(p.id)
                                 setAffinityTab("profile")
+                                setAffinitySearch("")
                               }
                             }}
                           >
@@ -628,6 +630,7 @@ export function CastDirectory({
                                 } else {
                                   setExpandedId(p.id)
                                   setAffinityTab("profile")
+                                  setAffinitySearch("")
                                 }
                               }}
                               aria-label={isExpanded ? "Collapse" : "Expand"}
@@ -738,51 +741,69 @@ export function CastDirectory({
                               </div>
                             )}
                             {affinityTab === "affinity" && (
-                              <div className="px-4 py-3 space-y-1 max-h-48 overflow-y-auto">
+                              <div className="px-4 py-3 space-y-2">
                                 {performers.filter((other) => other.id !== p.id).length === 0 ? (
                                   <p className="text-xs text-muted-foreground">No other performers.</p>
                                 ) : (
-                                  performers
-                                    .filter((other) => other.id !== p.id)
-                                    .sort((a, b) => a.name.localeCompare(b.name))
-                                    .map((other) => {
+                                  <>
+                                    <Input
+                                      placeholder="Search performers..."
+                                      value={affinitySearch}
+                                      onChange={(e) => setAffinitySearch(e.target.value)}
+                                      className="h-7 text-xs bg-input border-border"
+                                    />
+                                    {(() => {
+                                      const q = affinitySearch.trim().toLowerCase()
+                                      const others = performers
+                                        .filter((other) => other.id !== p.id)
+                                        .filter((other) => !q || other.name.toLowerCase().includes(q))
+                                        .sort((a, b) => a.name.localeCompare(b.name))
                                       const entry = compatibility[p.id] ?? { likes: [], dislikes: [] }
-                                      const liked = entry.likes.includes(other.id)
-                                      const disliked = entry.dislikes.includes(other.id)
-                                      return (
-                                        <div key={other.id} className="flex items-center gap-2 py-0.5">
-                                          <span className="text-xs text-foreground flex-1 truncate">{other.name}</span>
-                                          <div className="flex items-center gap-1 shrink-0">
-                                            <button
-                                              type="button"
-                                              onClick={() => toggleLike(p.id, other.id)}
-                                              title={liked ? "Remove like" : "Mark as liked collaborator"}
-                                              className={cn(
-                                                "rounded p-0.5 transition-colors",
-                                                liked
-                                                  ? "text-green-600 dark:text-green-400 bg-green-600/10"
-                                                  : "text-muted-foreground hover:text-green-600 dark:hover:text-green-400",
-                                              )}
-                                            >
-                                              <Heart className="h-3 w-3" />
-                                            </button>
-                                            <button
-                                              type="button"
-                                              onClick={() => toggleDislike(p.id, other.id)}
-                                              title={disliked ? "Remove conflict" : "Mark as incompatible"}
-                                              className={cn(
-                                                "rounded p-0.5 transition-colors",
-                                                disliked
-                                                  ? "text-destructive bg-destructive/10"
-                                                  : "text-muted-foreground hover:text-destructive",
-                                              )}
-                                            >
-                                              <ThumbsDown className="h-3 w-3" />
-                                            </button>
-                                          </div>
+                                      return others.length === 0 ? (
+                                        <p className="text-xs text-muted-foreground py-1">No matches.</p>
+                                      ) : (
+                                        <div className="space-y-0.5 max-h-40 overflow-y-auto">
+                                          {others.map((other) => {
+                                            const liked = entry.likes.includes(other.id)
+                                            const disliked = entry.dislikes.includes(other.id)
+                                            return (
+                                              <div key={other.id} className="flex items-center gap-2 py-0.5">
+                                                <span className="text-xs text-foreground flex-1 truncate">{other.name}</span>
+                                                <div className="flex items-center gap-1 shrink-0">
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => toggleLike(p.id, other.id)}
+                                                    title={liked ? "Remove like" : "Mark as liked collaborator"}
+                                                    className={cn(
+                                                      "rounded p-0.5 transition-colors",
+                                                      liked
+                                                        ? "text-green-600 dark:text-green-400 bg-green-600/10"
+                                                        : "text-muted-foreground hover:text-green-600 dark:hover:text-green-400",
+                                                    )}
+                                                  >
+                                                    <Heart className="h-3 w-3" />
+                                                  </button>
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => toggleDislike(p.id, other.id)}
+                                                    title={disliked ? "Remove conflict" : "Mark as incompatible"}
+                                                    className={cn(
+                                                      "rounded p-0.5 transition-colors",
+                                                      disliked
+                                                        ? "text-destructive bg-destructive/10"
+                                                        : "text-muted-foreground hover:text-destructive",
+                                                    )}
+                                                  >
+                                                    <ThumbsDown className="h-3 w-3" />
+                                                  </button>
+                                                </div>
+                                              </div>
+                                            )
+                                          })}
                                         </div>
                                       )
-                                    })
+                                    })()}
+                                  </>
                                 )}
                               </div>
                             )}

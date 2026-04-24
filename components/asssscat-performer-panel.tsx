@@ -81,6 +81,7 @@ export function AsssscatPerformerPanel({
   const [activeGroup, setActiveGroup] = useState<GroupFilter>("All")
   // The performer whose affinity settings are currently open
   const [affinityForId, setAffinityForId] = useState<string | null>(null)
+  const [affinitySearch, setAffinitySearch] = useState("")
   const [demoGenders, setDemoGenders] = useState<PerformerGender[]>([])
   const [demoRaces, setDemoRaces] = useState<PerformerRace[]>([])
   const [demoLgbtq, setDemoLgbtq] = useState<boolean | null>(null)
@@ -487,7 +488,14 @@ export function AsssscatPerformerPanel({
                                 ? "opacity-100 text-primary"
                                 : "opacity-0 group-hover:opacity-100 hover:text-foreground",
                             )}
-                            onClick={() => setAffinityForId(affinityOpen ? null : p.id)}
+                            onClick={() => {
+                              if (affinityOpen) {
+                                setAffinityForId(null)
+                              } else {
+                                setAffinityForId(p.id)
+                                setAffinitySearch("")
+                              }
+                            }}
                             aria-label={`${affinityOpen ? "Close" : "Edit"} affinity for ${p.name}`}
                             title="Edit compatibility preferences"
                           >
@@ -515,53 +523,75 @@ export function AsssscatPerformerPanel({
                             <p className="text-[10px] text-muted-foreground mb-1.5 pt-1">
                               Compatibility for {p.name}
                             </p>
-                            <div className="space-y-0.5 max-h-48 overflow-y-auto">
-                              {performers
+                            {performers.filter((other) => other.id !== p.id).length > 0 && (
+                              <div className="mb-1.5">
+                                <Input
+                                  placeholder="Search performers..."
+                                  value={affinitySearch}
+                                  onChange={(e) => setAffinitySearch(e.target.value)}
+                                  className="h-7 text-xs bg-input border-border"
+                                />
+                              </div>
+                            )}
+                            {(() => {
+                              const q = affinitySearch.trim().toLowerCase()
+                              const others = performers
                                 .filter((other) => other.id !== p.id)
+                                .filter((other) => !q || other.name.toLowerCase().includes(q))
                                 .sort((a, b) => a.name.localeCompare(b.name))
-                                .map((other) => {
-                                  const liked = entry.likes.includes(other.id)
-                                  const disliked = entry.dislikes.includes(other.id)
-                                  return (
-                                    <div
-                                      key={other.id}
-                                      className="flex items-center justify-between py-0.5 gap-2"
-                                    >
-                                      <span className="text-xs text-foreground truncate flex-1">
-                                        {other.name}
-                                      </span>
-                                      <div className="flex items-center gap-1 shrink-0">
-                                        <button
-                                          type="button"
-                                          onClick={() => toggleLike(p.id, other.id)}
-                                          title={liked ? "Remove like" : "Mark as liked collaborator"}
-                                          className={cn(
-                                            "rounded p-0.5 transition-colors",
-                                            liked
-                                              ? "text-green-600 dark:text-green-400 bg-green-600/10"
-                                              : "text-muted-foreground hover:text-green-600 dark:hover:text-green-400",
-                                          )}
-                                        >
-                                          <Heart className="h-3 w-3" />
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={() => toggleDislike(p.id, other.id)}
-                                          title={disliked ? "Remove conflict" : "Mark as incompatible"}
-                                          className={cn(
-                                            "rounded p-0.5 transition-colors",
-                                            disliked
-                                              ? "text-destructive bg-destructive/10"
-                                              : "text-muted-foreground hover:text-destructive",
-                                          )}
-                                        >
-                                          <ThumbsDown className="h-3 w-3" />
-                                        </button>
+                              return others.length === 0 ? (
+                                <p className="text-xs text-muted-foreground py-1">
+                                  {performers.filter((other) => other.id !== p.id).length === 0
+                                    ? "No other performers."
+                                    : "No matches."}
+                                </p>
+                              ) : (
+                                <div className="space-y-0.5 max-h-40 overflow-y-auto">
+                                  {others.map((other) => {
+                                    const liked = entry.likes.includes(other.id)
+                                    const disliked = entry.dislikes.includes(other.id)
+                                    return (
+                                      <div
+                                        key={other.id}
+                                        className="flex items-center justify-between py-0.5 gap-2"
+                                      >
+                                        <span className="text-xs text-foreground truncate flex-1">
+                                          {other.name}
+                                        </span>
+                                        <div className="flex items-center gap-1 shrink-0">
+                                          <button
+                                            type="button"
+                                            onClick={() => toggleLike(p.id, other.id)}
+                                            title={liked ? "Remove like" : "Mark as liked collaborator"}
+                                            className={cn(
+                                              "rounded p-0.5 transition-colors",
+                                              liked
+                                                ? "text-green-600 dark:text-green-400 bg-green-600/10"
+                                                : "text-muted-foreground hover:text-green-600 dark:hover:text-green-400",
+                                            )}
+                                          >
+                                            <Heart className="h-3 w-3" />
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => toggleDislike(p.id, other.id)}
+                                            title={disliked ? "Remove conflict" : "Mark as incompatible"}
+                                            className={cn(
+                                              "rounded p-0.5 transition-colors",
+                                              disliked
+                                                ? "text-destructive bg-destructive/10"
+                                                : "text-muted-foreground hover:text-destructive",
+                                            )}
+                                          >
+                                            <ThumbsDown className="h-3 w-3" />
+                                          </button>
+                                        </div>
                                       </div>
-                                    </div>
-                                  )
-                                })}
-                            </div>
+                                    )
+                                  })}
+                                </div>
+                              )
+                            })()}
                           </div>
                         )}
                       </li>
