@@ -40,9 +40,9 @@ export function renderAsssscatBody({ showDetails }: AsssscatEmailInput): string 
 
   const ticketLink = showDetails.ticketLink.trim() || "TBD"
 
-  return `Hi all,
+  return `Hello everybody--
 
-You're booked for ASSSSCAT on ${formattedDate}. Call time is ${ASSSSCAT_CALL_TIME} — please arrive by ${ASSSSCAT_ARRIVAL_TIME}. Day-of contact: ${ASSSSCAT_CONTACT_PHONE}.
+Excited to have you for ASSSSCAT on ${formattedDate}! The show begins at ${ASSSSCAT_CALL_TIME}, please arrive no later than ${ASSSSCAT_ARRIVAL_TIME}. If you are running late or your availability changes, please let me know as soon as possible. Should you need to get ahold of me, my number is ${ASSSSCAT_CONTACT_PHONE}.
 
 CAST
 ${castLines}
@@ -58,10 +58,10 @@ VENUE
 ${ASSSSCAT_VENUE}
 
 REMINDERS
-- Arrive by ${ASSSSCAT_ARRIVAL_TIME}; call time is ${ASSSSCAT_CALL_TIME}.
-- Reply-all if you have a conflict so we can line up a sub.
-- Bring a backup shirt and anything you need for the run.
-
-Thanks,
-${ASSSSCAT_SIGNATURE}`
+- Show is 1.5hrs with no intermission.
+- The host makes the final call on show order at the top of the show.
+- Expect 3-4 monologues from the monologist throughout.
+- You call your own show — trust your instincts.
+- If you need to cancel, please reply or text me as soon as possible.
+- Valet is available at Schwartz and Sandy's Wednesday through Sunday.`
 }

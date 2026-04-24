@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest'
 import {
   ASSSSCAT_CONTACT_PHONE,
   ASSSSCAT_COMPS_EMAIL,
-  ASSSSCAT_SIGNATURE,
   ASSSSCAT_VENUE,
   renderAsssscatBody,
   renderAsssscatSubject,
@@ -61,10 +60,14 @@ describe('renderAsssscatBody', () => {
     expect(body).toContain(ASSSSCAT_COMPS_EMAIL)
   })
 
-  it('includes venue, contact phone, and signature', () => {
+  it('opens with correct greeting', () => {
+    expect(body).toMatch(/^Hello everybody--/)
+  })
+
+  it('includes venue and contact phone, no closing signature', () => {
     expect(body).toContain(ASSSSCAT_VENUE)
     expect(body).toContain(ASSSSCAT_CONTACT_PHONE)
-    expect(body).toContain(ASSSSCAT_SIGNATURE)
+    expect(body).not.toContain('Chris Renfro')
   })
 
   it('renders call time and arrival time', () => {
