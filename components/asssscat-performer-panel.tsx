@@ -11,13 +11,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { AlertCircle, Heart, Pencil, Plus, Trash2, X, Check, ThumbsDown } from "lucide-react"
+import { AlertCircle, Heart, Pencil, Plus, Trash2, X, Check, ThumbsDown, SlidersHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   ASSSSCAT_PERFORMER_CATEGORIES,
+  PERFORMER_GENDERS,
+  PERFORMER_RACES,
   type AsssscatPerformer,
   type AsssscatPerformerCategory,
   type CompatibilityMap,
+  type PerformerGender,
+  type PerformerRace,
 } from "@/lib/types"
 import {
   addPerformer,
@@ -77,8 +81,24 @@ export function AsssscatPerformerPanel({
   const [activeGroup, setActiveGroup] = useState<GroupFilter>("All")
   // The performer whose affinity settings are currently open
   const [affinityForId, setAffinityForId] = useState<string | null>(null)
+  const [demoGenders, setDemoGenders] = useState<PerformerGender[]>([])
+  const [demoRaces, setDemoRaces] = useState<PerformerRace[]>([])
+  const [demoLgbtq, setDemoLgbtq] = useState<boolean | null>(null)
+  const [showDemoFilter, setShowDemoFilter] = useState(false)
 
-  const grouped = useMemo(() => groupByCategory(performers), [performers])
+  const hasDemoFilter = demoGenders.length > 0 || demoRaces.length > 0 || demoLgbtq !== null
+
+  const filteredPerformers = useMemo(() => {
+    if (!hasDemoFilter) return performers
+    return performers.filter((p) => {
+      if (demoGenders.length > 0 && (!p.gender || !demoGenders.includes(p.gender))) return false
+      if (demoRaces.length > 0 && (!p.race || !demoRaces.includes(p.race))) return false
+      if (demoLgbtq !== null && Boolean(p.lgbtq) !== demoLgbtq) return false
+      return true
+    })
+  }, [performers, demoGenders, demoRaces, demoLgbtq, hasDemoFilter])
+
+  const grouped = useMemo(() => groupByCategory(filteredPerformers), [filteredPerformers])
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds])
 
   const visibleCategories = useMemo(
@@ -177,18 +197,115 @@ export function AsssscatPerformerPanel({
     <div className="border border-border rounded-lg bg-card">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <h2 className="text-sm font-medium text-foreground">Performers</h2>
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          className="h-7 px-2 text-xs"
-          onClick={startAdd}
-          disabled={showForm}
-        >
-          <Plus className="h-3.5 w-3.5 mr-1" />
-          Add
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            type="button"
+            size="sm"
+            variant={hasDemoFilter ? "default" : "ghost"}
+            className="h-7 px-2 text-xs"
+            onClick={() => setShowDemoFilter((v) => !v)}
+            title="Filter by demographics"
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5" />
+            {hasDemoFilter && (
+              <span className="ml-1 text-[10px]">
+                {demoGenders.length + demoRaces.length + (demoLgbtq !== null ? 1 : 0)}
+              </span>
+            )}
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className="h-7 px-2 text-xs"
+            onClick={startAdd}
+            disabled={showForm}
+          >
+            <Plus className="h-3.5 w-3.5 mr-1" />
+            Add
+          </Button>
+        </div>
       </div>
+
+      {showDemoFilter && (
+        <div className="px-4 py-2 border-b border-border bg-muted/20 space-y-2">
+          <div>
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Gender</p>
+            <div className="flex flex-wrap gap-1">
+              {PERFORMER_GENDERS.map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() =>
+                    setDemoGenders((prev) =>
+                      prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g],
+                    )
+                  }
+                  className={cn(
+                    "text-[10px] px-1.5 py-0.5 rounded border transition-colors",
+                    demoGenders.includes(g)
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-border text-muted-foreground hover:text-foreground hover:bg-muted",
+                  )}
+                >
+                  {g}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Race</p>
+            <div className="flex flex-wrap gap-1">
+              {PERFORMER_RACES.map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() =>
+                    setDemoRaces((prev) =>
+                      prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r],
+                    )
+                  }
+                  className={cn(
+                    "text-[10px] px-1.5 py-0.5 rounded border transition-colors",
+                    demoRaces.includes(r)
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-border text-muted-foreground hover:text-foreground hover:bg-muted",
+                  )}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 pb-1">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">LGBTQ+</p>
+            {([true, false] as const).map((val) => (
+              <button
+                key={String(val)}
+                type="button"
+                onClick={() => setDemoLgbtq((prev) => (prev === val ? null : val))}
+                className={cn(
+                  "text-[10px] px-1.5 py-0.5 rounded border transition-colors",
+                  demoLgbtq === val
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "border-border text-muted-foreground hover:text-foreground hover:bg-muted",
+                )}
+              >
+                {val ? "Yes" : "No"}
+              </button>
+            ))}
+            {hasDemoFilter && (
+              <button
+                type="button"
+                className="text-[10px] text-muted-foreground hover:text-foreground ml-auto"
+                onClick={() => { setDemoGenders([]); setDemoRaces([]); setDemoLgbtq(null) }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="flex items-center gap-1 px-4 py-2 border-b border-border overflow-x-auto">
         <button

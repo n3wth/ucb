@@ -43,11 +43,32 @@ export const ASSSSCAT_PERFORMER_CATEGORIES = [
 ] as const
 export type AsssscatPerformerCategory = (typeof ASSSSCAT_PERFORMER_CATEGORIES)[number]
 
+export const PERFORMER_GENDERS = ["Male", "Female", "Non-Binary"] as const
+export type PerformerGender = (typeof PERFORMER_GENDERS)[number]
+
+export const PERFORMER_RACES = [
+  "Black",
+  "White",
+  "Asian",
+  "Native",
+  "Latinx",
+  "Middle Eastern",
+  "Pacific Islander",
+  "Multiracial",
+] as const
+export type PerformerRace = (typeof PERFORMER_RACES)[number]
+
 export interface AsssscatPerformer {
   id: string
   name: string
   email: string
   category: AsssscatPerformerCategory
+  additionalEmail?: string
+  phone?: string
+  gender?: PerformerGender
+  race?: PerformerRace
+  lgbtq?: boolean
+  bookingCount?: number
 }
 
 // Compatibility preferences keyed by performer ID.

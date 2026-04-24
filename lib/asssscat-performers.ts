@@ -4,8 +4,12 @@
 
 import {
   ASSSSCAT_PERFORMER_CATEGORIES,
+  PERFORMER_GENDERS,
+  PERFORMER_RACES,
   type AsssscatPerformer,
   type AsssscatPerformerCategory,
+  type PerformerGender,
+  type PerformerRace,
 } from "@/lib/types"
 
 const STORAGE_KEY = "ucb.asssscat.performers"
@@ -204,6 +208,14 @@ function isCategory(value: unknown): value is AsssscatPerformerCategory {
   )
 }
 
+function isGender(value: unknown): value is PerformerGender {
+  return typeof value === "string" && (PERFORMER_GENDERS as readonly string[]).includes(value)
+}
+
+function isRace(value: unknown): value is PerformerRace {
+  return typeof value === "string" && (PERFORMER_RACES as readonly string[]).includes(value)
+}
+
 function isPerformer(value: unknown): value is AsssscatPerformer {
   if (typeof value !== "object" || value === null) return false
   const p = value as Record<string, unknown>
@@ -214,7 +226,13 @@ function isPerformer(value: unknown): value is AsssscatPerformer {
     p.name.trim().length > 0 &&
     typeof p.email === "string" &&
     (p.email === "" || isValidEmail(p.email)) &&
-    isCategory(p.category)
+    isCategory(p.category) &&
+    (p.additionalEmail === undefined || typeof p.additionalEmail === "string") &&
+    (p.phone === undefined || typeof p.phone === "string") &&
+    (p.gender === undefined || isGender(p.gender)) &&
+    (p.race === undefined || isRace(p.race)) &&
+    (p.lgbtq === undefined || typeof p.lgbtq === "boolean") &&
+    (p.bookingCount === undefined || typeof p.bookingCount === "number")
   )
 }
 
@@ -363,4 +381,16 @@ export function groupByCategory(
     groups[c].sort((a, b) => a.name.localeCompare(b.name))
   }
   return groups
+}
+
+// Increment bookingCount for each performer in the given ID set, then save.
+export function incrementBookingCounts(
+  list: AsssscatPerformer[],
+  bookedIds: string[],
+): AsssscatPerformer[] {
+  const idSet = new Set(bookedIds)
+  const updated = list.map((p) =>
+    idSet.has(p.id) ? { ...p, bookingCount: (p.bookingCount ?? 0) + 1 } : p,
+  )
+  return savePerformers(updated)
 }

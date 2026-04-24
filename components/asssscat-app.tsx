@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Field, FieldLabel } from "@/components/ui/field"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,6 +18,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { AsssscatPerformerPanel } from "@/components/asssscat-performer-panel"
+import { CastDirectory } from "@/components/cast-directory"
 import { CcEmailList } from "@/components/cc-email-list"
 import { ToolPage } from "@/components/tool-page"
 import {
@@ -31,6 +33,7 @@ import {
   savePerformers,
   parseCastInput,
   matchPerformersByName,
+  incrementBookingCounts,
 } from "@/lib/asssscat-performers"
 import {
   loadAsssscatDefaultCc,
@@ -224,6 +227,9 @@ export function AsssscatApp() {
 
       setSendStatus({ kind: "success", id: data.email.id })
       setOneTimeCc([])
+      // Auto-increment booking counts for everyone in the cast.
+      const bookedIds = cast.map((p) => p.id)
+      setPerformers((current) => incrementBookingCounts(current, bookedIds))
     } catch (err) {
       const message = err instanceof Error ? err.message : "Network error"
       setSendStatus({ kind: "error", message })
@@ -236,6 +242,21 @@ export function AsssscatApp() {
       description="Send the cast booking email for ASSSSCAT at UCB Franklin Theatre."
       size="lg"
     >
+      <Tabs defaultValue="booking" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="booking">Booking</TabsTrigger>
+          <TabsTrigger value="directory">Cast Directory</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="directory">
+          <CastDirectory
+            performers={performers}
+            onChange={handlePerformersChange}
+            onPerformerRemoved={handlePerformerRemoved}
+          />
+        </TabsContent>
+
+        <TabsContent value="booking">
       <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-6">
         <aside>
           <AsssscatPerformerPanel
@@ -553,6 +574,8 @@ export function AsssscatApp() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+        </TabsContent>
+      </Tabs>
     </ToolPage>
   )
 }
