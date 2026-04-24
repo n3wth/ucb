@@ -7,6 +7,7 @@ import { ConfirmationResults } from "@/components/confirmation-results"
 import { StageProgress } from "@/components/stage-progress"
 import { ToolPage } from "@/components/tool-page"
 import { DefaultCcPreferences } from "@/components/default-cc-preferences"
+import { ShowCcPreferencesPanel } from "@/components/show-cc-preferences-panel"
 import { renderShowConfirmationBody, renderShowConfirmationSubject } from "@/lib/emails"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
@@ -27,6 +28,7 @@ export function ShowConfirmationApp() {
   const [emailContent, setEmailContent] = useState<string>("")
   const [result, setResult] = useState<ConfirmationResult | null>(null)
   const [isConfirming, setIsConfirming] = useState(false)
+  const [activeShowTitle, setActiveShowTitle] = useState<string>("")
 
   const handleComposeSubmit = (data: ShowDetails) => {
     setShowDetails(data)
@@ -92,6 +94,7 @@ export function ShowConfirmationApp() {
     setResult(null)
     setEmailContent("")
     setStage("compose")
+    setActiveShowTitle("")
   }
 
   return (
@@ -105,7 +108,14 @@ export function ShowConfirmationApp() {
         <div className="w-full">
           {stage === "compose" && (
             <div className="animate-in fade-in slide-in-from-bottom-3 duration-400 space-y-6">
-              <ShowConfirmationForm initialValue={showDetails} onSubmit={handleComposeSubmit} />
+              <ShowConfirmationForm
+                initialValue={showDetails}
+                onSubmit={handleComposeSubmit}
+                onShowTitleChange={setActiveShowTitle}
+              />
+              <ShowCcPreferencesPanel
+                activeShowTitle={activeShowTitle}
+              />
               <DefaultCcPreferences />
             </div>
           )}

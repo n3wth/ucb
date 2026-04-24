@@ -24,6 +24,7 @@ import {
 } from "@/lib/config"
 import { CcEmailList, type CcEmailListHandle } from "@/components/cc-email-list"
 import { loadDefaultCcEmails } from "@/lib/cc-preferences"
+import { loadShowCcEmails, normalizeShowTitle } from "@/lib/show-cc-preferences"
 import type { ShowDetails } from "@/lib/types"
 
 const DURATION_OTHER = "other"
@@ -35,6 +36,7 @@ type TechDurationChoice =
 interface ShowConfirmationFormProps {
   initialValue?: ShowDetails | null
   onSubmit: (data: ShowDetails) => void
+  onShowTitleChange?: (title: string) => void
 }
 
 function todayDateString(): string {
@@ -71,7 +73,7 @@ function initialTechDurationChoice(minutes: number): TechDurationChoice {
     : DURATION_OTHER
 }
 
-export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmationFormProps) {
+export function ShowConfirmationForm({ initialValue, onSubmit, onShowTitleChange }: ShowConfirmationFormProps) {
   const [formData, setFormData] = useState<ShowDetails>(initialValue ?? DEFAULT_FORM)
   const [durationChoice, setDurationChoice] = useState<DurationChoice>(() =>
     initialDurationChoice((initialValue ?? DEFAULT_FORM).durationMinutes),
@@ -79,9 +81,12 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
   const [techDurationChoice, setTechDurationChoice] = useState<TechDurationChoice>(() =>
     initialTechDurationChoice((initialValue ?? DEFAULT_FORM).techRehearsalDurationMinutes),
   )
+  // Track which normalised show title last triggered a CC auto-fill so we only
+  // do it once per title (not on every keystroke once emails are present).
+  const lastAutoFilledTitle = useRef<string>("")
   const ccListRef = useRef<CcEmailListHandle>(null)
 
-  // When opening a fresh form (no initialValue), pre-fill CCs from saved defaults.
+  // When opening a fresh form (no initialValue), pre-fill CCs from global saved defaults.
   // If the user navigated back to edit, keep whatever they already had.
   useEffect(() => {
     if (initialValue) return
@@ -91,6 +96,24 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
       prev.ccEmails.length === 0 ? { ...prev, ccEmails: defaults } : prev,
     )
   }, [initialValue])
+
+  // When show title changes, auto-merge per-show CC preferences.
+  // Only triggers when the title resolves to a saved entry and we haven't
+  // already auto-filled for this exact title.
+  useEffect(() => {
+    const key = normalizeShowTitle(formData.showTitle)
+    if (!key || key === lastAutoFilledTitle.current) return
+    const saved = loadShowCcEmails(formData.showTitle)
+    if (saved.length === 0) return
+    lastAutoFilledTitle.current = key
+    setFormData((prev) => {
+      // Merge: add saved emails that aren't already present.
+      const existing = new Set(prev.ccEmails.map((e) => e.toLowerCase()))
+      const toAdd = saved.filter((e) => !existing.has(e.toLowerCase()))
+      if (toAdd.length === 0) return prev
+      return { ...prev, ccEmails: [...prev.ccEmails, ...toAdd] }
+    })
+  }, [formData.showTitle])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -146,7 +169,10 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
               id="showTitle"
               placeholder="Harold Night"
               value={formData.showTitle}
-              onChange={(e) => updateField("showTitle", e.target.value)}
+              onChange={(e) => {
+                updateField("showTitle", e.target.value)
+                onShowTitleChange?.(e.target.value)
+              }}
               className={`${inputClasses} h-12 text-base`}
               required
             />
