@@ -18,6 +18,7 @@ import {
   PERFORMER_RACES,
   type AsssscatPerformer,
   type AsssscatPerformerCategory,
+  type CompatibilityMap,
   type PerformerGender,
   type PerformerRace,
 } from "@/lib/types"
@@ -29,7 +30,7 @@ import {
   removePerformer,
   updatePerformer,
 } from "@/lib/asssscat-performers"
-import { Check, ChevronDown, ChevronUp, Pencil, Plus, Trash2, X } from "lucide-react"
+import { Check, ChevronDown, ChevronUp, Heart, Pencil, Plus, ThumbsDown, Trash2, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 type GroupFilter = "All" | AsssscatPerformerCategory
@@ -52,6 +53,8 @@ interface CastDirectoryProps {
   performers: AsssscatPerformer[]
   onChange: (next: AsssscatPerformer[]) => void
   onPerformerRemoved?: (performerId: string) => void
+  compatibility?: CompatibilityMap
+  onCompatibilityChange?: (performerId: string, patch: { likes?: string[]; dislikes?: string[] }) => void
 }
 
 const inputClasses =
@@ -76,6 +79,8 @@ export function CastDirectory({
   performers,
   onChange,
   onPerformerRemoved,
+  compatibility = {},
+  onCompatibilityChange,
 }: CastDirectoryProps) {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -90,6 +95,23 @@ export function CastDirectory({
     lgbtq: null,
   })
   const [showDemoFilter, setShowDemoFilter] = useState(false)
+  const [affinityTab, setAffinityTab] = useState<"profile" | "affinity">("profile")
+
+  const toggleLike = (subjectId: string, targetId: string) => {
+    const entry = compatibility[subjectId] ?? { likes: [], dislikes: [] }
+    const isLiked = entry.likes.includes(targetId)
+    const newLikes = isLiked ? entry.likes.filter((x) => x !== targetId) : [...entry.likes, targetId]
+    const newDislikes = entry.dislikes.filter((x) => x !== targetId)
+    onCompatibilityChange?.(subjectId, { likes: newLikes, dislikes: newDislikes })
+  }
+
+  const toggleDislike = (subjectId: string, targetId: string) => {
+    const entry = compatibility[subjectId] ?? { likes: [], dislikes: [] }
+    const isDisliked = entry.dislikes.includes(targetId)
+    const newDislikes = isDisliked ? entry.dislikes.filter((x) => x !== targetId) : [...entry.dislikes, targetId]
+    const newLikes = entry.likes.filter((x) => x !== targetId)
+    onCompatibilityChange?.(subjectId, { likes: newLikes, dislikes: newDislikes })
+  }
 
   const grouped = useMemo(() => groupByCategory(performers), [performers])
 
@@ -534,7 +556,14 @@ export function CastDirectory({
                           <button
                             type="button"
                             className="flex-1 text-left min-w-0"
-                            onClick={() => setExpandedId(isExpanded ? null : p.id)}
+                            onClick={() => {
+                              if (isExpanded) {
+                                setExpandedId(null)
+                              } else {
+                                setExpandedId(p.id)
+                                setAffinityTab("profile")
+                              }
+                            }}
                           >
                             <div className="text-sm text-foreground truncate">{p.name}</div>
                             <div className="text-[11px] text-muted-foreground truncate">
@@ -576,7 +605,14 @@ export function CastDirectory({
                             <button
                               type="button"
                               className="text-muted-foreground hover:text-foreground transition-colors"
-                              onClick={() => setExpandedId(isExpanded ? null : p.id)}
+                              onClick={() => {
+                                if (isExpanded) {
+                                  setExpandedId(null)
+                                } else {
+                                  setExpandedId(p.id)
+                                  setAffinityTab("profile")
+                                }
+                              }}
                               aria-label={isExpanded ? "Collapse" : "Expand"}
                             >
                               {isExpanded ? (
@@ -588,45 +624,122 @@ export function CastDirectory({
                           </div>
                         </div>
                         {isExpanded && (
-                          <div className="px-4 pb-3 border-t border-border/40 bg-muted/20 space-y-1.5">
-                            <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                              <div>
-                                <dt className="text-muted-foreground">Email</dt>
-                                <dd className="text-foreground">{p.email || "—"}</dd>
+                          <div className="border-t border-border/40 bg-muted/20">
+                            <div className="flex border-b border-border/40">
+                              <button
+                                type="button"
+                                onClick={() => setAffinityTab("profile")}
+                                className={cn(
+                                  "px-4 py-1.5 text-[11px] font-medium transition-colors",
+                                  affinityTab === "profile"
+                                    ? "text-foreground border-b-2 border-primary -mb-px"
+                                    : "text-muted-foreground hover:text-foreground",
+                                )}
+                              >
+                                Profile
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setAffinityTab("affinity")}
+                                className={cn(
+                                  "px-4 py-1.5 text-[11px] font-medium transition-colors",
+                                  affinityTab === "affinity"
+                                    ? "text-foreground border-b-2 border-primary -mb-px"
+                                    : "text-muted-foreground hover:text-foreground",
+                                )}
+                              >
+                                Likes / Dislikes
+                              </button>
+                            </div>
+                            {affinityTab === "profile" && (
+                              <dl className="px-4 py-3 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                                <div>
+                                  <dt className="text-muted-foreground">Email</dt>
+                                  <dd className="text-foreground">{p.email || "—"}</dd>
+                                </div>
+                                {p.additionalEmail && (
+                                  <div>
+                                    <dt className="text-muted-foreground">Alt email</dt>
+                                    <dd className="text-foreground">{p.additionalEmail}</dd>
+                                  </div>
+                                )}
+                                {p.phone && (
+                                  <div>
+                                    <dt className="text-muted-foreground">Phone</dt>
+                                    <dd className="text-foreground">{p.phone}</dd>
+                                  </div>
+                                )}
+                                {p.gender && (
+                                  <div>
+                                    <dt className="text-muted-foreground">Gender</dt>
+                                    <dd className="text-foreground">{p.gender}</dd>
+                                  </div>
+                                )}
+                                {p.race && (
+                                  <div>
+                                    <dt className="text-muted-foreground">Race</dt>
+                                    <dd className="text-foreground">{p.race}</dd>
+                                  </div>
+                                )}
+                                <div>
+                                  <dt className="text-muted-foreground">LGBTQ+</dt>
+                                  <dd className="text-foreground">{p.lgbtq ? "Yes" : "No"}</dd>
+                                </div>
+                                <div>
+                                  <dt className="text-muted-foreground">Times booked</dt>
+                                  <dd className="text-foreground">{p.bookingCount ?? 0}</dd>
+                                </div>
+                              </dl>
+                            )}
+                            {affinityTab === "affinity" && (
+                              <div className="px-4 py-3 space-y-1 max-h-48 overflow-y-auto">
+                                {performers.filter((other) => other.id !== p.id).length === 0 ? (
+                                  <p className="text-xs text-muted-foreground">No other performers.</p>
+                                ) : (
+                                  performers
+                                    .filter((other) => other.id !== p.id)
+                                    .sort((a, b) => a.name.localeCompare(b.name))
+                                    .map((other) => {
+                                      const entry = compatibility[p.id] ?? { likes: [], dislikes: [] }
+                                      const liked = entry.likes.includes(other.id)
+                                      const disliked = entry.dislikes.includes(other.id)
+                                      return (
+                                        <div key={other.id} className="flex items-center gap-2 py-0.5">
+                                          <span className="text-xs text-foreground flex-1 truncate">{other.name}</span>
+                                          <div className="flex items-center gap-1 shrink-0">
+                                            <button
+                                              type="button"
+                                              onClick={() => toggleLike(p.id, other.id)}
+                                              title={liked ? "Remove like" : "Mark as liked collaborator"}
+                                              className={cn(
+                                                "rounded p-0.5 transition-colors",
+                                                liked
+                                                  ? "text-green-600 dark:text-green-400 bg-green-600/10"
+                                                  : "text-muted-foreground hover:text-green-600 dark:hover:text-green-400",
+                                              )}
+                                            >
+                                              <Heart className="h-3 w-3" />
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => toggleDislike(p.id, other.id)}
+                                              title={disliked ? "Remove conflict" : "Mark as incompatible"}
+                                              className={cn(
+                                                "rounded p-0.5 transition-colors",
+                                                disliked
+                                                  ? "text-destructive bg-destructive/10"
+                                                  : "text-muted-foreground hover:text-destructive",
+                                              )}
+                                            >
+                                              <ThumbsDown className="h-3 w-3" />
+                                            </button>
+                                          </div>
+                                        </div>
+                                      )
+                                    })
+                                )}
                               </div>
-                              {p.additionalEmail && (
-                                <div>
-                                  <dt className="text-muted-foreground">Alt email</dt>
-                                  <dd className="text-foreground">{p.additionalEmail}</dd>
-                                </div>
-                              )}
-                              {p.phone && (
-                                <div>
-                                  <dt className="text-muted-foreground">Phone</dt>
-                                  <dd className="text-foreground">{p.phone}</dd>
-                                </div>
-                              )}
-                              {p.gender && (
-                                <div>
-                                  <dt className="text-muted-foreground">Gender</dt>
-                                  <dd className="text-foreground">{p.gender}</dd>
-                                </div>
-                              )}
-                              {p.race && (
-                                <div>
-                                  <dt className="text-muted-foreground">Race</dt>
-                                  <dd className="text-foreground">{p.race}</dd>
-                                </div>
-                              )}
-                              <div>
-                                <dt className="text-muted-foreground">LGBTQ+</dt>
-                                <dd className="text-foreground">{p.lgbtq ? "Yes" : "No"}</dd>
-                              </div>
-                              <div>
-                                <dt className="text-muted-foreground">Times booked</dt>
-                                <dd className="text-foreground">{p.bookingCount ?? 0}</dd>
-                              </div>
-                            </dl>
+                            )}
                           </div>
                         )}
                       </li>

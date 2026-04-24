@@ -253,6 +253,8 @@ export function AsssscatApp() {
             performers={performers}
             onChange={handlePerformersChange}
             onPerformerRemoved={handlePerformerRemoved}
+            compatibility={compatibility}
+            onCompatibilityChange={handleCompatibilityChange}
           />
         </TabsContent>
 
