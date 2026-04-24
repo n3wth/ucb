@@ -29,6 +29,8 @@ import {
 import {
   loadPerformers,
   savePerformers,
+  parseCastInput,
+  matchPerformersByName,
 } from "@/lib/asssscat-performers"
 import {
   loadAsssscatDefaultCc,
@@ -39,7 +41,7 @@ import type {
   AsssscatPerformer,
   AsssscatShowDetails,
 } from "@/lib/types"
-import { Calendar, Send, Users, X } from "lucide-react"
+import { Calendar, Check, Send, Users, X } from "lucide-react"
 
 const inputClasses =
   "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
@@ -62,6 +64,7 @@ export function AsssscatApp() {
   const [ticketLink, setTicketLink] = useState("")
   const [oneTimeCc, setOneTimeCc] = useState<string[]>([])
   const [defaultCc, setDefaultCc] = useState<string[]>([])
+  const [castInput, setCastInput] = useState("")
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [sendStatus, setSendStatus] = useState<SendStatus>({ kind: "idle" })
 
@@ -117,6 +120,22 @@ export function AsssscatApp() {
     () => renderAsssscatSubject(showDetails),
     [showDetails],
   )
+
+  const castInputNames = useMemo(() => parseCastInput(castInput), [castInput])
+  const castInputMatches = useMemo(
+    () => matchPerformersByName(castInputNames, performers),
+    [castInputNames, performers],
+  )
+
+  const handleApplyCastInput = () => {
+    const toAdd = castInputMatches
+      .filter((r) => r.matched !== null)
+      .map((r) => r.matched!)
+    for (const p of toAdd) {
+      handlePickPerformer(p)
+    }
+    setCastInput("")
+  }
 
   const isSmallCast = cast.length < ASSSSCAT_SMALL_CAST_THRESHOLD
   const canSubmit =
@@ -222,6 +241,54 @@ export function AsssscatApp() {
                 required
               />
             </Field>
+
+            <div>
+              <Label htmlFor="castInput" className="text-xs">
+                Paste cast list
+              </Label>
+              <p className="text-xs text-muted-foreground mt-0.5 mb-2">
+                One name per line (or comma-separated). Matched performers are resolved automatically.
+              </p>
+              <Textarea
+                id="castInput"
+                value={castInput}
+                onChange={(e) => setCastInput(e.target.value)}
+                placeholder={"Jane Doe\nJohn Smith\n..."}
+                className="font-mono text-xs min-h-[80px] bg-input border-border resize-none"
+              />
+              {castInputNames.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  {castInputMatches.map((r, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs">
+                      {r.matched ? (
+                        <>
+                          <Check className="h-3 w-3 text-green-600 dark:text-green-400 shrink-0" />
+                          <span className="text-foreground">{r.matched.name}</span>
+                          <span className="text-muted-foreground truncate">{r.matched.email}</span>
+                        </>
+                      ) : (
+                        <>
+                          <X className="h-3 w-3 text-destructive shrink-0" />
+                          <span className="text-muted-foreground line-through">{r.input}</span>
+                          <span className="text-destructive">not found</span>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {castInputMatches.some((r) => r.matched !== null) && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  className="mt-2 h-8 text-xs"
+                  onClick={handleApplyCastInput}
+                >
+                  Add {castInputMatches.filter((r) => r.matched !== null).length} to cast
+                </Button>
+              )}
+            </div>
 
             <div>
               <Label className="text-xs flex items-center gap-1.5">

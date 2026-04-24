@@ -5,7 +5,9 @@ import {
   groupByCategory,
   isValidEmail,
   loadPerformers,
+  matchPerformersByName,
   newPerformerId,
+  parseCastInput,
   removePerformer,
   savePerformers,
   updatePerformer,
@@ -104,6 +106,50 @@ describe('groupByCategory', () => {
     expect(groups['Core Cast'].map((p) => p.name)).toEqual(['Alice', 'Bob'])
     expect(groups['Subs'].map((p) => p.name)).toEqual(['Carol'])
     expect(groups['Wild Cards']).toEqual([])
+  })
+})
+
+describe('parseCastInput', () => {
+  it('splits on newlines', () => {
+    expect(parseCastInput('Alice\nBob\nCarol')).toEqual(['Alice', 'Bob', 'Carol'])
+  })
+  it('splits on commas', () => {
+    expect(parseCastInput('Alice, Bob, Carol')).toEqual(['Alice', 'Bob', 'Carol'])
+  })
+  it('trims whitespace and drops empty entries', () => {
+    expect(parseCastInput('Alice\n\n  Bob  \n')).toEqual(['Alice', 'Bob'])
+  })
+  it('returns empty array for blank input', () => {
+    expect(parseCastInput('')).toEqual([])
+  })
+})
+
+describe('matchPerformersByName', () => {
+  const performers = [
+    perf({ id: '1', name: 'Alice Smith', email: 'alice@x.co' }),
+    perf({ id: '2', name: 'Bob Jones', email: 'bob@x.co' }),
+  ]
+
+  it('matches exact names case-insensitively', () => {
+    const results = matchPerformersByName(['alice smith', 'BOB JONES'], performers)
+    expect(results[0].matched?.id).toBe('1')
+    expect(results[1].matched?.id).toBe('2')
+  })
+
+  it('matches partial names', () => {
+    const results = matchPerformersByName(['Alice'], performers)
+    expect(results[0].matched?.id).toBe('1')
+  })
+
+  it('returns null for unmatched names', () => {
+    const results = matchPerformersByName(['Zelda'], performers)
+    expect(results[0].matched).toBeNull()
+    expect(results[0].input).toBe('Zelda')
+  })
+
+  it('handles empty performers list', () => {
+    const results = matchPerformersByName(['Alice'], [])
+    expect(results[0].matched).toBeNull()
   })
 })
 

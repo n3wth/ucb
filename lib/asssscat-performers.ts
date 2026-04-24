@@ -120,6 +120,31 @@ export function removePerformer(list: AsssscatPerformer[], id: string): Asssscat
   return list.filter((p) => p.id !== id)
 }
 
+export interface NameMatchResult {
+  input: string
+  matched: AsssscatPerformer | null
+}
+
+export function parseCastInput(raw: string): string[] {
+  return raw
+    .split(/[\n,]+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+}
+
+export function matchPerformersByName(
+  inputs: string[],
+  performers: AsssscatPerformer[],
+): NameMatchResult[] {
+  return inputs.map((input) => {
+    const needle = input.toLowerCase()
+    const exact = performers.find((p) => p.name.toLowerCase() === needle)
+    if (exact) return { input, matched: exact }
+    const partial = performers.find((p) => p.name.toLowerCase().includes(needle) || needle.includes(p.name.toLowerCase()))
+    return { input, matched: partial ?? null }
+  })
+}
+
 export function groupByCategory(
   list: AsssscatPerformer[],
 ): Record<AsssscatPerformerCategory, AsssscatPerformer[]> {
