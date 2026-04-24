@@ -33,7 +33,13 @@ export function ShowConfirmationApp() {
   const handleConfirm = async () => {
     if (!showDetails) return
     setIsConfirming(true)
-    setResult(PENDING_RESULT)
+    const pending: ConfirmationResult = {
+      ...PENDING_RESULT,
+      ...(showDetails.techRehearsal.enabled
+        ? { techRehearsalEvent: { status: "pending" } }
+        : {}),
+    }
+    setResult(pending)
     setStage("result")
 
     try {
@@ -54,6 +60,9 @@ export function ShowConfirmationApp() {
           email: { status: "error", error: msg },
           calendarEvent: { status: "error", error: msg },
           driveFolder: { status: "error", error: msg },
+          ...(showDetails.techRehearsal.enabled
+            ? { techRehearsalEvent: { status: "error", error: msg } }
+            : {}),
         })
         return
       }
@@ -70,6 +79,9 @@ export function ShowConfirmationApp() {
         email: { status: "error", error: msg },
         calendarEvent: { status: "error", error: msg },
         driveFolder: { status: "error", error: msg },
+        ...(showDetails.techRehearsal.enabled
+          ? { techRehearsalEvent: { status: "error", error: msg } }
+          : {}),
       })
     } finally {
       setIsConfirming(false)

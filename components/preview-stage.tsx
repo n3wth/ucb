@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
 import { Calendar, Clock, FolderOpen, MapPin, Monitor, ArrowLeft, Send, DollarSign } from "lucide-react"
 import { EmailPreview } from "@/components/email-preview"
-import { formatDate, formatTime, formatPrice } from "@/lib/format"
+import { formatDate, formatTime, formatPrice, formatDuration } from "@/lib/format"
 import type { ShowDetails } from "@/lib/types"
 
 interface PreviewStageProps {
@@ -79,6 +79,51 @@ export function PreviewStage({
           </div>
         </CardContent>
       </Card>
+
+      {/* Tech rehearsal event card */}
+      {showDetails.techRehearsal.enabled && (
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              Tech rehearsal event
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Separate calendar event for the tech rehearsal.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Event title</div>
+                <div className="font-medium text-foreground">
+                  {showDetails.showTitle ? `${showDetails.showTitle} - TECH` : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <DetailItem
+                  icon={<Calendar className="h-3.5 w-3.5" />}
+                  label="Date"
+                  value={formatDate(showDetails.techRehearsal.date)}
+                />
+                <DetailItem
+                  icon={<Clock className="h-3.5 w-3.5" />}
+                  label="Start"
+                  value={formatTime(showDetails.techRehearsal.time)}
+                />
+                <DetailItem
+                  icon={<Clock className="h-3.5 w-3.5" />}
+                  label="Duration"
+                  value={formatDuration(showDetails.techRehearsal.durationMinutes)}
+                />
+                <DetailItem icon={<MapPin className="h-3.5 w-3.5" />} label="Venue" value={showDetails.venue} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Drive folder card */}
       <Card className="border-border">

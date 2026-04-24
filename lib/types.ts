@@ -3,12 +3,20 @@ export interface DigitalTicket {
   price: number
 }
 
+export interface TechRehearsalEvent {
+  enabled: boolean
+  date: string
+  time: string
+  durationMinutes: number
+}
+
 export interface ShowDetails {
   showTitle: string
   showDate: string
   venue: "UCB Franklin" | "UCB Annex"
   showTime: string
   techRehearsalTime: string
+  techRehearsal: TechRehearsalEvent
   presaleTicketPrice: number
   doorTicketPrice: number
   digitalTicket: DigitalTicket
@@ -28,6 +36,7 @@ export interface ConfirmationResult {
   email: StepResult
   calendarEvent: StepResult
   driveFolder: StepResult
+  techRehearsalEvent?: StepResult
 }
 
 export interface ShowListItem {

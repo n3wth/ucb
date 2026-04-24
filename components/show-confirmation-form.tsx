@@ -18,12 +18,28 @@ interface ShowConfirmationFormProps {
   onSubmit: (data: ShowDetails) => void
 }
 
+const DEFAULT_TECH_REHEARSAL_MINUTES = 90
+
+const DURATION_OPTIONS = [
+  { value: "60", label: "1 hour" },
+  { value: "90", label: "1 hr 30 min" },
+  { value: "120", label: "2 hours" },
+  { value: "180", label: "3 hours" },
+  { value: "custom", label: "Custom" },
+] as const
+
 const DEFAULT_FORM: ShowDetails = {
   showTitle: "",
   showDate: "",
   venue: DEFAULT_VENUE,
   showTime: "",
   techRehearsalTime: "",
+  techRehearsal: {
+    enabled: false,
+    date: "",
+    time: "",
+    durationMinutes: DEFAULT_TECH_REHEARSAL_MINUTES,
+  },
   presaleTicketPrice: 0,
   doorTicketPrice: 0,
   digitalTicket: { enabled: false, price: DEFAULT_DIGITAL_PRICE },
@@ -201,6 +217,147 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
               required
             />
           </Field>
+
+          {/* Tech rehearsal calendar event option */}
+          <div className="rounded-lg border border-border bg-muted/40 p-5 space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="techRehearsalEnabled"
+                  className="text-sm font-medium flex items-center gap-2 cursor-pointer text-foreground"
+                >
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  Create tech rehearsal event
+                </Label>
+                <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
+                  Adds a separate calendar event for the tech rehearsal, titled &ldquo;
+                  {formData.showTitle || "EVENT TITLE"} - TECH&rdquo;.
+                </p>
+              </div>
+              <Switch
+                id="techRehearsalEnabled"
+                checked={formData.techRehearsal.enabled}
+                onCheckedChange={(checked) => {
+                  const current = formData.techRehearsal
+                  updateField("techRehearsal", {
+                    ...current,
+                    enabled: checked,
+                    // Prefill from show date + techRehearsalTime when turning on
+                    date: current.date || formData.showDate,
+                    time: current.time || formData.techRehearsalTime,
+                  })
+                }}
+                className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted-foreground/30"
+              />
+            </div>
+
+            {formData.techRehearsal.enabled && (
+              <div className="pt-4 border-t border-border/40 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Field>
+                    <FieldLabel htmlFor="techRehearsalDate" className="text-xs">
+                      <Calendar className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                      Tech date
+                    </FieldLabel>
+                    <Input
+                      id="techRehearsalDate"
+                      type="date"
+                      value={formData.techRehearsal.date}
+                      onChange={(e) =>
+                        updateField("techRehearsal", {
+                          ...formData.techRehearsal,
+                          date: e.target.value,
+                        })
+                      }
+                      className={inputClasses}
+                      required
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="techRehearsalStart" className="text-xs">
+                      <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                      Tech start time
+                    </FieldLabel>
+                    <Input
+                      id="techRehearsalStart"
+                      type="time"
+                      value={formData.techRehearsal.time}
+                      onChange={(e) =>
+                        updateField("techRehearsal", {
+                          ...formData.techRehearsal,
+                          time: e.target.value,
+                        })
+                      }
+                      className={inputClasses}
+                      required
+                    />
+                  </Field>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Field>
+                    <FieldLabel htmlFor="techRehearsalDurationPreset" className="text-xs">
+                      Duration
+                    </FieldLabel>
+                    <Select
+                      value={
+                        DURATION_OPTIONS.some(
+                          (o) => o.value !== "custom" && Number(o.value) === formData.techRehearsal.durationMinutes,
+                        )
+                          ? String(formData.techRehearsal.durationMinutes)
+                          : "custom"
+                      }
+                      onValueChange={(value) => {
+                        if (value === "custom") {
+                          updateField("techRehearsal", {
+                            ...formData.techRehearsal,
+                            durationMinutes: formData.techRehearsal.durationMinutes || DEFAULT_TECH_REHEARSAL_MINUTES,
+                          })
+                        } else {
+                          updateField("techRehearsal", {
+                            ...formData.techRehearsal,
+                            durationMinutes: Number(value),
+                          })
+                        }
+                      }}
+                    >
+                      <SelectTrigger id="techRehearsalDurationPreset" className={inputClasses}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DURATION_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="techRehearsalDurationMinutes" className="text-xs">
+                      Minutes
+                    </FieldLabel>
+                    <Input
+                      id="techRehearsalDurationMinutes"
+                      type="number"
+                      min={1}
+                      max={24 * 60}
+                      step={5}
+                      value={formData.techRehearsal.durationMinutes || ""}
+                      onChange={(e) =>
+                        updateField("techRehearsal", {
+                          ...formData.techRehearsal,
+                          durationMinutes: parseInt(e.target.value, 10) || 0,
+                        })
+                      }
+                      className={inputClasses}
+                      required
+                    />
+                  </Field>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Digital ticket option */}
           <div className="rounded-lg border border-border bg-muted/40 p-5 space-y-4">

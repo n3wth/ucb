@@ -7,6 +7,7 @@ const validBody = {
   showTime: '20:00',
   venue: 'UCB Franklin' as const,
   techRehearsalTime: '',
+  techRehearsal: { enabled: false, date: '', time: '', durationMinutes: 90 },
   presaleTicketPrice: 10,
   doorTicketPrice: 15,
   digitalTicket: { enabled: false, price: 0 },
@@ -78,6 +79,40 @@ describe('confirmShowRequestSchema', () => {
     const result = confirmShowRequestSchema.safeParse({
       ...validBody,
       digitalTicket: { enabled: 'yes', price: 5 },
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('accepts a valid enabled techRehearsal block', () => {
+    const result = confirmShowRequestSchema.safeParse({
+      ...validBody,
+      techRehearsal: {
+        enabled: true,
+        date: '2026-05-01',
+        time: '18:00',
+        durationMinutes: 90,
+      },
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects an enabled techRehearsal with missing date/time', () => {
+    const result = confirmShowRequestSchema.safeParse({
+      ...validBody,
+      techRehearsal: { enabled: true, date: '', time: '', durationMinutes: 90 },
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a non-positive techRehearsal duration', () => {
+    const result = confirmShowRequestSchema.safeParse({
+      ...validBody,
+      techRehearsal: {
+        enabled: true,
+        date: '2026-05-01',
+        time: '18:00',
+        durationMinutes: 0,
+      },
     })
     expect(result.success).toBe(false)
   })

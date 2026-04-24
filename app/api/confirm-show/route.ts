@@ -56,14 +56,41 @@ function buildEventDescription(d: ShowDetails): string {
     .join("\n")
 }
 
+function buildTechEventTitle(d: ShowDetails): string {
+  return `${d.showTitle} - TECH`
+}
+
+function buildTechEventDescription(d: ShowDetails): string {
+  return [
+    `Tech rehearsal for: ${d.showTitle}`,
+    `Venue: ${d.venue}`,
+    `Producer: ${d.producerEmail}`,
+  ].join("\n")
+}
+
+function pad2(n: number): string {
+  return String(n).padStart(2, "0")
+}
+
+function formatLocalISO(d: Date): string {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}:00`
+}
+
 function computeStartEnd(d: ShowDetails): { startISO: string; endISO: string } {
   const startISO = `${d.showDate}T${d.showTime}:00`
   const start = new Date(startISO)
   const end = new Date(start.getTime() + DEFAULT_EVENT_DURATION_HOURS * 60 * 60 * 1000)
   // Format as local "YYYY-MM-DDTHH:mm:ss" — Google interprets in timeZone param.
-  const pad = (n: number) => String(n).padStart(2, "0")
-  const endISO = `${end.getFullYear()}-${pad(end.getMonth() + 1)}-${pad(end.getDate())}T${pad(end.getHours())}:${pad(end.getMinutes())}:00`
-  return { startISO, endISO }
+  return { startISO, endISO: formatLocalISO(end) }
+}
+
+function computeTechStartEnd(d: ShowDetails): { startISO: string; endISO: string } | null {
+  const tech = d.techRehearsal
+  if (!tech.enabled || !tech.date || !tech.time || tech.durationMinutes <= 0) return null
+  const startISO = `${tech.date}T${tech.time}:00`
+  const start = new Date(startISO)
+  const end = new Date(start.getTime() + tech.durationMinutes * 60 * 1000)
+  return { startISO, endISO: formatLocalISO(end) }
 }
 
 export async function POST(request: NextRequest) {
@@ -127,24 +154,41 @@ export async function POST(request: NextRequest) {
         url: `https://drive.google.com/drive/folders/${simId}`,
       },
     }
+    if (body.techRehearsal.enabled) {
+      result.techRehearsalEvent = { status: "success", id: `${simId}-tech` }
+    }
     audit.log("staff", "confirm-show", simId, {
       title: body.showTitle,
       venue: body.venue,
       date: body.showDate,
       producer: body.producerEmail,
       mode: "simulation",
+      techRehearsal: body.techRehearsal.enabled,
     })
     return NextResponse.json(result)
   }
 
-  // --- Live mode: run all three actions in parallel, independently -----
+  // --- Live mode: run all actions in parallel, independently -----
   const { startISO, endISO } = computeStartEnd(body)
   const parentFolderId = VENUE_FOLDER_IDS[body.venue] || ""
 
   const subject = body.emailSubject?.trim() || renderShowConfirmationSubject(body)
   const emailBody = body.emailBody?.trim() || ""
 
-  const [driveFolder, calendarEvent, email] = await Promise.all([
+  const techStartEnd = computeTechStartEnd(body)
+  const techRehearsalPromise = techStartEnd
+    ? createCalendarEvent({
+        calendarId: UCB_CALENDAR_ID,
+        summary: buildTechEventTitle(body),
+        location: body.venue,
+        description: buildTechEventDescription(body),
+        startISO: techStartEnd.startISO,
+        endISO: techStartEnd.endISO,
+        timeZone: TIMEZONE,
+      })
+    : null
+
+  const [driveFolder, calendarEvent, email, techRehearsalEvent] = await Promise.all([
     createDriveFolder({
       name: buildFolderName(body),
       parentFolderId,
@@ -168,14 +212,19 @@ export async function POST(request: NextRequest) {
           status: "error",
           error: "No email body was provided.",
         } as const),
+    techRehearsalPromise ?? Promise.resolve(null),
   ])
 
   const result: ConfirmationResult = { email, calendarEvent, driveFolder }
+  if (techRehearsalEvent) {
+    result.techRehearsalEvent = techRehearsalEvent
+  }
 
   reqLog.info("done", {
     email: email.status,
     calendar: calendarEvent.status,
     drive: driveFolder.status,
+    techRehearsal: techRehearsalEvent?.status ?? "skipped",
   })
 
   audit.log("staff", "confirm-show", calendarEvent.id ?? driveFolder.id ?? requestId, {
@@ -186,6 +235,7 @@ export async function POST(request: NextRequest) {
     email: email.status,
     calendar: calendarEvent.status,
     drive: driveFolder.status,
+    techRehearsal: techRehearsalEvent?.status ?? "skipped",
   })
 
   return NextResponse.json(result)
