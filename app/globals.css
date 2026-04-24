@@ -417,4 +417,81 @@
     25% { transform: rotate(-6deg); }
     75% { transform: rotate(6deg); }
   }
+
+  /* TV static noise — pure CSS, no images. */
+  .landing-static {
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+    animation: static-scroll 0.08s steps(1) infinite;
+  }
+  @keyframes static-scroll {
+    0%   { background-position: 0 0; }
+    10%  { background-position: -40px 20px; }
+    20%  { background-position: 30px -15px; }
+    30%  { background-position: -20px 40px; }
+    40%  { background-position: 15px -30px; }
+    50%  { background-position: -35px 10px; }
+    60%  { background-position: 25px 35px; }
+    70%  { background-position: -10px -20px; }
+    80%  { background-position: 40px 5px; }
+    90%  { background-position: -25px -35px; }
+    100% { background-position: 10px 25px; }
+  }
+
+  /* Horizontal scanlines */
+  .landing-scanlines {
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      oklch(0 0 0 / 0.06) 2px,
+      oklch(0 0 0 / 0.06) 4px
+    );
+  }
+
+  /* Glitch text effect on the UCB wordmark */
+  .landing-glitch {
+    position: relative;
+    display: inline-block;
+  }
+  .landing-glitch::before,
+  .landing-glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    clip-path: inset(0);
+  }
+  .landing-glitch::before {
+    color: oklch(0.65 0.2 25);
+    animation: glitch-before 4s infinite linear;
+    animation-delay: 0.5s;
+  }
+  .landing-glitch::after {
+    color: oklch(0.65 0.22 200);
+    animation: glitch-after 4s infinite linear;
+    animation-delay: 0.7s;
+  }
+  @keyframes glitch-before {
+    0%, 94%, 100% { opacity: 0; transform: none; clip-path: inset(100% 0 0 0); }
+    95% { opacity: 0.8; transform: translate(-3px, 0); clip-path: inset(20% 0 60% 0); }
+    96% { opacity: 0.8; transform: translate(3px, 0); clip-path: inset(60% 0 10% 0); }
+    97% { opacity: 0; }
+  }
+  @keyframes glitch-after {
+    0%, 94%, 100% { opacity: 0; transform: none; clip-path: inset(100% 0 0 0); }
+    95.5% { opacity: 0.7; transform: translate(3px, 0); clip-path: inset(40% 0 40% 0); }
+    96.5% { opacity: 0.7; transform: translate(-2px, 0); clip-path: inset(10% 0 70% 0); }
+    97% { opacity: 0; }
+  }
+
+  /* Pulsing live indicator */
+  .landing-pulse {
+    animation: live-pulse 2s ease-in-out infinite;
+  }
+  @keyframes live-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
 }
