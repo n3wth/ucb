@@ -34,21 +34,21 @@ export const TOOLS: Tool[] = [
     status: "available",
   },
   {
-    id: "show-list",
-    name: "Show List",
-    description:
-      "Read-only list of upcoming confirmed shows from the UCB calendar.",
-    href: "/tools/show-list",
-    icon: CalendarDays,
-    status: "available",
-  },
-  {
     id: "asssscat",
     name: "ASSSSCAT",
     description:
       "Compose and send the cast booking email for ASSSSCAT at UCB Franklin.",
     href: "/tools/asssscat",
     icon: Mic2,
+    status: "available",
+  },
+  {
+    id: "show-list",
+    name: "Show List",
+    description:
+      "Read-only list of upcoming confirmed shows from the UCB calendar.",
+    href: "/tools/show-list",
+    icon: CalendarDays,
     status: "available",
   },
   {
