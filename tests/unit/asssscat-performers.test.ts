@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   addPerformer,
+  DEFAULT_PERFORMERS,
   dedupePerformers,
   groupByCategory,
   isValidEmail,
@@ -15,9 +16,11 @@ import {
 import type { AsssscatPerformer } from '@/lib/types'
 
 const STORAGE_KEY = 'ucb.asssscat.performers'
+const SEEDED_KEY = 'ucb.asssscat.performers.seeded'
 
 beforeEach(() => {
   window.localStorage.removeItem(STORAGE_KEY)
+  window.localStorage.removeItem(SEEDED_KEY)
 })
 
 const perf = (
@@ -154,7 +157,19 @@ describe('matchPerformersByName', () => {
 })
 
 describe('loadPerformers / savePerformers', () => {
-  it('returns [] when nothing is saved', () => {
+  it('seeds default performers on first load (no storage)', () => {
+    const result = loadPerformers()
+    expect(result.length).toBe(DEFAULT_PERFORMERS.length)
+    expect(result[0].name).toBe(DEFAULT_PERFORMERS[0].name)
+  })
+
+  it('marks storage as seeded after first load', () => {
+    loadPerformers()
+    expect(window.localStorage.getItem(SEEDED_KEY)).toBe('1')
+  })
+
+  it('does not re-seed after seeded flag is set', () => {
+    window.localStorage.setItem(SEEDED_KEY, '1')
     expect(loadPerformers()).toEqual([])
   })
 
@@ -168,6 +183,7 @@ describe('loadPerformers / savePerformers', () => {
   })
 
   it('drops invalid stored entries', () => {
+    window.localStorage.setItem(SEEDED_KEY, '1')
     window.localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify([
@@ -180,11 +196,13 @@ describe('loadPerformers / savePerformers', () => {
   })
 
   it('ignores malformed stored JSON', () => {
+    window.localStorage.setItem(SEEDED_KEY, '1')
     window.localStorage.setItem(STORAGE_KEY, '{nope')
     expect(loadPerformers()).toEqual([])
   })
 
   it('ignores non-array values', () => {
+    window.localStorage.setItem(SEEDED_KEY, '1')
     window.localStorage.setItem(STORAGE_KEY, '"string"')
     expect(loadPerformers()).toEqual([])
   })
