@@ -49,7 +49,7 @@ export function PreviewStage({
       <Card className="border-border">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Calendar className="h-4 w-4 text-foreground" />
             Calendar event
           </CardTitle>
           <CardDescription className="text-xs">Will be added to the shared UCB calendar.</CardDescription>
@@ -90,7 +90,7 @@ export function PreviewStage({
         <Card className="border-border">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <Calendar className="h-4 w-4 text-foreground" />
               Tech rehearsal calendar event
             </CardTitle>
             <CardDescription className="text-xs">
@@ -120,7 +120,7 @@ export function PreviewStage({
       <Card className="border-border">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
-            <FolderOpen className="h-4 w-4 text-muted-foreground" />
+            <FolderOpen className="h-4 w-4 text-foreground" />
             Drive folder
           </CardTitle>
           <CardDescription className="text-xs">Will be created in the venue&apos;s Google Drive.</CardDescription>

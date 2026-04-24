@@ -198,7 +198,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
           <div className="rounded-lg border border-border bg-muted/40 p-5 space-y-4">
             <div className="space-y-1.5">
               <Label className="text-sm font-medium flex items-center gap-2 text-foreground">
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <Clock className="h-4 w-4 text-foreground" />
                 Tech rehearsal
                 <span className="text-muted-foreground/70 font-normal text-xs">(optional)</span>
               </Label>
@@ -402,7 +402,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="digitalEnabled" className="text-sm font-medium flex items-center gap-2 cursor-pointer text-foreground">
-                  <Monitor className="h-4 w-4 text-muted-foreground" />
+                  <Monitor className="h-4 w-4 text-foreground" />
                   Digital ticket
                 </Label>
                 <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">

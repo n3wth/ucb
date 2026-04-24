@@ -49,7 +49,7 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="space-y-1">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
-              <Mail className="h-4 w-4 text-muted-foreground" />
+              <Mail className="h-4 w-4 text-foreground" />
               Confirmation email
             </CardTitle>
             <CardDescription className="text-xs">Will be sent to the producer after confirming.</CardDescription>

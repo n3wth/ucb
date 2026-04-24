@@ -43,7 +43,7 @@ export function DefaultCcPreferences({ onDefaultsChange }: DefaultCcPreferencesP
         >
           <div className="space-y-1">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-foreground">
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <Users className="h-4 w-4 text-foreground" />
               Default CC list
               {emails.length > 0 && (
                 <span className="text-xs font-normal text-muted-foreground">
@@ -56,9 +56,9 @@ export function DefaultCcPreferences({ onDefaultsChange }: DefaultCcPreferencesP
             </CardDescription>
           </div>
           {expanded ? (
-            <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
+            <ChevronDown className="h-4 w-4 text-foreground shrink-0" />
           ) : (
-            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+            <ChevronRight className="h-4 w-4 text-foreground shrink-0" />
           )}
         </button>
       </CardHeader>

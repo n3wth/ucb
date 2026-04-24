@@ -18,7 +18,7 @@ export function ToolRow({ tool }: ToolRowProps) {
   const content = (
     <div className="flex items-start gap-4 py-4">
       <div className="shrink-0 mt-0.5">
-        <Icon className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+        <Icon className="h-5 w-5 text-foreground" aria-hidden="true" />
       </div>
       <div className="flex-1 min-w-0">
         <h3 className="text-sm font-medium text-foreground">{tool.name}</h3>
@@ -28,7 +28,7 @@ export function ToolRow({ tool }: ToolRowProps) {
       </div>
       {available && (
         <ArrowRight
-          className="h-4 w-4 text-muted-foreground shrink-0 mt-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all"
+          className="h-4 w-4 text-foreground shrink-0 mt-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all"
           aria-hidden="true"
         />
       )}
