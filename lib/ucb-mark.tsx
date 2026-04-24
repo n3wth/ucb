@@ -2,9 +2,9 @@
 // Rendered via data URL so it works inside Next.js ImageResponse (Satori).
 
 export const UCB_BRAND = {
-  dark: '#1a0a0c',
-  light: '#fbf9f5',
-  maroon: '#5a1a1e',
+  dark: '#2b2c30',
+  light: '#f5f3ea',
+  accent: '#f5c518',
 } as const
 
 export function ucbMarkDataUrl(fill: string) {
