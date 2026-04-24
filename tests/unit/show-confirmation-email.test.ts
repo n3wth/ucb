@@ -11,11 +11,13 @@ const showDetails: ShowDetails = {
   showDate: '2026-05-01',
   showTime: '20:00',
   venue: 'UCB Franklin',
+  durationMinutes: 90,
   techRehearsalTime: '',
   presaleTicketPrice: 10,
   doorTicketPrice: 15,
   digitalTicket: { enabled: false, price: 0 },
   producerEmail: 'producer@example.com',
+  ccEmails: [],
 }
 
 const DRIVE_URL = 'https://drive.google.com/drive/folders/abc123'
