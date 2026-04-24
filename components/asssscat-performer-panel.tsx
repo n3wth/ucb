@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Pencil, Plus, Trash2, X, Check } from "lucide-react"
+import { AlertCircle, Pencil, Plus, Trash2, X, Check } from "lucide-react"
 import {
   ASSSSCAT_PERFORMER_CATEGORIES,
   type AsssscatPerformer,
@@ -227,25 +227,32 @@ export function AsssscatPerformerPanel({
                           type="button"
                           className="flex-1 text-left disabled:opacity-50 disabled:cursor-not-allowed"
                           onClick={() => onPickPerformer(p)}
-                          disabled={selected || !canAddMore}
+                          disabled={selected || !canAddMore || !p.email}
                           title={
-                            selected
+                            !p.email
+                              ? "No email on file — edit to add"
+                              : selected
                               ? "Already in cast"
                               : canAddMore
                               ? "Add to cast"
                               : "Cast is full"
                           }
                         >
-                          <div className="text-sm text-foreground truncate">
+                          <div className="text-sm text-foreground truncate flex items-center gap-1.5">
                             {p.name}
                             {selected && (
-                              <span className="ml-2 text-[10px] text-muted-foreground">
+                              <span className="text-[10px] text-muted-foreground">
                                 ✓ in cast
                               </span>
                             )}
+                            {!p.email && !selected && (
+                              <AlertCircle className="h-3 w-3 text-amber-500 shrink-0" aria-label="No email on file" />
+                            )}
                           </div>
                           <div className="text-[11px] text-muted-foreground truncate">
-                            {p.email}
+                            {p.email || (
+                              <span className="text-amber-500">no email on file</span>
+                            )}
                           </div>
                         </button>
                         <button

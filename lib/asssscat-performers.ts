@@ -14,7 +14,7 @@ export const MAX_PERFORMERS = 500
 export const EMAIL_REGEX = /.+@.+\..+/
 
 // Default performer roster sourced from Chris's contacts list.
-// Only performers with known email addresses are included.
+// Performers with no known email have email: "" and are flagged in the UI.
 // Category mapping: Wild Card → Wild Cards, Sub List → Subs.
 export const DEFAULT_PERFORMERS: Omit<AsssscatPerformer, "id">[] = [
   // Core Cast
@@ -79,7 +79,7 @@ export const DEFAULT_PERFORMERS: Omit<AsssscatPerformer, "id">[] = [
   { name: "Mary Anthony", email: "maryeanthony1@gmail.com", category: "Wild Cards" },
   { name: "Monika Smith", email: "missmonikasmith@gmail.com", category: "Wild Cards" },
   { name: "Mookie Blaiklock", email: "mblaiklock@gmail.com", category: "Wild Cards" },
-  { name: "Moujan Zolfghari", email: "moujanz@gmail.com", category: "Wild Cards" },
+  { name: "Moujan Zolfaghari", email: "moujanz@gmail.com", category: "Wild Cards" },
   { name: "Nick Mandernach", email: "nicholasmandernach@gmail.com", category: "Wild Cards" },
   { name: "Ryan Barton", email: "ryanbarton15@gmail.com", category: "Wild Cards" },
   { name: "Toni Charline", email: "tonicharline@gmail.com", category: "Wild Cards" },
@@ -137,6 +137,7 @@ export const DEFAULT_PERFORMERS: Omit<AsssscatPerformer, "id">[] = [
   { name: "Connor Ratliff", email: "connorratliff@gmail.com", category: "Drop-Ins" },
   { name: "D'Arcy Carden", email: "darcycarden@gmail.com", category: "Drop-Ins" },
   { name: "Drew Tarver", email: "drew.tarver@gmail.com", category: "Drop-Ins" },
+  { name: "Edi Patterson", email: "", category: "Drop-Ins" },
   { name: "Ego Nwodim", email: "eknwodim@gmail.com", category: "Drop-Ins" },
   { name: "Eugene Cordero", email: "ecorderoiv@gmail.com", category: "Drop-Ins" },
   { name: "Fran Gillespie", email: "gillespie.fran@gmail.com", category: "Drop-Ins" },
@@ -153,6 +154,7 @@ export const DEFAULT_PERFORMERS: Omit<AsssscatPerformer, "id">[] = [
   { name: "Matt Besser", email: "mattbesser67@gmail.com", category: "Drop-Ins" },
   { name: "Matt Walsh", email: "ucbwalshy@aol.com", category: "Drop-Ins" },
   { name: "Mike Mitchell", email: "mmitc47579@aol.com", category: "Drop-Ins" },
+  { name: "Mike O'Brien", email: "", category: "Drop-Ins" },
   { name: "Neil Campbell", email: "nbcampbell@gmail.com", category: "Drop-Ins" },
   { name: "Neil Casey", email: "notneilcasey@mac.com", category: "Drop-Ins" },
   { name: "Nicole Byer", email: "nicolebyer@gmail.com", category: "Drop-Ins" },
@@ -162,6 +164,8 @@ export const DEFAULT_PERFORMERS: Omit<AsssscatPerformer, "id">[] = [
   { name: "Paul F. Tompkins", email: "chalkstripe@gmail.com", category: "Drop-Ins" },
   { name: "Sasheer Zamata", email: "sasheer1@gmail.com", category: "Drop-Ins" },
   { name: "Stephanie Allynne", email: "stephanieallynne@gmail.com", category: "Drop-Ins" },
+  { name: "Sudi Green", email: "", category: "Drop-Ins" },
+  { name: "Tawny Newsome", email: "", category: "Drop-Ins" },
   { name: "Tim Baltz", email: "btimothee1111@gmail.com", category: "Drop-Ins" },
   { name: "Zach Woods", email: "zachwoods55@yahoo.com", category: "Drop-Ins" },
   // Test Group
@@ -169,10 +173,13 @@ export const DEFAULT_PERFORMERS: Omit<AsssscatPerformer, "id">[] = [
   { name: "Anna Garcia", email: "annalynnegarcia@gmail.com", category: "Test Group" },
   { name: "Anna Rajo", email: "anna.rajomiller@gmail.com", category: "Test Group" },
   { name: "Chad Westbrook", email: "cmwestbrook22@gmail.com", category: "Test Group" },
+  { name: "Chris Tcholakian", email: "", category: "Test Group" },
+  { name: "Collin McGurk", email: "", category: "Test Group" },
   { name: "DJ Mausner", email: "mausnerdj@gmail.com", category: "Test Group" },
   { name: "Eli Gonzalez", email: "eli.j.gonzalez@gmail.com", category: "Test Group" },
   { name: "Greg Roman", email: "ghr.greg@gmail.com", category: "Test Group" },
   { name: "Jack Brown", email: "brown7790jjb@gmail.com", category: "Test Group" },
+  { name: "James Jellin", email: "", category: "Test Group" },
   { name: "Joe Fahey", email: "joefaheycomedy@gmail.com", category: "Test Group" },
   { name: "Josh Brekhus", email: "joshbrekhus@gmail.com", category: "Test Group" },
   { name: "Lauren Holt", email: "leholt312@gmail.com", category: "Test Group" },
@@ -206,7 +213,7 @@ function isPerformer(value: unknown): value is AsssscatPerformer {
     typeof p.name === "string" &&
     p.name.trim().length > 0 &&
     typeof p.email === "string" &&
-    isValidEmail(p.email) &&
+    (p.email === "" || isValidEmail(p.email)) &&
     isCategory(p.category)
   )
 }
@@ -260,16 +267,17 @@ export function savePerformers(list: AsssscatPerformer[]): AsssscatPerformer[] {
   return cleaned
 }
 
-// De-duplicate by lowercased email, preserving first-seen entry.
+// De-duplicate by lowercased email; for no-email entries, deduplicate by lowercased name.
 export function dedupePerformers(list: AsssscatPerformer[]): AsssscatPerformer[] {
   const seen = new Set<string>()
   const out: AsssscatPerformer[] = []
   for (const p of list) {
-    const key = p.email.trim().toLowerCase()
+    const email = p.email.trim()
+    const key = email ? `email:${email.toLowerCase()}` : `name:${p.name.trim().toLowerCase()}`
     if (!key) continue
     if (seen.has(key)) continue
     seen.add(key)
-    out.push({ ...p, name: p.name.trim(), email: p.email.trim() })
+    out.push({ ...p, name: p.name.trim(), email })
   }
   return out
 }

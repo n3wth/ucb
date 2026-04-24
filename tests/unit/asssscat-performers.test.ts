@@ -54,6 +54,18 @@ describe('dedupePerformers', () => {
     expect(out[0].id).toBe('1')
     expect(out[1].id).toBe('3')
   })
+
+  it('deduplicates no-email entries by lowercased name', () => {
+    const list = [
+      perf({ id: '1', name: 'Edi Patterson', email: '' }),
+      perf({ id: '2', name: 'edi patterson', email: '' }),
+      perf({ id: '3', name: 'Other Person', email: '' }),
+    ]
+    const out = dedupePerformers(list)
+    expect(out).toHaveLength(2)
+    expect(out[0].id).toBe('1')
+    expect(out[1].id).toBe('3')
+  })
 })
 
 describe('addPerformer / updatePerformer / removePerformer', () => {
@@ -66,6 +78,17 @@ describe('addPerformer / updatePerformer / removePerformer', () => {
     })
     expect(list).toHaveLength(1)
     expect(list[0].name).toBe('Alice')
+  })
+
+  it('accepts no-email performers (email: "")', () => {
+    const list = addPerformer([], {
+      id: 'y',
+      name: 'Edi Patterson',
+      email: '',
+      category: 'Drop-Ins',
+    })
+    expect(list).toHaveLength(1)
+    expect(list[0].email).toBe('')
   })
 
   it('updates existing performers by id', () => {
@@ -190,9 +213,11 @@ describe('loadPerformers / savePerformers', () => {
         { id: '1', name: '', email: 'a@x.co', category: 'Core Cast' },
         { id: '2', name: 'Bob', email: 'bad', category: 'Core Cast' },
         { id: '3', name: 'Carol', email: 'c@x.co', category: 'Core Cast' },
+        { id: '4', name: 'Edi Patterson', email: '', category: 'Drop-Ins' },
       ]),
     )
-    expect(loadPerformers()).toHaveLength(1)
+    // id:1 dropped (empty name), id:2 dropped (invalid email), id:3 and id:4 kept
+    expect(loadPerformers()).toHaveLength(2)
   })
 
   it('ignores malformed stored JSON', () => {
