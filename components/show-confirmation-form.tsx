@@ -218,7 +218,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
                 <SelectContent>
                   {SHOW_DURATION_PRESETS.map((minutes) => (
                     <SelectItem key={minutes} value={String(minutes)}>
-                      {minutes / 60} {minutes / 60 === 1 ? "hour" : "hours"}
+                      {minutes} min
                     </SelectItem>
                   ))}
                   <SelectItem value={DURATION_OTHER}>Other</SelectItem>

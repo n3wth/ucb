@@ -23,7 +23,7 @@ export const DEFAULT_VENUE: VenueName = VENUES[0].name
 
 export const DEFAULT_DIGITAL_PRICE = 10
 
-export const SHOW_DURATION_PRESETS = [60, 90, 120, 150, 180, 210, 240] as const
+export const SHOW_DURATION_PRESETS = [60, 90, 120] as const
 export const DEFAULT_SHOW_DURATION_MINUTES = 90
 export const MIN_SHOW_DURATION_MINUTES = 15
 export const MAX_SHOW_DURATION_MINUTES = 600
