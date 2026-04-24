@@ -37,11 +37,18 @@ interface ShowConfirmationFormProps {
   onSubmit: (data: ShowDetails) => void
 }
 
+function todayDateString(): string {
+  const d = new Date()
+  const mm = String(d.getMonth() + 1).padStart(2, "0")
+  const dd = String(d.getDate()).padStart(2, "0")
+  return `${d.getFullYear()}-${mm}-${dd}`
+}
+
 const DEFAULT_FORM: ShowDetails = {
   showTitle: "",
-  showDate: "",
+  showDate: todayDateString(),
   venue: DEFAULT_VENUE,
-  showTime: "",
+  showTime: "20:00",
   durationMinutes: DEFAULT_SHOW_DURATION_MINUTES,
   techRehearsalTime: "",
   techRehearsalDurationMinutes: DEFAULT_TECH_REHEARSAL_DURATION_MINUTES,
@@ -211,7 +218,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
                 <SelectContent>
                   {SHOW_DURATION_PRESETS.map((minutes) => (
                     <SelectItem key={minutes} value={String(minutes)}>
-                      {minutes} minutes
+                      {minutes / 60} {minutes / 60 === 1 ? "hour" : "hours"}
                     </SelectItem>
                   ))}
                   <SelectItem value={DURATION_OTHER}>Other</SelectItem>
@@ -225,17 +232,17 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
               <FieldLabel htmlFor="durationMinutes" className="text-xs">
                 <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
                 Custom duration
-                <span className="text-muted-foreground/70 font-normal ml-1">(minutes)</span>
+                <span className="text-muted-foreground/70 font-normal ml-1">(hours)</span>
               </FieldLabel>
               <Input
                 id="durationMinutes"
                 type="number"
-                min={MIN_SHOW_DURATION_MINUTES}
-                max={MAX_SHOW_DURATION_MINUTES}
-                step="5"
-                value={formData.durationMinutes || ""}
+                min={MIN_SHOW_DURATION_MINUTES / 60}
+                max={MAX_SHOW_DURATION_MINUTES / 60}
+                step="0.5"
+                value={formData.durationMinutes ? formData.durationMinutes / 60 : ""}
                 onChange={(e) =>
-                  updateField("durationMinutes", Math.floor(parseFloat(e.target.value) || 0))
+                  updateField("durationMinutes", Math.round((parseFloat(e.target.value) || 0) * 60))
                 }
                 className={inputClasses}
                 required
@@ -286,7 +293,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
                   <SelectContent>
                     {TECH_REHEARSAL_DURATION_PRESETS.map((minutes) => (
                       <SelectItem key={minutes} value={String(minutes)}>
-                        {minutes} minutes
+                        {minutes / 60} {minutes / 60 === 1 ? "hour" : "hours"}
                       </SelectItem>
                     ))}
                     <SelectItem value={DURATION_OTHER}>Other</SelectItem>
@@ -300,19 +307,19 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
                 <FieldLabel htmlFor="techRehearsalDurationMinutes" className="text-xs">
                   <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
                   Custom duration
-                  <span className="text-muted-foreground/70 font-normal ml-1">(minutes)</span>
+                  <span className="text-muted-foreground/70 font-normal ml-1">(hours)</span>
                 </FieldLabel>
                 <Input
                   id="techRehearsalDurationMinutes"
                   type="number"
-                  min={MIN_SHOW_DURATION_MINUTES}
-                  max={MAX_SHOW_DURATION_MINUTES}
-                  step="5"
-                  value={formData.techRehearsalDurationMinutes || ""}
+                  min={MIN_SHOW_DURATION_MINUTES / 60}
+                  max={MAX_SHOW_DURATION_MINUTES / 60}
+                  step="0.5"
+                  value={formData.techRehearsalDurationMinutes ? formData.techRehearsalDurationMinutes / 60 : ""}
                   onChange={(e) =>
                     updateField(
                       "techRehearsalDurationMinutes",
-                      Math.floor(parseFloat(e.target.value) || 0),
+                      Math.round((parseFloat(e.target.value) || 0) * 60),
                     )
                   }
                   className={inputClasses}

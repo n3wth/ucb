@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { confirmShowRequestSchema } from '@/lib/schemas'
+import { DEFAULT_TECH_REHEARSAL_DURATION_MINUTES } from '@/lib/config'
 
 const validBody = {
   showTitle: 'Maude Night',
@@ -147,7 +148,7 @@ describe('confirmShowRequestSchema', () => {
     const result = confirmShowRequestSchema.safeParse(rest)
     expect(result.success).toBe(true)
     if (result.success) {
-      expect(result.data.techRehearsalDurationMinutes).toBe(90)
+      expect(result.data.techRehearsalDurationMinutes).toBe(DEFAULT_TECH_REHEARSAL_DURATION_MINUTES)
     }
   })
 
