@@ -196,6 +196,21 @@ describe('loadPerformers / savePerformers', () => {
     expect(loadPerformers()).toEqual([])
   })
 
+  it('merges defaults into pre-existing data when seeded flag is absent', () => {
+    // Simulates Chris's case: he added one performer before the seed was deployed.
+    const existing = [perf({ id: 'manual-1', name: 'Chris Renfro', email: 'christopher.a.renfro@gmail.com', category: 'Core Cast' })]
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(existing))
+    // SEEDED_KEY is NOT set (beforeEach cleared it)
+    const result = loadPerformers()
+    // Should contain the full default roster, not just the one manual entry
+    expect(result.length).toBeGreaterThan(1)
+    expect(result.length).toBe(DEFAULT_PERFORMERS.length)
+    // Chris Renfro appears exactly once (deduped by email)
+    expect(result.filter((p) => p.email === 'christopher.a.renfro@gmail.com')).toHaveLength(1)
+    // The seeded flag should now be set
+    expect(window.localStorage.getItem(SEEDED_KEY)).toBe('1')
+  })
+
   it('round-trips valid performers', () => {
     const list = [
       perf({ id: '1', name: 'Alice', email: 'a@x.co' }),

@@ -230,8 +230,14 @@ export function loadPerformers(): AsssscatPerformer[] {
   try {
     const alreadySeeded = window.localStorage.getItem(SEEDED_KEY)
     const raw = window.localStorage.getItem(STORAGE_KEY)
-    if (!alreadySeeded && !raw) {
-      return seedDefaultPerformers()
+    if (!alreadySeeded) {
+      // First load after seed deployment: merge defaults into any existing data.
+      // Existing entries win on dedup so user edits are preserved.
+      const existing = raw ? (() => {
+        const parsed: unknown = JSON.parse(raw)
+        return Array.isArray(parsed) ? parsed.filter(isPerformer) : []
+      })() : []
+      return seedDefaultPerformers(existing)
     }
     if (!raw) return []
     const parsed: unknown = JSON.parse(raw)
@@ -243,9 +249,10 @@ export function loadPerformers(): AsssscatPerformer[] {
   }
 }
 
-function seedDefaultPerformers(): AsssscatPerformer[] {
-  const seeded = DEFAULT_PERFORMERS.map((p) => ({ ...p, id: newPerformerId() }))
-  const cleaned = dedupePerformers(seeded.filter(isPerformer)).slice(0, MAX_PERFORMERS)
+function seedDefaultPerformers(existing: AsssscatPerformer[] = []): AsssscatPerformer[] {
+  const defaults = DEFAULT_PERFORMERS.map((p) => ({ ...p, id: newPerformerId() }))
+  // Existing entries are listed first so they win dedup (preserves user edits).
+  const cleaned = dedupePerformers([...existing, ...defaults].filter(isPerformer)).slice(0, MAX_PERFORMERS)
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(cleaned))
     window.localStorage.setItem(SEEDED_KEY, "1")
