@@ -408,7 +408,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit }: ShowConfirmatio
                   <Monitor className="h-4 w-4 text-foreground" />
                   Digital ticket
                 </Label>
-                <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   Add a livestream option for remote viewers. The stream setup is handled separately.
                 </p>
               </div>
