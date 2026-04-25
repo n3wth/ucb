@@ -45,16 +45,21 @@ function buildFolderName(d: ShowDetails): string {
   return `${d.showTitle} – ${d.showDate}`
 }
 
-function dedupeCc(ccEmails: string[] | undefined, producerEmail: string): string[] | undefined {
-  if (!ccEmails?.length) return undefined
-  const producer = producerEmail.trim().toLowerCase()
+function dedupeRecipients(
+  emails: string[] | undefined,
+  exclude: Iterable<string>,
+): string[] | undefined {
+  if (!emails?.length) return undefined
   const seen = new Set<string>()
+  for (const e of exclude) {
+    const k = e.trim().toLowerCase()
+    if (k) seen.add(k)
+  }
   const out: string[] = []
-  for (const raw of ccEmails) {
+  for (const raw of emails) {
     const addr = raw.trim()
     if (!addr) continue
     const key = addr.toLowerCase()
-    if (key === producer) continue
     if (seen.has(key)) continue
     seen.add(key)
     out.push(addr)
@@ -210,12 +215,17 @@ export async function POST(request: NextRequest) {
       timeZone: TIMEZONE,
     }),
     finalEmailBody
-      ? sendEmail({
-          to: body.producerEmail,
-          subject,
-          body: finalEmailBody,
-          cc: dedupeCc(body.ccEmails, body.producerEmail),
-        })
+      ? (() => {
+          const cc = dedupeRecipients(body.ccEmails, [body.producerEmail])
+          const bcc = dedupeRecipients(body.bccEmails, [body.producerEmail, ...(cc ?? [])])
+          return sendEmail({
+            to: body.producerEmail,
+            subject,
+            body: finalEmailBody,
+            cc,
+            bcc,
+          })
+        })()
       : Promise.resolve({
           status: "error",
           error: "No email body was provided.",
@@ -243,6 +253,7 @@ export async function POST(request: NextRequest) {
     date: body.showDate,
     producer: body.producerEmail,
     ccCount: body.ccEmails?.length ?? 0,
+    bccCount: body.bccEmails?.length ?? 0,
     email: email.status,
     calendar: calendarEvent.status,
     techCalendar: techCalendarEvent?.status,

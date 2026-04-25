@@ -16,6 +16,7 @@ export interface ShowDetails {
   digitalTicket: DigitalTicket
   producerEmail: string
   ccEmails: string[]
+  bccEmails: string[]
 }
 
 export type StepStatus = "idle" | "pending" | "success" | "error"

@@ -19,6 +19,7 @@ const showDetails: ShowDetails = {
   digitalTicket: { enabled: false, price: 0 },
   producerEmail: 'producer@example.com',
   ccEmails: [],
+  bccEmails: [],
 }
 
 const showDetailsWithTech: ShowDetails = {

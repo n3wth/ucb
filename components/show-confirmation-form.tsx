@@ -69,6 +69,7 @@ const DEFAULT_FORM: ShowDetails = {
   digitalTicket: { enabled: false, price: DEFAULT_DIGITAL_PRICE },
   producerEmail: "",
   ccEmails: [],
+  bccEmails: [],
 }
 
 function initialDurationChoice(minutes: number): DurationChoice {
@@ -101,6 +102,7 @@ export function ShowConfirmationForm({
   // do it once per title (not on every keystroke once emails are present).
   const lastAutoFilledTitle = useRef<string>("")
   const ccListRef = useRef<CcEmailListHandle>(null)
+  const bccListRef = useRef<CcEmailListHandle>(null)
 
   // When opening a fresh form (no initialValue), pre-fill CCs from global saved defaults.
   // If the user navigated back to edit, keep whatever they already had.
@@ -136,7 +138,8 @@ export function ShowConfirmationForm({
     // Commit any in-flight CC draft that the user typed but didn't confirm
     // with Enter/Tab/blur before clicking submit.
     const finalCcEmails = ccListRef.current?.flush() ?? formData.ccEmails
-    onSubmit({ ...formData, ccEmails: finalCcEmails })
+    const finalBccEmails = bccListRef.current?.flush() ?? formData.bccEmails
+    onSubmit({ ...formData, ccEmails: finalCcEmails, bccEmails: finalBccEmails })
   }
 
   const updateField = <K extends keyof ShowDetails>(field: K, value: ShowDetails[K]) => {
@@ -204,6 +207,23 @@ export function ShowConfirmationForm({
     </Field>
   )
 
+  const bccEmailsField = (
+    <Field>
+      <FieldLabel htmlFor="bccInput" className="text-xs">
+        <Users className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+        BCC
+        <span className="text-muted-foreground/70 font-normal ml-1">(optional)</span>
+      </FieldLabel>
+      <CcEmailList
+        ref={bccListRef}
+        inputId="bccInput"
+        emails={formData.bccEmails}
+        onChange={(next) => updateField("bccEmails", next)}
+        emptyHint="Add addresses to BCC on this confirmation."
+      />
+    </Field>
+  )
+
   if (splitLayout) {
     return (
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-6 items-start">
@@ -217,6 +237,7 @@ export function ShowConfirmationForm({
             <CardContent className="pt-6 space-y-6">
               {producerEmailField}
               {ccEmailsField}
+              {bccEmailsField}
             </CardContent>
           </Card>
           {sidebarExtras}
@@ -818,6 +839,22 @@ export function ShowConfirmationForm({
               emails={formData.ccEmails}
               onChange={(next) => updateField("ccEmails", next)}
               emptyHint="Add addresses to CC on this confirmation. Defaults can be managed below."
+            />
+          </Field>
+
+          {/* BCC emails */}
+          <Field>
+            <FieldLabel htmlFor="bccInput" className="text-xs">
+              <Users className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+              BCC
+              <span className="text-muted-foreground/70 font-normal ml-1">(optional)</span>
+            </FieldLabel>
+            <CcEmailList
+              ref={bccListRef}
+              inputId="bccInput"
+              emails={formData.bccEmails}
+              onChange={(next) => updateField("bccEmails", next)}
+              emptyHint="Add addresses to BCC on this confirmation."
             />
           </Field>
 

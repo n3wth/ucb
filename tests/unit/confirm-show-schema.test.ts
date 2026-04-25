@@ -15,6 +15,7 @@ const validBody = {
   digitalTicket: { enabled: false, price: 0 },
   producerEmail: 'producer@example.com',
   ccEmails: [] as string[],
+  bccEmails: [] as string[],
   emailSubject: 'Hi',
   emailBody: 'Body',
 }
@@ -185,6 +186,47 @@ describe('confirmShowRequestSchema', () => {
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues[0]?.message).toBe('ccEmails cannot exceed 20 addresses')
+    }
+  })
+
+  it('defaults bccEmails to an empty array when absent', () => {
+    const { bccEmails, ...rest } = validBody
+    void bccEmails
+    const result = confirmShowRequestSchema.safeParse(rest)
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.bccEmails).toEqual([])
+    }
+  })
+
+  it('accepts a list of valid bccEmails', () => {
+    const result = confirmShowRequestSchema.safeParse({
+      ...validBody,
+      bccEmails: ['one@example.com', 'two@example.com'],
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects a bccEmails list containing an invalid address', () => {
+    const result = confirmShowRequestSchema.safeParse({
+      ...validBody,
+      bccEmails: ['ok@example.com', 'not-an-email'],
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe('bccEmails contains an invalid address')
+    }
+  })
+
+  it('rejects a bccEmails list exceeding the maximum length', () => {
+    const many = Array.from({ length: 21 }, (_, i) => `bcc${i}@example.com`)
+    const result = confirmShowRequestSchema.safeParse({
+      ...validBody,
+      bccEmails: many,
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toBe('bccEmails cannot exceed 20 addresses')
     }
   })
 })

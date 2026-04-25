@@ -63,6 +63,11 @@ export function EmailPreview({ showDetails, driveFolderUrl, emailContent, onEmai
                 CC: {showDetails.ccEmails.join(", ")}
               </Badge>
             )}
+            {showDetails.bccEmails.length > 0 && (
+              <Badge variant="outline" className="font-normal text-xs">
+                BCC: {showDetails.bccEmails.join(", ")}
+              </Badge>
+            )}
           </div>
         </div>
       </CardHeader>
