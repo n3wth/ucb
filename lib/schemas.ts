@@ -103,3 +103,28 @@ export const sendAsssscatRequestSchema = z.object({
 })
 
 export type SendAsssscatRequest = z.infer<typeof sendAsssscatRequestSchema>
+
+const lineupPerformerSchema = z.object({
+  performerId: z.string().trim().min(1).nullable(),
+  name: z.string().trim().min(1, "performer name is required"),
+})
+
+export const lineupEntrySchema = z.object({
+  id: nonEmpty("id"),
+  showDate: nonEmpty("showDate"),
+  monologistName: z.string().trim().default(""),
+  performers: z.array(lineupPerformerSchema).max(8, "A lineup cannot have more than 8 performers"),
+  createdAt: z.string().trim().min(1, "createdAt is required"),
+})
+
+export const lineupEntryUpsertSchema = lineupEntrySchema.extend({
+  // When true, the server skips the insert if an existing entry has the same
+  // date + monologist + performer-name set.
+  dedupe: z.boolean().optional().default(false),
+})
+
+export type LineupEntryUpsertRequest = z.infer<typeof lineupEntryUpsertSchema>
+
+export const lineupMigrateRequestSchema = z.object({
+  entries: z.array(lineupEntrySchema).max(2000, "Too many entries"),
+})

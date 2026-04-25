@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import {
   loadLineupLog,
   saveLineupEntry,
@@ -7,13 +7,19 @@ import {
   newLineupId,
   countLineupAppearancesById,
   lineupEntriesForPerformer,
+  isDuplicateLineup,
   type LineupEntry,
 } from '@/lib/asssscat-lineup-log'
 
-const STORAGE_KEY = 'ucb.asssscat.lineup-log'
+const LEGACY_STORAGE_KEY = 'ucb.asssscat.lineup-log'
+const LEGACY_MIGRATED_KEY = 'ucb.asssscat.lineup-log.migrated'
 
 beforeEach(() => {
-  window.localStorage.removeItem(STORAGE_KEY)
+  window.localStorage.clear()
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
 })
 
 const entry = (overrides: Partial<LineupEntry> = {}): LineupEntry => ({
@@ -27,111 +33,135 @@ const entry = (overrides: Partial<LineupEntry> = {}): LineupEntry => ({
   createdAt: overrides.createdAt ?? new Date().toISOString(),
 })
 
+// Minimal stub that records every fetch call and returns a JSON body.
+function stubFetch(handler: (input: RequestInfo, init?: RequestInit) => unknown) {
+  const calls: Array<{ input: RequestInfo; init?: RequestInit }> = []
+  const fn = vi.fn(async (input: RequestInfo, init?: RequestInit) => {
+    calls.push({ input, init })
+    const body = handler(input, init)
+    return new Response(JSON.stringify(body ?? {}), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  })
+  vi.stubGlobal('fetch', fn)
+  return { fn, calls }
+}
+
 describe('loadLineupLog', () => {
-  it('returns empty list when storage is empty', () => {
-    expect(loadLineupLog()).toEqual([])
+  it('returns server entries via the API', async () => {
+    const a = entry({ id: 'a', showDate: '2026-01-01' })
+    const b = entry({ id: 'b', showDate: '2026-12-01' })
+    stubFetch(() => ({ entries: [a, b] }))
+
+    const result = await loadLineupLog()
+    expect(result.map((e) => e.id)).toEqual(['b', 'a'])
   })
 
-  it('ignores corrupt JSON', () => {
-    window.localStorage.setItem(STORAGE_KEY, 'not json')
-    expect(loadLineupLog()).toEqual([])
+  it('returns [] on fetch failure', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('boom', { status: 500 })))
+    expect(await loadLineupLog()).toEqual([])
   })
 
-  it('filters out non-entries', () => {
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify([{ bogus: true }, entry({ id: 'a' })]),
-    )
-    const loaded = loadLineupLog()
-    expect(loaded).toHaveLength(1)
-    expect(loaded[0].id).toBe('a')
+  it('migrates legacy localStorage entries to the server on first load', async () => {
+    const legacy = entry({ id: 'legacy-1' })
+    window.localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify([legacy]))
+
+    const { calls } = stubFetch((input) => {
+      if (typeof input === 'string' && input.includes('/migrate')) {
+        return { entries: [legacy], imported: 1 }
+      }
+      return { entries: [legacy] }
+    })
+
+    const result = await loadLineupLog()
+    expect(result.map((e) => e.id)).toEqual(['legacy-1'])
+    expect(calls.some((c) => String(c.input).includes('/migrate'))).toBe(true)
+    expect(window.localStorage.getItem(LEGACY_MIGRATED_KEY)).toBe('1')
+  })
+
+  it('skips legacy migration once already migrated', async () => {
+    window.localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify([entry({ id: 'x' })]))
+    window.localStorage.setItem(LEGACY_MIGRATED_KEY, '1')
+
+    const { calls } = stubFetch(() => ({ entries: [] }))
+    await loadLineupLog()
+    expect(calls.some((c) => String(c.input).includes('/migrate'))).toBe(false)
   })
 })
 
 describe('saveLineupEntry', () => {
-  it('inserts new entries', () => {
+  it('POSTs the entry and returns the server list', async () => {
     const e = entry({ id: '1' })
-    const result = saveLineupEntry(e)
-    expect(result).toHaveLength(1)
-    expect(result[0].id).toBe('1')
-    expect(loadLineupLog()).toEqual(result)
+    const { calls } = stubFetch(() => ({ entries: [e] }))
+    const result = await saveLineupEntry(e)
+    expect(result).toEqual([e])
+    expect(calls[0].init?.method).toBe('POST')
+    expect(JSON.parse(String(calls[0].init?.body))).toMatchObject({ id: '1' })
   })
 
-  it('replaces existing entry by id', () => {
-    saveLineupEntry(entry({ id: '1', monologistName: 'Old' }))
-    const updated = saveLineupEntry(entry({ id: '1', monologistName: 'New' }))
-    expect(updated).toHaveLength(1)
-    expect(updated[0].monologistName).toBe('New')
-  })
-
-  it('sorts results most-recent-date first', () => {
-    saveLineupEntry(entry({ id: 'a', showDate: '2026-01-01' }))
-    saveLineupEntry(entry({ id: 'b', showDate: '2026-12-01' }))
-    saveLineupEntry(entry({ id: 'c', showDate: '2026-06-01' }))
-    const dates = loadLineupLog().map((e) => e.showDate)
-    expect(dates).toEqual(['2026-12-01', '2026-06-01', '2026-01-01'])
+  it('returns [] on fetch failure', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('nope', { status: 500 })))
+    expect(await saveLineupEntry(entry())).toEqual([])
   })
 })
 
 describe('deleteLineupEntry', () => {
-  it('removes the matching entry', () => {
-    saveLineupEntry(entry({ id: 'a' }))
-    saveLineupEntry(entry({ id: 'b' }))
-    const remaining = deleteLineupEntry('a')
-    expect(remaining.map((e) => e.id)).toEqual(['b'])
+  it('issues a DELETE request and returns the server list', async () => {
+    const remaining = entry({ id: 'b' })
+    const { calls } = stubFetch(() => ({ entries: [remaining] }))
+    const result = await deleteLineupEntry('a')
+    expect(result.map((e) => e.id)).toEqual(['b'])
+    expect(calls[0].init?.method).toBe('DELETE')
+    expect(String(calls[0].input)).toContain('/api/asssscat/lineup-log/a')
   })
 })
 
 describe('recordLineupIfNew', () => {
-  it('records when no matching entry exists', () => {
-    const result = recordLineupIfNew(entry({ id: 'fresh' }))
-    expect(result).toHaveLength(1)
+  it('POSTs with dedupe=true', async () => {
+    const e = entry({ id: 'fresh' })
+    const { calls } = stubFetch(() => ({ entries: [e] }))
+    await recordLineupIfNew(e)
+    const body = JSON.parse(String(calls[0].init?.body))
+    expect(body.dedupe).toBe(true)
+  })
+})
+
+describe('isDuplicateLineup', () => {
+  it('detects duplicate by date + monologist + performer-name set', () => {
+    const a = entry({
+      id: 'a',
+      showDate: '2026-05-01',
+      monologistName: 'Mono',
+      performers: [
+        { performerId: 'p1', name: 'Alice' },
+        { performerId: 'p2', name: 'Bob' },
+      ],
+    })
+    const b = entry({
+      id: 'b',
+      showDate: '2026-05-01',
+      monologistName: 'Mono',
+      performers: [
+        { performerId: 'p2', name: 'Bob' },
+        { performerId: 'p1', name: 'Alice' },
+      ],
+    })
+    expect(isDuplicateLineup(b, [a])).toBe(true)
   })
 
-  it('skips a duplicate (same date + monologist + performer set)', () => {
-    recordLineupIfNew(
-      entry({
-        id: 'a',
-        showDate: '2026-05-01',
-        monologistName: 'Mono',
-        performers: [
-          { performerId: 'p1', name: 'Alice' },
-          { performerId: 'p2', name: 'Bob' },
-        ],
-      }),
-    )
-    const result = recordLineupIfNew(
-      entry({
-        id: 'b',
-        showDate: '2026-05-01',
-        monologistName: 'Mono',
-        // Same names in different order — still a duplicate.
-        performers: [
-          { performerId: 'p2', name: 'Bob' },
-          { performerId: 'p1', name: 'Alice' },
-        ],
-      }),
-    )
-    expect(result).toHaveLength(1)
-    expect(result[0].id).toBe('a')
-  })
-
-  it('records when same date but different cast', () => {
-    recordLineupIfNew(
-      entry({
-        id: 'a',
-        showDate: '2026-05-01',
-        performers: [{ performerId: 'p1', name: 'Alice' }],
-      }),
-    )
-    const result = recordLineupIfNew(
-      entry({
-        id: 'b',
-        showDate: '2026-05-01',
-        performers: [{ performerId: 'p2', name: 'Bob' }],
-      }),
-    )
-    expect(result).toHaveLength(2)
+  it('does not flag entries with different casts', () => {
+    const a = entry({
+      id: 'a',
+      showDate: '2026-05-01',
+      performers: [{ performerId: 'p1', name: 'Alice' }],
+    })
+    const b = entry({
+      id: 'b',
+      showDate: '2026-05-01',
+      performers: [{ performerId: 'p2', name: 'Bob' }],
+    })
+    expect(isDuplicateLineup(b, [a])).toBe(false)
   })
 })
 
@@ -197,5 +227,4 @@ describe('lineupEntriesForPerformer', () => {
     const result = lineupEntriesForPerformer(entries, 'p1')
     expect(result.map((e) => e.id).sort()).toEqual(['a', 'c'])
   })
-
 })

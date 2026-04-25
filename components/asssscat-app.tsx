@@ -122,14 +122,27 @@ export function AsssscatApp() {
     setDefaultCc(loadAsssscatDefaultCc())
     setCompatibility(loadCompatibility())
     setBookingDrafts(loadBookingDrafts())
-    setLineupEntries(loadLineupLog())
+    let cancelled = false
+    void loadLineupLog().then((entries) => {
+      if (!cancelled) setLineupEntries(entries)
+    })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   // Refresh lineup entries whenever the user opens lineup-log/stats tabs so
   // edits made elsewhere (lineup-log tab edits, manual additions) propagate.
   useEffect(() => {
-    if (activeTab === "lineup-log" || activeTab === "stats" || activeTab === "directory") {
-      setLineupEntries(loadLineupLog())
+    if (activeTab !== "lineup-log" && activeTab !== "stats" && activeTab !== "directory") {
+      return
+    }
+    let cancelled = false
+    void loadLineupLog().then((entries) => {
+      if (!cancelled) setLineupEntries(entries)
+    })
+    return () => {
+      cancelled = true
     }
   }, [activeTab])
 
@@ -328,7 +341,7 @@ export function AsssscatApp() {
         performers: cast.map((p) => ({ performerId: p.id, name: p.name })),
         createdAt: new Date().toISOString(),
       }
-      setLineupEntries(recordLineupIfNew(lineupEntry))
+      setLineupEntries(await recordLineupIfNew(lineupEntry))
       // Remove from bookings if this was a draft
       if (activeDraftId) {
         setBookingDrafts(deleteBookingDraft(activeDraftId))

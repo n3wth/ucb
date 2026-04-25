@@ -88,7 +88,13 @@ export function AsssscatLineupLog({ performers, onEntriesChange }: AsssscatLineu
   const [pendingDelete, setPendingDelete] = useState<string | null>(null)
 
   useEffect(() => {
-    setEntries(loadLineupLog())
+    let cancelled = false
+    void loadLineupLog().then((next) => {
+      if (!cancelled) setEntries(next)
+    })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const updateEntries = (next: LineupEntry[]) => {
@@ -118,7 +124,7 @@ export function AsssscatLineupLog({ performers, onEntriesChange }: AsssscatLineu
 
   const cancelEdit = () => setEdit(null)
 
-  const saveEdit = () => {
+  const saveEdit = async () => {
     if (!edit || !edit.showDate) return
     const existing = entries.find((e) => e.id === edit.id)
     const entry: LineupEntry = {
@@ -128,14 +134,15 @@ export function AsssscatLineupLog({ performers, onEntriesChange }: AsssscatLineu
       performers: buildPerformers(edit.performersText, performers),
       createdAt: existing?.createdAt ?? new Date().toISOString(),
     }
-    updateEntries(saveLineupEntry(entry))
     setEdit(null)
+    updateEntries(await saveLineupEntry(entry))
   }
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!pendingDelete) return
-    updateEntries(deleteLineupEntry(pendingDelete))
+    const id = pendingDelete
     setPendingDelete(null)
+    updateEntries(await deleteLineupEntry(id))
   }
 
   const editing = edit !== null
@@ -193,7 +200,7 @@ export function AsssscatLineupLog({ performers, onEntriesChange }: AsssscatLineu
             <Button variant="outline" size="sm" onClick={cancelEdit}>
               <X className="h-4 w-4 mr-1" /> Cancel
             </Button>
-            <Button size="sm" onClick={saveEdit} disabled={!edit.showDate}>
+            <Button size="sm" onClick={() => void saveEdit()} disabled={!edit.showDate}>
               <Save className="h-4 w-4 mr-1" /> Save
             </Button>
           </div>
@@ -282,7 +289,7 @@ export function AsssscatLineupLog({ performers, onEntriesChange }: AsssscatLineu
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
+            <AlertDialogAction onClick={() => void confirmDelete()}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
