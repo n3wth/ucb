@@ -55,10 +55,10 @@ export default function LandingPage() {
         />
 
         <section className="flex-1 flex flex-col justify-center">
-          <div className="mx-auto max-w-6xl px-6 pt-12 pb-16 sm:pt-16 sm:pb-20">
+          <div className="mx-auto max-w-6xl px-6 pt-4 pb-6 sm:pt-6 sm:pb-8 w-full">
 
             {/* Date stamp — tilted left edge */}
-            <div className="flex items-center gap-4 mb-10">
+            <div className="flex items-center gap-4 mb-4 sm:mb-5">
               <div className="w-1 h-8 bg-primary rotate-[-4deg] shrink-0" />
               <span className="text-[10px] tracking-[0.4em] uppercase text-foreground/50 font-mono">
                 {todayLong}
@@ -70,18 +70,18 @@ export default function LandingPage() {
             <div className="relative">
 
               {/* Hero headline — large, bleeds off grid */}
-              <div className="relative mb-8 sm:mb-12">
-                <p className="mb-4 text-[10px] tracking-[0.5em] uppercase text-primary font-mono">
+              <div className="relative mb-5 sm:mb-6">
+                <p className="mb-2 text-[10px] tracking-[0.5em] uppercase text-primary font-mono">
                   ◆ IN HOUSE
                 </p>
 
                 {/* Prominent UCB logo — stamped above the headline */}
-                <div className="mb-6 sm:mb-8 flex items-center gap-4">
+                <div className="mb-3 sm:mb-4 flex items-center gap-4">
                   <div className="rotate-[-3deg] origin-bottom-left">
                     <UcbLogo
-                      size={120}
-                      showEyes
-                      className="sm:!w-[160px] sm:!h-[160px] lg:!w-[200px] lg:!h-[200px]"
+                      size={72}
+                      showEyes={false}
+                      className="sm:!w-[96px] sm:!h-[96px] lg:!w-[120px] lg:!h-[120px]"
                     />
                   </div>
                   <div className="hidden sm:flex flex-col gap-1 pb-2">
@@ -95,19 +95,19 @@ export default function LandingPage() {
                 </div>
 
                 <h1 className="font-display leading-[0.88] tracking-tight uppercase">
-                  <span className="block text-4xl sm:text-6xl lg:text-[5.5rem] text-foreground">
+                  <span className="block text-3xl sm:text-5xl lg:text-[4rem] text-foreground">
                     Internal Booking Tools{" "}
                   </span>
-                  <span className="block text-4xl sm:text-6xl lg:text-[5.5rem] text-foreground/40 pl-[0.08em] sm:pl-[0.15em]">
+                  <span className="block text-3xl sm:text-5xl lg:text-[4rem] text-foreground/40 pl-[0.08em] sm:pl-[0.15em]">
                     for the{" "}
                   </span>
                   <span
-                    className="block text-6xl sm:text-8xl lg:text-[9rem] text-primary landing-glitch"
+                    className="block text-5xl sm:text-7xl lg:text-[6.5rem] text-primary landing-glitch"
                     data-text="UCB"
                   >
                     UCB{" "}
                   </span>
-                  <span className="block font-serif italic text-xl sm:text-2xl lg:text-3xl text-foreground/60 font-normal normal-case tracking-normal mt-3 pl-1">
+                  <span className="block font-serif italic text-lg sm:text-xl lg:text-2xl text-foreground/60 font-normal normal-case tracking-normal mt-2 pl-1">
                     Artistic Team.
                   </span>
                 </h1>
@@ -121,11 +121,11 @@ export default function LandingPage() {
                   className="absolute -left-6 top-1/2 w-[calc(100%+3rem)] h-px bg-foreground/10 rotate-[-1.5deg] origin-left pointer-events-none"
                 />
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-8">
                   {/* Tagline */}
                   <div className="relative">
-                    <div className="rotate-[-2deg] border border-foreground/30 px-4 py-3 bg-background inline-block">
-                      <p className="text-xs text-foreground/50 font-mono leading-relaxed">
+                    <div className="rotate-[-2deg] border border-foreground/30 px-3 py-2 bg-background inline-block">
+                      <p className="text-xs text-foreground/50 font-mono leading-tight">
                         Don&apos;t think.<br />
                         Book.
                       </p>
@@ -135,7 +135,7 @@ export default function LandingPage() {
                   {/* CTA button */}
                   <Link
                     href="/login"
-                    className="group inline-flex items-center gap-3 border-2 border-primary bg-primary px-6 py-4 text-sm font-bold tracking-[0.25em] uppercase text-primary-foreground hover:bg-foreground hover:text-background hover:border-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background cta-shimmer landing-cta-tilt"
+                    className="group inline-flex items-center gap-3 border-2 border-primary bg-primary px-6 py-3 text-sm font-bold tracking-[0.25em] uppercase text-primary-foreground hover:bg-foreground hover:text-background hover:border-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background cta-shimmer landing-cta-tilt"
                   >
                     <span>Sign in</span>
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -148,17 +148,6 @@ export default function LandingPage() {
                       Live
                     </span>
                   </div>
-                </div>
-              </div>
-
-              {/* Bottom rule strip — slightly tilted */}
-              <div className="mt-16 sm:mt-20">
-                <div className="flex items-center gap-6">
-                  <div className="h-px flex-1 bg-foreground/20" />
-                  <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/25 font-mono">
-                    UCB BOOKINGS INTERNAL · v2
-                  </span>
-                  <div className="h-px w-8 bg-foreground/20 rotate-[-15deg] origin-left" />
                 </div>
               </div>
             </div>
