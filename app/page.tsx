@@ -46,10 +46,10 @@ export default function LandingPage() {
         />
 
         <section className="flex-1 flex flex-col justify-center">
-          <div className="mx-auto max-w-6xl w-full px-6 pt-10 pb-16 sm:pt-14 sm:pb-20">
+          <div className="mx-auto max-w-6xl w-full px-6 pt-4 pb-10 sm:pt-6 sm:pb-12">
 
             {/* Date stamp — bare, no rule, slightly tilted */}
-            <div className="mb-12 sm:mb-16">
+            <div className="mb-4 sm:mb-6">
               <span
                 className="inline-block text-[10px] tracking-[0.4em] uppercase text-foreground/45 font-mono rotate-[-1.5deg] origin-left"
                 aria-label={`Today is ${todayLong}`}
@@ -62,21 +62,21 @@ export default function LandingPage() {
             <div className="relative">
 
               {/* Hero — words are physical objects, each tilted differently */}
-              <div className="relative mb-10 sm:mb-14">
-                <p className="mb-6 text-[10px] tracking-[0.5em] uppercase text-primary font-mono rotate-[1deg] inline-block origin-left">
+              <div className="relative mb-4 sm:mb-6">
+                <p className="mb-3 text-[10px] tracking-[0.5em] uppercase text-primary font-mono rotate-[1deg] inline-block origin-left">
                   ◆ IN HOUSE
                 </p>
 
                 {/* UCB logo + meta — pushed to a corner-ish spot, tilted */}
-                <div className="mb-4 sm:mb-6 flex items-end gap-5">
+                <div className="mb-3 sm:mb-4 flex items-end gap-5">
                   <div className="rotate-[-5deg] origin-bottom-left">
                     <UcbLogo
-                      size={130}
+                      size={72}
                       showEyes
-                      className="sm:!w-[170px] sm:!h-[170px] lg:!w-[210px] lg:!h-[210px]"
+                      className="sm:!w-[96px] sm:!h-[96px] lg:!w-[120px] lg:!h-[120px]"
                     />
                   </div>
-                  <div className="hidden sm:flex flex-col gap-1 pb-2 rotate-[2deg] origin-bottom-left">
+                  <div className="hidden sm:flex flex-col gap-1 pb-1 rotate-[2deg] origin-bottom-left">
                     <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/40 font-mono">
                       Upright Citizens Brigade
                     </span>
@@ -95,32 +95,32 @@ export default function LandingPage() {
 
                   <span aria-hidden className="block">
                     {/* Line 1: "Internal" — display, big, slight tilt */}
-                    <span className="font-display block text-[3rem] sm:text-[5rem] lg:text-[7rem] text-foreground rotate-[-2deg] origin-bottom-left inline-block">
+                    <span className="font-display block text-[2.4rem] sm:text-[3.6rem] lg:text-[5rem] text-foreground rotate-[-2deg] origin-bottom-left inline-block">
                       Internal
                     </span>
                   </span>
 
                   <span aria-hidden className="block -mt-1 sm:-mt-2 pl-[0.4em]">
                     {/* Line 2: "Booking" condensed/wide spaced */}
-                    <span className="font-display block text-[2.6rem] sm:text-[4.4rem] lg:text-[6rem] text-foreground/85 tracking-[-0.02em] rotate-[1deg] origin-top-left inline-block">
+                    <span className="font-display block text-[2.1rem] sm:text-[3.2rem] lg:text-[4.4rem] text-foreground/85 tracking-[-0.02em] rotate-[1deg] origin-top-left inline-block">
                       Booking
                     </span>
                   </span>
 
                   <span aria-hidden className="block mt-1 sm:mt-2">
                     {/* Line 3: "Tools" + serif italic "for the" stuck on, ransom-note */}
-                    <span className="font-display text-[2.6rem] sm:text-[4.4rem] lg:text-[6rem] text-foreground rotate-[-1deg] inline-block align-baseline">
+                    <span className="font-display text-[2.1rem] sm:text-[3.2rem] lg:text-[4.4rem] text-foreground rotate-[-1deg] inline-block align-baseline">
                       Tools
                     </span>
-                    <span className="font-serif italic font-normal normal-case tracking-normal text-foreground/60 text-xl sm:text-3xl lg:text-4xl ml-3 sm:ml-5 rotate-[3deg] inline-block align-baseline">
+                    <span className="font-serif italic font-normal normal-case tracking-normal text-foreground/60 text-lg sm:text-2xl lg:text-3xl ml-3 sm:ml-5 rotate-[3deg] inline-block align-baseline">
                       for&nbsp;the
                     </span>
                   </span>
 
                   {/* Line 4: UCB — huge, glitching, dramatic tilt off-axis */}
-                  <span aria-hidden className="block mt-2 sm:mt-3 -ml-1 sm:-ml-2">
+                  <span aria-hidden className="block mt-1 sm:mt-2 -ml-1 sm:-ml-2">
                     <span
-                      className="font-display landing-glitch text-primary text-[5rem] sm:text-[8rem] lg:text-[12rem] leading-none rotate-[-4deg] origin-bottom-left inline-block"
+                      className="font-display landing-glitch text-primary text-[3.6rem] sm:text-[5.5rem] lg:text-[8rem] leading-none rotate-[-4deg] origin-bottom-left inline-block"
                       data-text="UCB"
                     >
                       UCB
@@ -128,11 +128,11 @@ export default function LandingPage() {
                   </span>
 
                   {/* Line 5: serif italic "Artistic Team" — handwritten feel */}
-                  <span aria-hidden className="block mt-3 sm:mt-4 pl-2 sm:pl-4">
-                    <span className="font-serif italic font-normal normal-case tracking-normal text-foreground/70 text-2xl sm:text-4xl lg:text-5xl rotate-[-2deg] inline-block">
+                  <span aria-hidden className="block mt-2 sm:mt-3 pl-2 sm:pl-4">
+                    <span className="font-serif italic font-normal normal-case tracking-normal text-foreground/70 text-xl sm:text-3xl lg:text-4xl rotate-[-2deg] inline-block">
                       Artistic
                     </span>
-                    <span className="font-serif italic font-bold normal-case tracking-normal text-primary text-2xl sm:text-4xl lg:text-5xl ml-2 sm:ml-3 rotate-[2deg] inline-block">
+                    <span className="font-serif italic font-bold normal-case tracking-normal text-primary text-xl sm:text-3xl lg:text-4xl ml-2 sm:ml-3 rotate-[2deg] inline-block">
                       Team.
                     </span>
                   </span>
@@ -140,7 +140,7 @@ export default function LandingPage() {
               </div>
 
               {/* CTA strip — no decorative line, just objects floating */}
-              <div className="relative mt-4 sm:mt-6">
+              <div className="relative mt-2 sm:mt-3">
                 <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6 sm:gap-10">
                   {/* Tagline: zine-style stacked words, no border */}
                   <div className="rotate-[-3deg] origin-bottom-left">
