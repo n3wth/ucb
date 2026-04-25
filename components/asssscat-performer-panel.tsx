@@ -85,6 +85,7 @@ export function AsssscatPerformerPanel({
   // The performer whose affinity settings are currently open
   const [affinityForId, setAffinityForId] = useState<string | null>(null)
   const [affinitySearch, setAffinitySearch] = useState("")
+  const [nameSearch, setNameSearch] = useState("")
   const [demoGenders, setDemoGenders] = useState<PerformerGender[]>([])
   const [demoRaces, setDemoRaces] = useState<PerformerRace[]>([])
   const [demoLgbtq, setDemoLgbtq] = useState<boolean | null>(null)
@@ -94,6 +95,13 @@ export function AsssscatPerformerPanel({
 
   const filteredPerformers = useMemo(() => {
     let list = performers
+    const q = nameSearch.trim().toLowerCase()
+    if (q) {
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q),
+      )
+    }
     if (hasDemoFilter) {
       list = list.filter((p) => {
         if (demoGenders.length > 0 && (!p.gender || !demoGenders.includes(p.gender))) return false
@@ -106,7 +114,7 @@ export function AsssscatPerformerPanel({
       list = list.filter((p) => availableFilter.has(p.id))
     }
     return list
-  }, [performers, demoGenders, demoRaces, demoLgbtq, hasDemoFilter, availableFilter])
+  }, [performers, nameSearch, demoGenders, demoRaces, demoLgbtq, hasDemoFilter, availableFilter])
 
   const grouped = useMemo(() => groupByCategory(filteredPerformers), [filteredPerformers])
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds])
@@ -235,6 +243,17 @@ export function AsssscatPerformerPanel({
             Add
           </Button>
         </div>
+      </div>
+
+      <div className="px-4 py-2 border-b border-border">
+        <Input
+          type="search"
+          placeholder="Search performers..."
+          value={nameSearch}
+          onChange={(e) => setNameSearch(e.target.value)}
+          className="h-8 text-xs bg-input border-border"
+          aria-label="Search performers by name"
+        />
       </div>
 
       {showDemoFilter && (
@@ -418,6 +437,10 @@ export function AsssscatPerformerPanel({
           <p className="px-4 py-6 text-xs text-muted-foreground text-center">
             No performers yet. Add recurring cast members to quickly slot them
             into shows.
+          </p>
+        ) : filteredPerformers.length === 0 ? (
+          <p className="px-4 py-6 text-xs text-muted-foreground text-center">
+            No performers match your search.
           </p>
         ) : (
           visibleCategories.map((category) => {
