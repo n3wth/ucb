@@ -13,6 +13,10 @@ import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
 type Stage = "compose" | "preview" | "result"
 
+// Feature flag — flip to false to revert the producer/CC sidebar layout.
+// See ucb-wl2: Chris may want to roll this back.
+const USE_PRODUCER_CC_SIDEBAR = true
+
 function buildPendingResult(hasTechRehearsal: boolean): ConfirmationResult {
   return {
     email: { status: "pending" },
@@ -101,6 +105,7 @@ export function ShowConfirmationApp() {
     <ToolPage
       title="Show Confirmation"
       description="Confirm a show in one form. Sends the producer email, adds the calendar event, and creates the Drive folder."
+      size={USE_PRODUCER_CC_SIDEBAR ? "lg" : "md"}
     >
       <div className="flex flex-col items-center gap-10">
         <StageProgress current={stage} />
@@ -112,11 +117,22 @@ export function ShowConfirmationApp() {
                 initialValue={showDetails}
                 onSubmit={handleComposeSubmit}
                 onShowTitleChange={setActiveShowTitle}
+                splitLayout={USE_PRODUCER_CC_SIDEBAR}
+                sidebarExtras={
+                  USE_PRODUCER_CC_SIDEBAR ? (
+                    <>
+                      <ShowCcPreferencesPanel activeShowTitle={activeShowTitle} />
+                      <DefaultCcPreferences />
+                    </>
+                  ) : undefined
+                }
               />
-              <ShowCcPreferencesPanel
-                activeShowTitle={activeShowTitle}
-              />
-              <DefaultCcPreferences />
+              {!USE_PRODUCER_CC_SIDEBAR && (
+                <>
+                  <ShowCcPreferencesPanel activeShowTitle={activeShowTitle} />
+                  <DefaultCcPreferences />
+                </>
+              )}
             </div>
           )}
 

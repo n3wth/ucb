@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -37,6 +37,16 @@ interface ShowConfirmationFormProps {
   initialValue?: ShowDetails | null
   onSubmit: (data: ShowDetails) => void
   onShowTitleChange?: (title: string) => void
+  /**
+   * When true, renders Producer Email and CC fields in a left sidebar Card
+   * alongside the main show details on the right. See `sidebarExtras` to
+   * append additional content (preference panels) into that sidebar.
+   * Set the layout flag in show-confirmation-app.tsx; this prop is wired
+   * for easy rollback if Chris doesn't like it.
+   */
+  splitLayout?: boolean
+  /** Extra content rendered in the left sidebar below the CC field. */
+  sidebarExtras?: ReactNode
 }
 
 function todayDateString(): string {
@@ -73,7 +83,13 @@ function initialTechDurationChoice(minutes: number): TechDurationChoice {
     : DURATION_OTHER
 }
 
-export function ShowConfirmationForm({ initialValue, onSubmit, onShowTitleChange }: ShowConfirmationFormProps) {
+export function ShowConfirmationForm({
+  initialValue,
+  onSubmit,
+  onShowTitleChange,
+  splitLayout = false,
+  sidebarExtras,
+}: ShowConfirmationFormProps) {
   const [formData, setFormData] = useState<ShowDetails>(initialValue ?? DEFAULT_FORM)
   const [durationChoice, setDurationChoice] = useState<DurationChoice>(() =>
     initialDurationChoice((initialValue ?? DEFAULT_FORM).durationMinutes),
@@ -149,6 +165,381 @@ export function ShowConfirmationForm({ initialValue, onSubmit, onShowTitleChange
 
   const inputClasses = "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
 
+  const producerEmailField = (
+    <Field>
+      <FieldLabel htmlFor="producerEmail" className="text-xs">
+        <Mail className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+        Producer email
+      </FieldLabel>
+      <Input
+        id="producerEmail"
+        type="email"
+        placeholder="producer@example.com"
+        value={formData.producerEmail}
+        onChange={(e) => updateField("producerEmail", e.target.value)}
+        className={inputClasses}
+        required
+      />
+    </Field>
+  )
+
+  const ccEmailsField = (
+    <Field>
+      <FieldLabel htmlFor="ccInput" className="text-xs">
+        <Users className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+        CC
+        <span className="text-muted-foreground/70 font-normal ml-1">(optional)</span>
+      </FieldLabel>
+      <CcEmailList
+        ref={ccListRef}
+        inputId="ccInput"
+        emails={formData.ccEmails}
+        onChange={(next) => updateField("ccEmails", next)}
+        emptyHint={
+          splitLayout
+            ? "Add addresses to CC on this confirmation."
+            : "Add addresses to CC on this confirmation. Defaults can be managed below."
+        }
+      />
+    </Field>
+  )
+
+  if (splitLayout) {
+    return (
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-6 items-start">
+        <aside className="space-y-6 lg:sticky lg:top-6">
+          <Card className="border-border">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-medium text-foreground">
+                Producer
+              </CardTitle>
+              <CardDescription className="text-sm text-muted-foreground leading-relaxed">
+                Who&apos;s the email going to, and who else gets a CC?
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-6">
+              {producerEmailField}
+              {ccEmailsField}
+            </CardContent>
+          </Card>
+          {sidebarExtras}
+        </aside>
+
+        <Card className="w-full border-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-medium text-foreground">
+              Show details
+            </CardTitle>
+            <CardDescription className="text-sm text-muted-foreground leading-relaxed">
+              Fill in the details below. You&apos;ll review everything before confirming.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="space-y-8">
+              {renderShowDetailFields()}
+              <Button type="submit" className="w-full h-11 group cta-shimmer" size="lg">
+                Continue to review
+                <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </form>
+    )
+  }
+
+  function renderShowDetailFields() {
+    return (
+      <>
+        {/* Show title - full width, emphasized */}
+        <Field>
+          <FieldLabel htmlFor="showTitle" className="text-xs">Show title</FieldLabel>
+          <Input
+            id="showTitle"
+            placeholder="Harold Night"
+            value={formData.showTitle}
+            onChange={(e) => {
+              updateField("showTitle", e.target.value)
+              onShowTitleChange?.(e.target.value)
+            }}
+            className={`${inputClasses} h-12 text-base`}
+            required
+          />
+        </Field>
+
+        {/* Date, Venue row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <Field>
+            <FieldLabel htmlFor="showDate" className="text-xs">
+              <Calendar className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+              Show date
+            </FieldLabel>
+            <Input
+              id="showDate"
+              type="date"
+              value={formData.showDate}
+              onChange={(e) => updateField("showDate", e.target.value)}
+              className={inputClasses}
+              required
+            />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="venue" className="text-xs">Venue</FieldLabel>
+            <Select
+              value={formData.venue}
+              onValueChange={(value: VenueName) => updateField("venue", value)}
+            >
+              <SelectTrigger id="venue" className={inputClasses}>
+                <SelectValue placeholder="Select venue" />
+              </SelectTrigger>
+              <SelectContent>
+                {VENUES.map((venue) => (
+                  <SelectItem key={venue.id} value={venue.name}>
+                    {venue.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+        </div>
+
+        {/* Show time and event duration row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <Field>
+            <FieldLabel htmlFor="showTime" className="text-xs">
+              <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+              Show time
+            </FieldLabel>
+            <Input
+              id="showTime"
+              type="time"
+              value={formData.showTime}
+              onChange={(e) => updateField("showTime", e.target.value)}
+              className={inputClasses}
+              required
+            />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="durationChoice" className="text-xs">
+              <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+              Event duration
+            </FieldLabel>
+            <Select value={String(durationChoice)} onValueChange={handleDurationChoiceChange}>
+              <SelectTrigger id="durationChoice" className={inputClasses}>
+                <SelectValue placeholder="Select duration" />
+              </SelectTrigger>
+              <SelectContent>
+                {SHOW_DURATION_PRESETS.map((minutes) => (
+                  <SelectItem key={minutes} value={String(minutes)}>
+                    {minutes} min
+                  </SelectItem>
+                ))}
+                <SelectItem value={DURATION_OTHER}>Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+        </div>
+
+        {durationChoice === DURATION_OTHER && (
+          <Field>
+            <FieldLabel htmlFor="durationMinutes" className="text-xs">
+              <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+              Custom duration
+              <span className="text-muted-foreground/70 font-normal ml-1">(hours)</span>
+            </FieldLabel>
+            <Input
+              id="durationMinutes"
+              type="number"
+              min={MIN_SHOW_DURATION_MINUTES / 60}
+              max={MAX_SHOW_DURATION_MINUTES / 60}
+              step="0.5"
+              value={formData.durationMinutes ? formData.durationMinutes / 60 : ""}
+              onChange={(e) =>
+                updateField("durationMinutes", Math.round((parseFloat(e.target.value) || 0) * 60))
+              }
+              className={inputClasses}
+              required
+            />
+          </Field>
+        )}
+
+        {/* Tech rehearsal section */}
+        <div className="rounded-lg border border-border bg-muted/40 p-5 space-y-4">
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium flex items-center gap-2 text-foreground">
+              <Clock className="h-4 w-4 text-foreground" />
+              Tech rehearsal
+              <span className="text-muted-foreground/70 font-normal text-xs">(optional)</span>
+            </Label>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              If a time is set, a tech rehearsal calendar event will be created titled &quot;{formData.showTitle || "SHOW TITLE"} - TECH&quot;.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <Field>
+              <FieldLabel htmlFor="techRehearsalTime" className="text-xs">
+                <Clock className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                Start time
+              </FieldLabel>
+              <Input
+                id="techRehearsalTime"
+                type="time"
+                value={formData.techRehearsalTime}
+                onChange={(e) => updateField("techRehearsalTime", e.target.value)}
+                className={inputClasses}
+              />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="techDurationChoice" className="text-xs">
+                <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                Duration
+              </FieldLabel>
+              <Select
+                value={String(techDurationChoice)}
+                onValueChange={handleTechDurationChoiceChange}
+              >
+                <SelectTrigger id="techDurationChoice" className={inputClasses}>
+                  <SelectValue placeholder="Select duration" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TECH_REHEARSAL_DURATION_PRESETS.map((minutes) => (
+                    <SelectItem key={minutes} value={String(minutes)}>
+                      {minutes / 60} {minutes / 60 === 1 ? "hour" : "hours"}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value={DURATION_OTHER}>Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
+
+          {techDurationChoice === DURATION_OTHER && (
+            <Field>
+              <FieldLabel htmlFor="techRehearsalDurationMinutes" className="text-xs">
+                <Timer className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                Custom duration
+                <span className="text-muted-foreground/70 font-normal ml-1">(hours)</span>
+              </FieldLabel>
+              <Input
+                id="techRehearsalDurationMinutes"
+                type="number"
+                min={MIN_SHOW_DURATION_MINUTES / 60}
+                max={MAX_SHOW_DURATION_MINUTES / 60}
+                step="0.5"
+                value={formData.techRehearsalDurationMinutes ? formData.techRehearsalDurationMinutes / 60 : ""}
+                onChange={(e) =>
+                  updateField(
+                    "techRehearsalDurationMinutes",
+                    Math.round((parseFloat(e.target.value) || 0) * 60),
+                  )
+                }
+                className={inputClasses}
+                required
+              />
+            </Field>
+          )}
+        </div>
+
+        {/* Pricing row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <Field>
+            <FieldLabel htmlFor="presaleTicketPrice" className="text-xs">
+              <DollarSign className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+              Presale ticket
+            </FieldLabel>
+            <InputGroup>
+              <InputGroupAddon className="bg-muted border-border text-muted-foreground">$</InputGroupAddon>
+              <InputGroupInput
+                id="presaleTicketPrice"
+                type="number"
+                min="0"
+                step="0.50"
+                placeholder="0.00"
+                value={formData.presaleTicketPrice || ""}
+                onChange={(e) => updateField("presaleTicketPrice", parseFloat(e.target.value) || 0)}
+                className={inputClasses}
+                required
+              />
+            </InputGroup>
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="doorTicketPrice" className="text-xs">
+              <DollarSign className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+              Door ticket
+            </FieldLabel>
+            <InputGroup>
+              <InputGroupAddon className="bg-muted border-border text-muted-foreground">$</InputGroupAddon>
+              <InputGroupInput
+                id="doorTicketPrice"
+                type="number"
+                min="0"
+                step="0.50"
+                placeholder="0.00"
+                value={formData.doorTicketPrice || ""}
+                onChange={(e) => updateField("doorTicketPrice", parseFloat(e.target.value) || 0)}
+                className={inputClasses}
+                required
+              />
+            </InputGroup>
+          </Field>
+        </div>
+
+        {/* Digital ticket option */}
+        <div className="rounded-lg border border-border bg-muted/40 p-5 space-y-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="digitalEnabled" className="text-sm font-medium flex items-center gap-2 cursor-pointer text-foreground">
+                <Monitor className="h-4 w-4 text-foreground" />
+                Digital ticket
+              </Label>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Add a livestream option for remote viewers. The stream setup is handled separately.
+              </p>
+            </div>
+            <Switch
+              id="digitalEnabled"
+              checked={formData.digitalTicket.enabled}
+              onCheckedChange={(checked) =>
+                updateField("digitalTicket", { ...formData.digitalTicket, enabled: checked })
+              }
+              className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted-foreground/30"
+            />
+          </div>
+
+          {formData.digitalTicket.enabled && (
+            <div className="pt-4 border-t border-border/40 animate-in fade-in slide-in-from-top-1 duration-200">
+              <Label htmlFor="digitalPrice" className="text-xs text-muted-foreground mb-2 block">
+                Stream ticket price
+              </Label>
+              <InputGroup className="max-w-32">
+                <InputGroupAddon className="bg-muted border-border text-muted-foreground">$</InputGroupAddon>
+                <InputGroupInput
+                  id="digitalPrice"
+                  type="number"
+                  min="0"
+                  step="0.50"
+                  value={formData.digitalTicket.price}
+                  onChange={(e) =>
+                    updateField("digitalTicket", {
+                      ...formData.digitalTicket,
+                      price: parseFloat(e.target.value) || 0,
+                    })
+                  }
+                  className={inputClasses}
+                />
+              </InputGroup>
+            </div>
+          )}
+        </div>
+      </>
+    )
+  }
+
   return (
     <Card className="w-full border-border">
       <CardHeader className="pb-2">
@@ -159,7 +550,7 @@ export function ShowConfirmationForm({ initialValue, onSubmit, onShowTitleChange
           Fill in the details below. You&apos;ll review everything before confirming.
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Show title - full width, emphasized */}
