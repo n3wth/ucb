@@ -124,8 +124,8 @@ export async function POST(request: NextRequest) {
     })
 
   const improviserEmails = body.improvisers.map((p) => p.email)
-  const bcc = dedupeBcc(improviserEmails, [ASSSSCAT_TO])
-  const cc = dedupeCc([...body.defaultCc, ...body.oneTimeCc], [ASSSSCAT_TO, ...improviserEmails])
+  const bcc = dedupeBcc([...improviserEmails, ...body.oneTimeBcc], [ASSSSCAT_TO])
+  const cc = dedupeCc([...body.defaultCc, ...body.oneTimeCc], [ASSSSCAT_TO, ...bcc])
 
   if (!hasGoogleCredentials()) {
     reqLog.warn("SIMULATION MODE — GOOGLE_* env vars not fully set")

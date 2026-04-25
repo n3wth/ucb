@@ -76,4 +76,29 @@ describe('sendAsssscatRequestSchema', () => {
     })
     expect(parsed.success).toBe(false)
   })
+
+  it('accepts a one-time BCC list', () => {
+    const parsed = sendAsssscatRequestSchema.safeParse({
+      ...validBody,
+      oneTimeBcc: ['producer@example.com'],
+    })
+    expect(parsed.success).toBe(true)
+  })
+
+  it('rejects invalid one-time BCC entries', () => {
+    const parsed = sendAsssscatRequestSchema.safeParse({
+      ...validBody,
+      oneTimeBcc: ['not-an-email'],
+    })
+    expect(parsed.success).toBe(false)
+  })
+
+  it('caps one-time BCC at 20 entries', () => {
+    const many = Array.from({ length: 21 }, (_, i) => `bcc${i}@example.com`)
+    const parsed = sendAsssscatRequestSchema.safeParse({
+      ...validBody,
+      oneTimeBcc: many,
+    })
+    expect(parsed.success).toBe(false)
+  })
 })

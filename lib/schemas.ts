@@ -91,6 +91,7 @@ export const sendAsssscatRequestSchema = z.object({
   ticketLink: z.string().trim(),
   oneTimeCc: z.array(ccEmail).max(20, "oneTimeCc cannot exceed 20 addresses").optional().default([]),
   defaultCc: z.array(ccEmail).max(20, "defaultCc cannot exceed 20 addresses").optional().default([]),
+  oneTimeBcc: z.array(ccEmail).max(20, "oneTimeBcc cannot exceed 20 addresses").optional().default([]),
   emailSubject: z.string().optional(),
   emailBody: z.string().optional(),
   smallCastAcknowledged: z.boolean().optional().default(false),

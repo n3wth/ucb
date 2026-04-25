@@ -13,6 +13,7 @@ export interface BookingDraft {
   ticketLink: string
   cast: AsssscatPerformer[]
   oneTimeCc: string[]
+  oneTimeBcc?: string[]
   savedAt: string
 }
 
@@ -27,6 +28,7 @@ function isDraft(value: unknown): value is BookingDraft {
     typeof v.ticketLink === 'string' &&
     Array.isArray(v.cast) &&
     Array.isArray(v.oneTimeCc) &&
+    (v.oneTimeBcc === undefined || Array.isArray(v.oneTimeBcc)) &&
     typeof v.savedAt === 'string'
   )
 }
