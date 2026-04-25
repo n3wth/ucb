@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -24,7 +24,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import {
-  loadLineupLog,
   saveLineupEntry,
   deleteLineupEntry,
   newLineupId,
@@ -40,6 +39,8 @@ const inputClasses =
 
 interface AsssscatLineupLogProps {
   performers: AsssscatPerformer[]
+  entries: LineupEntry[]
+  onChange: (entries: LineupEntry[]) => void
 }
 
 interface EditState {
@@ -79,14 +80,13 @@ function formatShowDate(iso: string): string {
   })
 }
 
-export function AsssscatLineupLog({ performers }: AsssscatLineupLogProps) {
-  const [entries, setEntries] = useState<LineupEntry[]>([])
+export function AsssscatLineupLog({
+  performers,
+  entries,
+  onChange,
+}: AsssscatLineupLogProps) {
   const [edit, setEdit] = useState<EditState | null>(null)
   const [pendingDelete, setPendingDelete] = useState<string | null>(null)
-
-  useEffect(() => {
-    setEntries(loadLineupLog())
-  }, [])
 
   const sorted = useMemo(() => entries, [entries])
 
@@ -120,13 +120,13 @@ export function AsssscatLineupLog({ performers }: AsssscatLineupLogProps) {
       performers: buildPerformers(edit.performersText, performers),
       createdAt: existing?.createdAt ?? new Date().toISOString(),
     }
-    setEntries(saveLineupEntry(entry))
+    onChange(saveLineupEntry(entry))
     setEdit(null)
   }
 
   const confirmDelete = () => {
     if (!pendingDelete) return
-    setEntries(deleteLineupEntry(pendingDelete))
+    onChange(deleteLineupEntry(pendingDelete))
     setPendingDelete(null)
   }
 

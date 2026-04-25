@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
+  countLineupAppearances,
   loadLineupLog,
   saveLineupEntry,
   deleteLineupEntry,
@@ -130,5 +131,49 @@ describe('recordLineupIfNew', () => {
       }),
     )
     expect(result).toHaveLength(2)
+  })
+})
+
+describe('countLineupAppearances', () => {
+  it('returns an empty map for no entries', () => {
+    expect(countLineupAppearances([]).size).toBe(0)
+  })
+
+  it('counts appearances per linked performer ID', () => {
+    const counts = countLineupAppearances([
+      entry({
+        id: '1',
+        showDate: '2026-04-01',
+        performers: [
+          { performerId: 'p1', name: 'Alice' },
+          { performerId: 'p2', name: 'Bob' },
+        ],
+      }),
+      entry({
+        id: '2',
+        showDate: '2026-04-08',
+        performers: [
+          { performerId: 'p1', name: 'Alice' },
+          { performerId: 'p3', name: 'Carol' },
+        ],
+      }),
+    ])
+    expect(counts.get('p1')).toBe(2)
+    expect(counts.get('p2')).toBe(1)
+    expect(counts.get('p3')).toBe(1)
+  })
+
+  it('ignores performers with no linked profile', () => {
+    const counts = countLineupAppearances([
+      entry({
+        id: '1',
+        performers: [
+          { performerId: 'p1', name: 'Alice' },
+          { performerId: null, name: 'Unknown Guest' },
+        ],
+      }),
+    ])
+    expect(counts.get('p1')).toBe(1)
+    expect(counts.size).toBe(1)
   })
 })

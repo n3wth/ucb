@@ -30,7 +30,7 @@ import {
   removePerformer,
   updatePerformer,
 } from "@/lib/asssscat-performers"
-import { Check, ChevronDown, ChevronUp, Heart, Pencil, Plus, ThumbsDown, Trash2, X } from "lucide-react"
+import { ArrowUpRight, BarChart3, Check, ChevronDown, ChevronUp, Heart, Pencil, Plus, ThumbsDown, Trash2, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 type GroupFilter = "All" | AsssscatPerformerCategory
@@ -55,6 +55,10 @@ interface CastDirectoryProps {
   onPerformerRemoved?: (performerId: string) => void
   compatibility?: CompatibilityMap
   onCompatibilityChange?: (performerId: string, patch: { likes?: string[]; dislikes?: string[] }) => void
+  // Per-performer lineup appearance counts derived from the lineup log.
+  lineupCounts?: Map<string, number>
+  // Navigate to the Statistics tab focused on this performer.
+  onViewStats?: (performerId: string) => void
 }
 
 const inputClasses =
@@ -81,6 +85,8 @@ export function CastDirectory({
   onPerformerRemoved,
   compatibility = {},
   onCompatibilityChange,
+  lineupCounts,
+  onViewStats,
 }: CastDirectoryProps) {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -673,11 +679,25 @@ export function CastDirectory({
                               {p.email || <span className="text-amber-500">no email</span>}
                             </div>
                           </button>
+                          {(() => {
+                            const lineupCount = lineupCounts?.get(p.id) ?? 0
+                            return (
                           <div className="flex items-center gap-1 shrink-0">
-                            {p.bookingCount !== undefined && p.bookingCount > 0 && (
-                              <span className="text-[10px] text-muted-foreground border border-border rounded px-1 py-0.5">
-                                {p.bookingCount}×
-                              </span>
+                            {lineupCount > 0 && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  onViewStats?.(p.id)
+                                }}
+                                disabled={!onViewStats}
+                                className="text-[10px] text-muted-foreground border border-border rounded px-1 py-0.5 inline-flex items-center gap-0.5 enabled:hover:text-foreground enabled:hover:border-foreground/40 transition-colors disabled:cursor-default"
+                                title={onViewStats ? `View ${p.name} in Statistics` : `${lineupCount} lineup appearances`}
+                                aria-label={onViewStats ? `View ${p.name} in Statistics — ${lineupCount} lineup appearances` : undefined}
+                              >
+                                <BarChart3 className="h-2.5 w-2.5" />
+                                {lineupCount}×
+                              </button>
                             )}
                             {p.gender && (
                               <span className="text-[10px] text-muted-foreground/70 hidden sm:inline">
@@ -718,6 +738,8 @@ export function CastDirectory({
                               )}
                             </button>
                           </div>
+                            )
+                          })()}
                         </div>
                         {isExpanded && (
                           <div className="border-t border-border/40 bg-muted/20">
@@ -768,7 +790,24 @@ export function CastDirectory({
                                     <dd className="text-foreground">{p.lgbtq ? "Yes" : "No"}</dd>
                                   </div>
                                   <div>
-                                    <dt className="text-muted-foreground">Times booked</dt>
+                                    <dt className="text-muted-foreground">Lineup appearances</dt>
+                                    <dd className="text-foreground">
+                                      {onViewStats ? (
+                                        <button
+                                          type="button"
+                                          onClick={() => onViewStats(p.id)}
+                                          className="inline-flex items-center gap-1 text-foreground hover:text-primary transition-colors underline-offset-2 hover:underline"
+                                        >
+                                          {lineupCounts?.get(p.id) ?? 0}
+                                          <ArrowUpRight className="h-3 w-3" />
+                                        </button>
+                                      ) : (
+                                        (lineupCounts?.get(p.id) ?? 0)
+                                      )}
+                                    </dd>
+                                  </div>
+                                  <div>
+                                    <dt className="text-muted-foreground">Booking sends</dt>
                                     <dd className="text-foreground">{p.bookingCount ?? 0}</dd>
                                   </div>
                                 </dl>

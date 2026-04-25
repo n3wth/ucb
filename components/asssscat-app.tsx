@@ -57,6 +57,8 @@ import {
   type BookingDraft,
 } from "@/lib/asssscat-bookings"
 import {
+  countLineupAppearances,
+  loadLineupLog,
   recordLineupIfNew,
   newLineupId,
   type LineupEntry,
@@ -105,6 +107,13 @@ export function AsssscatApp() {
   const [bookingDrafts, setBookingDrafts] = useState<BookingDraft[]>([])
   const [activeDraftId, setActiveDraftId] = useState<string | null>(null)
 
+  // Lineup log entries — source of truth for per-performer appearance counts
+  // shown on profile cards and on the Statistics tab.
+  const [lineupEntries, setLineupEntries] = useState<LineupEntry[]>([])
+
+  // Performer to highlight on the Statistics tab when navigated from a profile.
+  const [statsFocusId, setStatsFocusId] = useState<string | null>(null)
+
   // Drag-and-drop state for the Cast slot list
   const [castDragActive, setCastDragActive] = useState(false)
 
@@ -113,7 +122,18 @@ export function AsssscatApp() {
     setDefaultCc(loadAsssscatDefaultCc())
     setCompatibility(loadCompatibility())
     setBookingDrafts(loadBookingDrafts())
+    setLineupEntries(loadLineupLog())
   }, [])
+
+  const lineupCounts = useMemo(
+    () => countLineupAppearances(lineupEntries),
+    [lineupEntries],
+  )
+
+  const handleViewPerformerStats = (performerId: string) => {
+    setStatsFocusId(performerId)
+    setActiveTab("stats")
+  }
 
   const handlePerformersChange = (next: AsssscatPerformer[]) => {
     const saved = savePerformers(next)
@@ -298,7 +318,7 @@ export function AsssscatApp() {
         performers: cast.map((p) => ({ performerId: p.id, name: p.name })),
         createdAt: new Date().toISOString(),
       }
-      recordLineupIfNew(lineupEntry)
+      setLineupEntries(recordLineupIfNew(lineupEntry))
       // Remove from bookings if this was a draft
       if (activeDraftId) {
         setBookingDrafts(deleteBookingDraft(activeDraftId))
@@ -379,11 +399,20 @@ export function AsssscatApp() {
         </TabsList>
 
         <TabsContent value="lineup-log">
-          <AsssscatLineupLog performers={performers} />
+          <AsssscatLineupLog
+            performers={performers}
+            entries={lineupEntries}
+            onChange={setLineupEntries}
+          />
         </TabsContent>
 
         <TabsContent value="stats">
-          <AsssscatStats performers={performers} />
+          <AsssscatStats
+            performers={performers}
+            lineupCounts={lineupCounts}
+            focusPerformerId={statsFocusId}
+            onFocusCleared={() => setStatsFocusId(null)}
+          />
         </TabsContent>
 
         <TabsContent value="directory">
@@ -393,6 +422,8 @@ export function AsssscatApp() {
             onPerformerRemoved={handlePerformerRemoved}
             compatibility={compatibility}
             onCompatibilityChange={handleCompatibilityChange}
+            lineupCounts={lineupCounts}
+            onViewStats={handleViewPerformerStats}
           />
         </TabsContent>
 

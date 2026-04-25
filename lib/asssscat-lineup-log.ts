@@ -92,6 +92,20 @@ export function deleteLineupEntry(id: string): LineupEntry[] {
   return persist(loadLineupLog().filter((e) => e.id !== id))
 }
 
+// Count how many times each performer (by ID) appears across all log entries.
+// Performers without a linked profile (performerId === null) are ignored — only
+// resolved cast directory performers contribute to the count.
+export function countLineupAppearances(entries: LineupEntry[]): Map<string, number> {
+  const counts = new Map<string, number>()
+  for (const entry of entries) {
+    for (const p of entry.performers) {
+      if (!p.performerId) continue
+      counts.set(p.performerId, (counts.get(p.performerId) ?? 0) + 1)
+    }
+  }
+  return counts
+}
+
 // Record a lineup if no existing entry for the same date has the same set of
 // performer names. Used after a successful send so re-sends don't double-log.
 export function recordLineupIfNew(entry: LineupEntry): LineupEntry[] {
