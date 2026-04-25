@@ -89,7 +89,7 @@ export function AsssscatAvailablePanel({
   return (
     <section className="border border-border rounded-lg bg-card p-3 space-y-2">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-xs font-medium text-foreground">Available tonight</h3>
+        <h3 className="text-xs font-medium text-foreground">Availability Confirmed</h3>
         {names.length > 0 && (
           <button
             type="button"
