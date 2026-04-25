@@ -3,12 +3,15 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ChevronDown, ChevronRight, Film, Trash2 } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { ChevronDown, ChevronRight, Film, Plus, Trash2 } from "lucide-react"
 import { CcEmailList } from "@/components/cc-email-list"
 import {
   loadShowCcMap,
   saveShowCcEmails,
   deleteShowCcEmails,
+  normalizeShowTitle,
   type ShowCcMap,
 } from "@/lib/show-cc-preferences"
 
@@ -23,6 +26,9 @@ export function ShowCcPreferencesPanel({ activeShowTitle, onChange }: ShowCcPref
   const [map, setMap] = useState<ShowCcMap>({})
   const [expanded, setExpanded] = useState(false)
   const [hydrated, setHydrated] = useState(false)
+  const [newTitleDraft, setNewTitleDraft] = useState("")
+  const [newTitle, setNewTitle] = useState<string | null>(null)
+  const [titleError, setTitleError] = useState<string | null>(null)
 
   useEffect(() => {
     setMap(loadShowCcMap())
@@ -41,7 +47,30 @@ export function ShowCcPreferencesPanel({ activeShowTitle, onChange }: ShowCcPref
 
   const handleDelete = (title: string) => {
     deleteShowCcEmails(title)
+    if (newTitle && normalizeShowTitle(newTitle) === normalizeShowTitle(title)) {
+      setNewTitle(null)
+    }
     refresh()
+  }
+
+  const handleAddTitle = () => {
+    const candidate = newTitleDraft.trim()
+    if (!candidate) {
+      setTitleError("Enter a show title.")
+      return
+    }
+    const key = normalizeShowTitle(candidate)
+    if (map[key] && map[key].length > 0) {
+      setTitleError("That show already has a CC list below.")
+      return
+    }
+    if (activeShowTitle && normalizeShowTitle(activeShowTitle) === key) {
+      setTitleError("That title is already being edited above.")
+      return
+    }
+    setNewTitle(candidate)
+    setNewTitleDraft("")
+    setTitleError(null)
   }
 
   if (!hydrated) return null
@@ -82,20 +111,70 @@ export function ShowCcPreferencesPanel({ activeShowTitle, onChange }: ShowCcPref
 
       {expanded && (
         <CardContent className="pt-0 space-y-5">
+          {/* Add a CC list for any show title without typing it in the booking form first. */}
+          <div className="space-y-2">
+            <Label htmlFor="show-cc-new-title" className="text-xs font-medium text-foreground">
+              Add CC list for a show
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                id="show-cc-new-title"
+                type="text"
+                placeholder="Show title (e.g. Harold Night)"
+                value={newTitleDraft}
+                onChange={(e) => {
+                  setNewTitleDraft(e.target.value)
+                  if (titleError) setTitleError(null)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && newTitleDraft.trim()) {
+                    e.preventDefault()
+                    handleAddTitle()
+                  }
+                }}
+                className="bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddTitle}
+                disabled={!newTitleDraft.trim()}
+                className="h-10 shrink-0"
+              >
+                <Plus className="h-3.5 w-3.5 mr-1" />
+                Add
+              </Button>
+            </div>
+            {titleError && <p className="text-xs text-destructive">{titleError}</p>}
+          </div>
+
           {/* Inline editor for the currently typed show title */}
           {activeShowTitle && (
             <ShowTitleCcEditor
               title={activeShowTitle}
-              emails={map[activeShowTitle.trim().toLowerCase()] ?? []}
+              emails={map[normalizeShowTitle(activeShowTitle)] ?? []}
               onUpdate={(emails) => handleUpdate(activeShowTitle, emails)}
               onDelete={() => handleDelete(activeShowTitle)}
               isActive
             />
           )}
 
+          {/* Editor for a title just added via the input above (not yet saved). */}
+          {newTitle &&
+            normalizeShowTitle(newTitle) !== normalizeShowTitle(activeShowTitle ?? "") &&
+            !map[normalizeShowTitle(newTitle)] && (
+              <ShowTitleCcEditor
+                title={newTitle}
+                emails={[]}
+                onUpdate={(emails) => handleUpdate(newTitle, emails)}
+                onDelete={() => handleDelete(newTitle)}
+              />
+            )}
+
           {/* All other saved shows */}
           {savedTitles
-            .filter((key) => key !== activeShowTitle?.trim().toLowerCase())
+            .filter((key) => key !== normalizeShowTitle(activeShowTitle ?? ""))
             .map((key) => (
               <ShowTitleCcEditor
                 key={key}
@@ -105,12 +184,6 @@ export function ShowCcPreferencesPanel({ activeShowTitle, onChange }: ShowCcPref
                 onDelete={() => handleDelete(key)}
               />
             ))}
-
-          {totalCount === 0 && !activeShowTitle && (
-            <p className="text-xs text-muted-foreground">
-              No per-show CC lists saved yet. Type a show title in the form above to add one.
-            </p>
-          )}
         </CardContent>
       )}
     </Card>
