@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { AsssscatPerformerPanel } from "@/components/asssscat-performer-panel"
+import { AsssscatAvailablePanel } from "@/components/asssscat-available-panel"
 import { CastDirectory } from "@/components/cast-directory"
 import { CcEmailList } from "@/components/cc-email-list"
 import { ToolPage } from "@/components/tool-page"
@@ -89,8 +90,8 @@ export function AsssscatApp() {
   const [sendStatus, setSendStatus] = useState<SendStatus>({ kind: "idle" })
   const [activeTab, setActiveTab] = useState("booking")
 
-  // Available performers filter (feature 4)
-  const [availableInput, setAvailableInput] = useState("")
+  // Available performers filter (feature 4) — chip list of pasted names
+  const [availableNames, setAvailableNames] = useState<string[]>([])
   const [filterByAvailable, setFilterByAvailable] = useState(false)
 
   // Bookings tab state (feature 3)
@@ -186,7 +187,6 @@ export function AsssscatApp() {
   )
 
   // Available performers filter: compute the set of matched IDs
-  const availableNames = useMemo(() => parseCastInput(availableInput), [availableInput])
   const availableMatches = useMemo(
     () => matchPerformersByName(availableNames, performers),
     [availableNames, performers],
@@ -435,7 +435,7 @@ export function AsssscatApp() {
 
         <TabsContent value="booking">
       <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-6">
-        <aside>
+        <aside className="space-y-3">
           <AsssscatPerformerPanel
             performers={performers}
             onChange={handlePerformersChange}
@@ -447,6 +447,13 @@ export function AsssscatApp() {
             onCompatibilitySave={handleCompatibilitySave}
             onPerformerRemoved={handlePerformerRemoved}
             availableFilter={filterByAvailable ? availableIds : null}
+          />
+          <AsssscatAvailablePanel
+            performers={performers}
+            names={availableNames}
+            onChange={setAvailableNames}
+            filterActive={filterByAvailable}
+            onFilterToggle={setFilterByAvailable}
           />
         </aside>
 
@@ -473,50 +480,6 @@ export function AsssscatApp() {
                 required
               />
             </Field>
-
-            {/* Available performers filter (feature 4) */}
-            <div>
-              <Label className="text-xs">
-                Available performers
-              </Label>
-              <p className="text-xs text-muted-foreground mt-0.5 mb-2">
-                Paste a list of performers available for this date to filter the panel.
-              </p>
-              <Textarea
-                value={availableInput}
-                onChange={(e) => setAvailableInput(e.target.value)}
-                placeholder={"Jane Doe\nJohn Smith\n..."}
-                className="font-mono text-xs min-h-[64px] bg-input border-border resize-none"
-              />
-              {availableNames.length > 0 && (
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">
-                    {availableIds.size} of {availableNames.length} matched
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setFilterByAvailable((v) => !v)}
-                    className={cn(
-                      "text-xs px-2 py-0.5 rounded border transition-colors",
-                      filterByAvailable
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "border-border text-muted-foreground hover:text-foreground hover:bg-muted",
-                    )}
-                  >
-                    {filterByAvailable ? "Showing available only" : "Show available only"}
-                  </button>
-                  {filterByAvailable && (
-                    <button
-                      type="button"
-                      onClick={() => setFilterByAvailable(false)}
-                      className="text-xs text-muted-foreground hover:text-foreground"
-                    >
-                      Show all
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
 
             <div>
               <Label htmlFor="castInput" className="text-xs">
