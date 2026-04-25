@@ -1,8 +1,16 @@
 import { formatDate } from "@/lib/format"
 import type { AsssscatShowDetails } from "@/lib/types"
 
+export interface AsssscatEmailOverrides {
+  callTime?: string
+  arrivalTime?: string
+  contactPhone?: string
+  compsEmail?: string
+}
+
 export interface AsssscatEmailInput {
   showDetails: AsssscatShowDetails
+  overrides?: AsssscatEmailOverrides
 }
 
 export const ASSSSCAT_TO = "chris.renfro@ucbcomedy.com"
@@ -29,8 +37,12 @@ function formatMonologist(monologist: AsssscatShowDetails["monologist"]): string
   return credits ? `${nameLine} — ${credits}` : nameLine
 }
 
-export function renderAsssscatBody({ showDetails }: AsssscatEmailInput): string {
+export function renderAsssscatBody({ showDetails, overrides }: AsssscatEmailInput): string {
   const formattedDate = showDetails.showDate ? formatDate(showDetails.showDate) : "TBD"
+  const callTime = overrides?.callTime?.trim() || ASSSSCAT_CALL_TIME
+  const arrivalTime = overrides?.arrivalTime?.trim() || ASSSSCAT_ARRIVAL_TIME
+  const contactPhone = overrides?.contactPhone?.trim() || ASSSSCAT_CONTACT_PHONE
+  const compsEmail = overrides?.compsEmail?.trim() || ASSSSCAT_COMPS_EMAIL
 
   const castLines = Array.from({ length: ASSSSCAT_MAX_IMPROVISERS }, (_, i) => {
     const performer = showDetails.improvisers[i]
@@ -42,7 +54,7 @@ export function renderAsssscatBody({ showDetails }: AsssscatEmailInput): string 
 
   return `Hello everybody--
 
-Excited to have you for ASSSSCAT on ${formattedDate}! The show begins at ${ASSSSCAT_CALL_TIME}, please arrive no later than ${ASSSSCAT_ARRIVAL_TIME}. If you are running late or your availability changes, please let me know as soon as possible. Should you need to get ahold of me, my number is ${ASSSSCAT_CONTACT_PHONE}.
+Excited to have you for ASSSSCAT on ${formattedDate}! The show begins at ${callTime}, please arrive no later than ${arrivalTime}. If you are running late or your availability changes, please let me know as soon as possible. Should you need to get ahold of me, my number is ${contactPhone}.
 
 CAST
 ${castLines}
@@ -52,7 +64,7 @@ ${formatMonologist(showDetails.monologist)}
 
 TICKET LINK
 ${ticketLink}
-For comps, please email ${ASSSSCAT_COMPS_EMAIL}.
+For comps, please email ${compsEmail}.
 
 VENUE
 ${ASSSSCAT_VENUE}

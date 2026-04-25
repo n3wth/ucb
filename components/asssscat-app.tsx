@@ -43,6 +43,11 @@ import {
   saveAsssscatDefaultCc,
 } from "@/lib/asssscat-preferences"
 import {
+  ASSSSCAT_DEFAULTS,
+  loadEmailTemplateSettings,
+  type AsssscatTemplateSettings,
+} from "@/lib/email-template-settings"
+import {
   getIncompatiblePairs,
   loadCompatibility,
   removePerformerCompatibility,
@@ -108,11 +113,15 @@ export function AsssscatApp() {
   // Drag-and-drop state for the Cast slot list
   const [castDragActive, setCastDragActive] = useState(false)
 
+  // Template overrides loaded from /tools/settings (localStorage).
+  const [templateSettings, setTemplateSettings] = useState<AsssscatTemplateSettings>(ASSSSCAT_DEFAULTS)
+
   useEffect(() => {
     setPerformers(loadPerformers())
     setDefaultCc(loadAsssscatDefaultCc())
     setCompatibility(loadCompatibility())
     setBookingDrafts(loadBookingDrafts())
+    setTemplateSettings(loadEmailTemplateSettings().asssscat)
   }, [])
 
   const handlePerformersChange = (next: AsssscatPerformer[]) => {
@@ -191,8 +200,8 @@ export function AsssscatApp() {
   )
 
   const emailPreview = useMemo(
-    () => renderAsssscatBody({ showDetails }),
-    [showDetails],
+    () => renderAsssscatBody({ showDetails, overrides: templateSettings }),
+    [showDetails, templateSettings],
   )
   const subjectPreview = useMemo(
     () => renderAsssscatSubject(showDetails),
