@@ -72,7 +72,7 @@ export default function LandingPage() {
                   <div className="rotate-[-5deg] origin-bottom-left">
                     <UcbLogo
                       size={72}
-                      showEyes
+                      showEyes={false}
                       className="sm:!w-[96px] sm:!h-[96px] lg:!w-[120px] lg:!h-[120px]"
                     />
                   </div>

@@ -15,7 +15,7 @@ interface EyePosition {
   y: number
 }
 
-export function UcbLogo({ size = 36, className = "", showEyes = true }: UcbLogoProps) {
+export function UcbLogo({ size = 36, className = "", showEyes = false }: UcbLogoProps) {
   const [pupilOffset, setPupilOffset] = useState<EyePosition>({ x: 0, y: 0 })
   const [isHovering, setIsHovering] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
