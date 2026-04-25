@@ -98,6 +98,9 @@ export function AsssscatApp() {
   const [bookingDrafts, setBookingDrafts] = useState<BookingDraft[]>([])
   const [activeDraftId, setActiveDraftId] = useState<string | null>(null)
 
+  // Drag-and-drop state for the Cast slot list
+  const [castDragActive, setCastDragActive] = useState(false)
+
   useEffect(() => {
     setPerformers(loadPerformers())
     setDefaultCc(loadAsssscatDefaultCc())
@@ -141,6 +144,31 @@ export function AsssscatApp() {
 
   const handleRemoveFromCast = (id: string) => {
     setCast((current) => current.filter((p) => p.id !== id))
+  }
+
+  const PERFORMER_DRAG_TYPE = "application/x-asssscat-performer-id"
+
+  const handleCastDragOver = (e: React.DragEvent) => {
+    if (!e.dataTransfer.types.includes(PERFORMER_DRAG_TYPE)) return
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "copy"
+    if (!castDragActive) setCastDragActive(true)
+  }
+
+  const handleCastDragLeave = (e: React.DragEvent) => {
+    // Only clear when leaving the list, not when crossing child boundaries
+    if (e.currentTarget.contains(e.relatedTarget as Node | null)) return
+    setCastDragActive(false)
+  }
+
+  const handleCastDrop = (e: React.DragEvent) => {
+    const id = e.dataTransfer.getData(PERFORMER_DRAG_TYPE)
+    setCastDragActive(false)
+    if (!id) return
+    e.preventDefault()
+    const performer = performers.find((p) => p.id === id)
+    if (!performer) return
+    handlePickPerformer(performer)
   }
 
   const showDetails: AsssscatShowDetails = useMemo(
@@ -534,20 +562,33 @@ export function AsssscatApp() {
                 <Users className="h-3 w-3 opacity-70" />
                 Cast ({cast.length}/{ASSSSCAT_MAX_IMPROVISERS})
               </Label>
-              <ol className="mt-2 space-y-1.5">
+              <ol
+                className={cn(
+                  "mt-2 space-y-1.5 rounded-md p-1 transition-colors",
+                  castDragActive
+                    ? "outline-2 outline-dashed outline-primary/60 bg-primary/5"
+                    : "outline-2 outline-transparent",
+                )}
+                onDragOver={handleCastDragOver}
+                onDragLeave={handleCastDragLeave}
+                onDrop={handleCastDrop}
+                aria-label="Cast slots — drop performers here to add"
+              >
                 {Array.from({ length: ASSSSCAT_MAX_IMPROVISERS }).map((_, i) => {
                   const performer = cast[i]
                   const isIncompat = performer
                     ? incompatiblePairs.some((pair) => pair.includes(performer.id))
                     : false
+                  const isNextEmptySlot = !performer && i === cast.length
                   return (
                     <li
                       key={i}
                       className={cn(
-                        "flex items-center gap-2 border rounded-md px-3 py-2",
+                        "flex items-center gap-2 border rounded-md px-3 py-2 transition-colors",
                         isIncompat
                           ? "border-destructive/60 bg-destructive/10"
                           : "border-border bg-input",
+                        castDragActive && isNextEmptySlot && "border-primary bg-primary/10",
                       )}
                     >
                       <span className="text-xs text-muted-foreground w-5">
@@ -575,7 +616,9 @@ export function AsssscatApp() {
                         </>
                       ) : (
                         <span className="text-xs text-muted-foreground italic">
-                          Click a performer to add
+                          {castDragActive && isNextEmptySlot
+                            ? "Drop to add"
+                            : "Click or drag a performer to add"}
                         </span>
                       )}
                     </li>

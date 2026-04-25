@@ -59,7 +59,6 @@ ${ASSSSCAT_VENUE}
 
 REMINDERS
 - Show is 1.5hrs with no intermission.
-- The host makes the final call on show order at the top of the show.
 - Expect 3-4 monologues from the monologist throughout.
 - You call your own show — trust your instincts.
 - If you need to cancel, please reply or text me as soon as possible.

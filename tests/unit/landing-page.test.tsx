@@ -7,7 +7,7 @@ describe('LandingPage', () => {
     render(<LandingPage />)
 
     const heading = screen.getByRole('heading', { level: 1 })
-    expect(heading).toHaveTextContent(/internal tools for the ucb/i)
+    expect(heading).toHaveTextContent(/internal booking tools for the ucb/i)
     expect(heading).toHaveTextContent(/artistic team/i)
 
     const signInLinks = screen.getAllByRole('link', { name: /sign in/i })

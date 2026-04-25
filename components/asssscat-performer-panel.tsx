@@ -445,15 +445,30 @@ export function AsssscatPerformerPanel({
                           : "bg-green-600/10 dark:bg-green-500/10"
                         : ""
                     const entry = compatibility[p.id] ?? { likes: [], dislikes: [] }
+                    const draggable = !selected && canAddMore && Boolean(p.email)
                     return (
                       <li
                         key={p.id}
                         className={cn("px-4 flex flex-col group", affinityBg)}
+                        draggable={draggable}
+                        onDragStart={(e) => {
+                          if (!draggable) return
+                          e.dataTransfer.effectAllowed = "copy"
+                          e.dataTransfer.setData(
+                            "application/x-asssscat-performer-id",
+                            p.id,
+                          )
+                          // Plain-text fallback so drops on incompatible targets are inert
+                          e.dataTransfer.setData("text/plain", p.name)
+                        }}
                       >
                         <div className="py-1.5 flex items-center gap-2">
                           <button
                             type="button"
-                            className="flex-1 text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                            className={cn(
+                              "flex-1 text-left disabled:opacity-50 disabled:cursor-not-allowed",
+                              draggable && "cursor-grab active:cursor-grabbing",
+                            )}
                             onClick={() => onPickPerformer(p)}
                             disabled={selected || !canAddMore || !p.email}
                             title={
@@ -462,7 +477,7 @@ export function AsssscatPerformerPanel({
                                 : selected
                                 ? "Already in cast"
                                 : canAddMore
-                                ? "Add to cast"
+                                ? "Click or drag to add to cast"
                                 : "Cast is full"
                             }
                           >

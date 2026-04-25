@@ -2,6 +2,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { UcbLogo } from "@/components/ucb-logo"
 
 function formatToday(date: Date) {
   return new Intl.DateTimeFormat("en-US", {
@@ -74,9 +75,28 @@ export default function LandingPage() {
                   ◆ IN HOUSE
                 </p>
 
+                {/* Prominent UCB logo — stamped above the headline */}
+                <div className="mb-6 sm:mb-8 flex items-center gap-4">
+                  <div className="rotate-[-3deg] origin-bottom-left">
+                    <UcbLogo
+                      size={120}
+                      showEyes
+                      className="sm:!w-[160px] sm:!h-[160px] lg:!w-[200px] lg:!h-[200px]"
+                    />
+                  </div>
+                  <div className="hidden sm:flex flex-col gap-1 pb-2">
+                    <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/40 font-mono">
+                      Upright Citizens Brigade
+                    </span>
+                    <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/30 font-mono">
+                      Est. MCMXCVI · NY · LA
+                    </span>
+                  </div>
+                </div>
+
                 <h1 className="font-display leading-[0.88] tracking-tight uppercase">
                   <span className="block text-4xl sm:text-6xl lg:text-[5.5rem] text-foreground">
-                    Internal tools{" "}
+                    Internal Booking Tools{" "}
                   </span>
                   <span className="block text-4xl sm:text-6xl lg:text-[5.5rem] text-foreground/40 pl-[0.08em] sm:pl-[0.15em]">
                     for the{" "}
@@ -88,21 +108,9 @@ export default function LandingPage() {
                     UCB{" "}
                   </span>
                   <span className="block font-serif italic text-xl sm:text-2xl lg:text-3xl text-foreground/60 font-normal normal-case tracking-normal mt-3 pl-1">
-                    artistic team.
+                    Artistic Team.
                   </span>
                 </h1>
-
-                {/* Small tilted badge */}
-                <div className="absolute top-0 right-0 sm:right-8 hidden sm:block">
-                  <div className="rotate-[8deg] border border-foreground/20 px-3 py-2 origin-top-right">
-                    <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/30 font-mono block">
-                      Est. MCMXCVI
-                    </span>
-                    <span className="text-[9px] tracking-[0.4em] uppercase text-foreground/30 font-mono block mt-0.5">
-                      NY · LA
-                    </span>
-                  </div>
-                </div>
               </div>
 
               {/* CTA strip — tilted, punchy */}
@@ -114,12 +122,12 @@ export default function LandingPage() {
                 />
 
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
-                  {/* Staff notice */}
+                  {/* Tagline */}
                   <div className="relative">
                     <div className="rotate-[-2deg] border border-foreground/30 px-4 py-3 bg-background inline-block">
                       <p className="text-xs text-foreground/50 font-mono leading-relaxed">
-                        Staff only.<br />
-                        Don&apos;t think. Book.
+                        Don&apos;t think.<br />
+                        Book.
                       </p>
                     </div>
                   </div>
