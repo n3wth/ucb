@@ -67,7 +67,7 @@ export interface AsssscatPerformer {
   additionalEmail?: string
   phone?: string
   gender?: PerformerGender
-  race?: PerformerRace
+  races?: PerformerRace[]
   lgbtq?: boolean
   bookingCount?: number
 }

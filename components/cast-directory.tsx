@@ -70,7 +70,7 @@ function emptyDraft(): Omit<AsssscatPerformer, "id"> {
     additionalEmail: "",
     phone: "",
     gender: undefined,
-    race: undefined,
+    races: undefined,
     lgbtq: false,
   }
 }
@@ -140,7 +140,10 @@ export function CastDirectory({
       if (demoFilter.genders.length > 0 && (!p.gender || !demoFilter.genders.includes(p.gender))) {
         return false
       }
-      if (demoFilter.races.length > 0 && (!p.race || !demoFilter.races.includes(p.race))) {
+      if (
+        demoFilter.races.length > 0 &&
+        (!p.races || !p.races.some((r) => demoFilter.races.includes(r)))
+      ) {
         return false
       }
       if (demoFilter.lgbtq !== null && Boolean(p.lgbtq) !== demoFilter.lgbtq) {
@@ -178,7 +181,7 @@ export function CastDirectory({
       additionalEmail: p.additionalEmail ?? "",
       phone: p.phone ?? "",
       gender: p.gender,
-      race: p.race,
+      races: p.races,
       lgbtq: p.lgbtq ?? false,
       bookingCount: p.bookingCount,
     })
@@ -217,7 +220,7 @@ export function CastDirectory({
       additionalEmail: additionalEmail || undefined,
       phone: phone || undefined,
       gender: draft.gender,
-      race: draft.race,
+      races: draft.races && draft.races.length > 0 ? draft.races : undefined,
       lgbtq: draft.lgbtq ?? false,
       bookingCount: draft.bookingCount,
     }
@@ -508,27 +511,38 @@ export function CastDirectory({
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1">
-                <Label htmlFor="dirRace" className="text-xs">Race / Ethnicity</Label>
-                <Select
-                  value={draft.race ?? NONE_VALUE}
-                  onValueChange={(v) =>
-                    setDraft((d) => ({
-                      ...d,
-                      race: v === NONE_VALUE ? undefined : (v as PerformerRace),
-                    }))
-                  }
-                >
-                  <SelectTrigger id="dirRace" className={inputClasses}>
-                    <SelectValue placeholder="Not specified" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={NONE_VALUE}>Not specified</SelectItem>
-                    {PERFORMER_RACES.map((r) => (
-                      <SelectItem key={r} value={r}>{r}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="space-y-1 sm:col-span-2">
+                <Label className="text-xs">Race / Ethnicity</Label>
+                <div className="flex flex-wrap gap-1.5" role="group" aria-label="Race / Ethnicity">
+                  {PERFORMER_RACES.map((r) => {
+                    const selected = draft.races?.includes(r) ?? false
+                    return (
+                      <button
+                        key={r}
+                        type="button"
+                        aria-pressed={selected}
+                        onClick={() =>
+                          setDraft((d) => {
+                            const current = d.races ?? []
+                            const next = current.includes(r)
+                              ? current.filter((x) => x !== r)
+                              : [...current, r]
+                            return { ...d, races: next.length > 0 ? next : undefined }
+                          })
+                        }
+                        className={cn(
+                          "text-[11px] px-2 py-0.5 rounded-md border transition-colors",
+                          selected
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "border-border text-muted-foreground hover:text-foreground hover:bg-muted",
+                        )}
+                      >
+                        {r}
+                      </button>
+                    )
+                  })}
+                </div>
+                <p className="text-[10px] text-muted-foreground">Select all that apply.</p>
               </div>
               <div className="flex items-center gap-2 pt-1">
                 <Checkbox
@@ -757,10 +771,12 @@ export function CastDirectory({
                                       <dd className="text-foreground">{p.gender}</dd>
                                     </div>
                                   )}
-                                  {p.race && (
+                                  {p.races && p.races.length > 0 && (
                                     <div>
-                                      <dt className="text-muted-foreground">Race</dt>
-                                      <dd className="text-foreground">{p.race}</dd>
+                                      <dt className="text-muted-foreground">
+                                        {p.races.length === 1 ? "Race" : "Races"}
+                                      </dt>
+                                      <dd className="text-foreground">{p.races.join(", ")}</dd>
                                     </div>
                                   )}
                                   <div>

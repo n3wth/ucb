@@ -105,7 +105,7 @@ export function AsssscatPerformerPanel({
     if (hasDemoFilter) {
       list = list.filter((p) => {
         if (demoGenders.length > 0 && (!p.gender || !demoGenders.includes(p.gender))) return false
-        if (demoRaces.length > 0 && (!p.race || !demoRaces.includes(p.race))) return false
+        if (demoRaces.length > 0 && (!p.races || !p.races.some((r) => demoRaces.includes(r)))) return false
         if (demoLgbtq !== null && Boolean(p.lgbtq) !== demoLgbtq) return false
         return true
       })

@@ -98,7 +98,7 @@ describe('addPerformer / updatePerformer / removePerformer', () => {
       email: 'alice@example.com',
       category: 'Core Cast',
       gender: 'Female',
-      race: 'Black',
+      races: ['Black', 'Latinx'],
       lgbtq: true,
       phone: '555-1234',
       additionalEmail: 'alice2@example.com',
@@ -106,11 +106,31 @@ describe('addPerformer / updatePerformer / removePerformer', () => {
     })
     expect(list).toHaveLength(1)
     expect(list[0].gender).toBe('Female')
-    expect(list[0].race).toBe('Black')
+    expect(list[0].races).toEqual(['Black', 'Latinx'])
     expect(list[0].lgbtq).toBe(true)
     expect(list[0].phone).toBe('555-1234')
     expect(list[0].additionalEmail).toBe('alice2@example.com')
     expect(list[0].bookingCount).toBe(3)
+  })
+
+  it('migrates legacy single-race storage entries into races array on load', () => {
+    // Simulate a localStorage payload written by an older app version that
+    // stored a single `race` field instead of the multi-select `races` array.
+    const legacy = [
+      {
+        id: 'legacy-1',
+        name: 'Bea',
+        email: 'bea@example.com',
+        category: 'Core Cast',
+        race: 'Middle Eastern',
+      },
+    ]
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(legacy))
+    window.localStorage.setItem(SEEDED_KEY, '1')
+    const loaded = loadPerformers()
+    expect(loaded).toHaveLength(1)
+    expect(loaded[0].races).toEqual(['Middle Eastern'])
+    expect((loaded[0] as unknown as { race?: string }).race).toBeUndefined()
   })
 
   it('updates existing performers by id', () => {

@@ -216,6 +216,10 @@ function isRace(value: unknown): value is PerformerRace {
   return typeof value === "string" && (PERFORMER_RACES as readonly string[]).includes(value)
 }
 
+function isRaceArray(value: unknown): value is PerformerRace[] {
+  return Array.isArray(value) && value.every(isRace)
+}
+
 function isPerformer(value: unknown): value is AsssscatPerformer {
   if (typeof value !== "object" || value === null) return false
   const p = value as Record<string, unknown>
@@ -230,10 +234,20 @@ function isPerformer(value: unknown): value is AsssscatPerformer {
     (p.additionalEmail === undefined || typeof p.additionalEmail === "string") &&
     (p.phone === undefined || typeof p.phone === "string") &&
     (p.gender === undefined || isGender(p.gender)) &&
-    (p.race === undefined || isRace(p.race)) &&
+    (p.races === undefined || isRaceArray(p.races)) &&
     (p.lgbtq === undefined || typeof p.lgbtq === "boolean") &&
     (p.bookingCount === undefined || typeof p.bookingCount === "number")
   )
+}
+
+// Coerce legacy single-string `race` field into the new `races` array so old
+// localStorage payloads survive the upgrade without losing the existing value.
+function migrateLegacyRace(value: unknown): unknown {
+  if (typeof value !== "object" || value === null) return value
+  const p = value as Record<string, unknown>
+  if (p.races !== undefined || p.race === undefined) return value
+  const { race, ...rest } = p
+  return isRace(race) ? { ...rest, races: [race] } : rest
 }
 
 export function newPerformerId(): string {
@@ -253,14 +267,14 @@ export function loadPerformers(): AsssscatPerformer[] {
       // Existing entries win on dedup so user edits are preserved.
       const existing = raw ? (() => {
         const parsed: unknown = JSON.parse(raw)
-        return Array.isArray(parsed) ? parsed.filter(isPerformer) : []
+        return Array.isArray(parsed) ? parsed.map(migrateLegacyRace).filter(isPerformer) : []
       })() : []
       return seedDefaultPerformers(existing)
     }
     if (!raw) return []
     const parsed: unknown = JSON.parse(raw)
     if (!Array.isArray(parsed)) return []
-    const valid = parsed.filter(isPerformer).slice(0, MAX_PERFORMERS)
+    const valid = parsed.map(migrateLegacyRace).filter(isPerformer).slice(0, MAX_PERFORMERS)
     return dedupePerformers(valid)
   } catch {
     return []
