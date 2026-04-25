@@ -5,6 +5,8 @@ import {
   deleteLineupEntry,
   recordLineupIfNew,
   newLineupId,
+  countLineupAppearancesById,
+  lineupEntriesForPerformer,
   type LineupEntry,
 } from '@/lib/asssscat-lineup-log'
 
@@ -131,4 +133,69 @@ describe('recordLineupIfNew', () => {
     )
     expect(result).toHaveLength(2)
   })
+})
+
+describe('countLineupAppearancesById', () => {
+  it('returns empty map for no entries', () => {
+    expect(countLineupAppearancesById([])).toEqual(new Map())
+  })
+
+  it('counts appearances per linked performer id', () => {
+    const entries: LineupEntry[] = [
+      entry({
+        id: 'a',
+        showDate: '2026-01-01',
+        performers: [
+          { performerId: 'p1', name: 'Alice' },
+          { performerId: 'p2', name: 'Bob' },
+        ],
+      }),
+      entry({
+        id: 'b',
+        showDate: '2026-02-01',
+        performers: [
+          { performerId: 'p1', name: 'Alice' },
+          { performerId: 'p3', name: 'Carol' },
+        ],
+      }),
+    ]
+    const counts = countLineupAppearancesById(entries)
+    expect(counts.get('p1')).toBe(2)
+    expect(counts.get('p2')).toBe(1)
+    expect(counts.get('p3')).toBe(1)
+  })
+
+  it('skips performers without a linked id', () => {
+    const entries: LineupEntry[] = [
+      entry({
+        id: 'a',
+        performers: [
+          { performerId: 'p1', name: 'Alice' },
+          { performerId: null, name: 'Unlinked Person' },
+        ],
+      }),
+    ]
+    const counts = countLineupAppearancesById(entries)
+    expect(counts.get('p1')).toBe(1)
+    expect(counts.size).toBe(1)
+  })
+})
+
+describe('lineupEntriesForPerformer', () => {
+  it('returns only entries that include the given performer id', () => {
+    const entries: LineupEntry[] = [
+      entry({ id: 'a', performers: [{ performerId: 'p1', name: 'Alice' }] }),
+      entry({ id: 'b', performers: [{ performerId: 'p2', name: 'Bob' }] }),
+      entry({
+        id: 'c',
+        performers: [
+          { performerId: 'p1', name: 'Alice' },
+          { performerId: 'p2', name: 'Bob' },
+        ],
+      }),
+    ]
+    const result = lineupEntriesForPerformer(entries, 'p1')
+    expect(result.map((e) => e.id).sort()).toEqual(['a', 'c'])
+  })
+
 })

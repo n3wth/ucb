@@ -57,8 +57,10 @@ import {
   type BookingDraft,
 } from "@/lib/asssscat-bookings"
 import {
-  recordLineupIfNew,
+  countLineupAppearancesById,
+  loadLineupLog,
   newLineupId,
+  recordLineupIfNew,
   type LineupEntry,
 } from "@/lib/asssscat-lineup-log"
 import type {
@@ -108,12 +110,40 @@ export function AsssscatApp() {
   // Drag-and-drop state for the Cast slot list
   const [castDragActive, setCastDragActive] = useState(false)
 
+  // Lineup log entries (kept in app state so appearance counts and the stats
+  // tab stay in sync with bookings sent / lineup-log edits).
+  const [lineupEntries, setLineupEntries] = useState<LineupEntry[]>([])
+
+  // When set, the Statistics tab shows lineups filtered to this performer.
+  const [statsPerformerFilterId, setStatsPerformerFilterId] = useState<string | null>(null)
+
   useEffect(() => {
     setPerformers(loadPerformers())
     setDefaultCc(loadAsssscatDefaultCc())
     setCompatibility(loadCompatibility())
     setBookingDrafts(loadBookingDrafts())
+    setLineupEntries(loadLineupLog())
   }, [])
+
+  // Refresh lineup entries whenever the user opens lineup-log/stats tabs so
+  // edits made elsewhere (lineup-log tab edits, manual additions) propagate.
+  useEffect(() => {
+    if (activeTab === "lineup-log" || activeTab === "stats" || activeTab === "directory") {
+      setLineupEntries(loadLineupLog())
+    }
+  }, [activeTab])
+
+  const lineupAppearancesById = useMemo(
+    () => countLineupAppearancesById(lineupEntries),
+    [lineupEntries],
+  )
+
+  const handleViewStatsForPerformer = (performerId: string) => {
+    setStatsPerformerFilterId(performerId)
+    setActiveTab("stats")
+  }
+
+  const handleClearStatsFilter = () => setStatsPerformerFilterId(null)
 
   const handlePerformersChange = (next: AsssscatPerformer[]) => {
     const saved = savePerformers(next)
@@ -298,7 +328,7 @@ export function AsssscatApp() {
         performers: cast.map((p) => ({ performerId: p.id, name: p.name })),
         createdAt: new Date().toISOString(),
       }
-      recordLineupIfNew(lineupEntry)
+      setLineupEntries(recordLineupIfNew(lineupEntry))
       // Remove from bookings if this was a draft
       if (activeDraftId) {
         setBookingDrafts(deleteBookingDraft(activeDraftId))
@@ -379,11 +409,19 @@ export function AsssscatApp() {
         </TabsList>
 
         <TabsContent value="lineup-log">
-          <AsssscatLineupLog performers={performers} />
+          <AsssscatLineupLog
+            performers={performers}
+            onEntriesChange={setLineupEntries}
+          />
         </TabsContent>
 
         <TabsContent value="stats">
-          <AsssscatStats performers={performers} />
+          <AsssscatStats
+            performers={performers}
+            lineupEntries={lineupEntries}
+            performerFilterId={statsPerformerFilterId}
+            onClearFilter={handleClearStatsFilter}
+          />
         </TabsContent>
 
         <TabsContent value="directory">
@@ -393,6 +431,8 @@ export function AsssscatApp() {
             onPerformerRemoved={handlePerformerRemoved}
             compatibility={compatibility}
             onCompatibilityChange={handleCompatibilityChange}
+            lineupAppearancesById={lineupAppearancesById}
+            onViewLineupStats={handleViewStatsForPerformer}
           />
         </TabsContent>
 

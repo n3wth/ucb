@@ -92,6 +92,33 @@ export function deleteLineupEntry(id: string): LineupEntry[] {
   return persist(loadLineupLog().filter((e) => e.id !== id))
 }
 
+// Count how many times each performer appears across lineup-log entries.
+// Returns a map keyed by performer ID (only performers with linked IDs).
+// Unlinked names are ignored — they show up in the log as raw names but
+// can't be reliably attributed to a directory profile.
+export function countLineupAppearancesById(
+  entries: LineupEntry[],
+): Map<string, number> {
+  const counts = new Map<string, number>()
+  for (const entry of entries) {
+    for (const performer of entry.performers) {
+      if (!performer.performerId) continue
+      counts.set(performer.performerId, (counts.get(performer.performerId) ?? 0) + 1)
+    }
+  }
+  return counts
+}
+
+// Lineup entries that include the given performer (matched by linked ID).
+export function lineupEntriesForPerformer(
+  entries: LineupEntry[],
+  performerId: string,
+): LineupEntry[] {
+  return entries.filter((e) =>
+    e.performers.some((p) => p.performerId === performerId),
+  )
+}
+
 // Record a lineup if no existing entry for the same date has the same set of
 // performer names. Used after a successful send so re-sends don't double-log.
 export function recordLineupIfNew(entry: LineupEntry): LineupEntry[] {

@@ -55,6 +55,12 @@ interface CastDirectoryProps {
   onPerformerRemoved?: (performerId: string) => void
   compatibility?: CompatibilityMap
   onCompatibilityChange?: (performerId: string, patch: { likes?: string[]; dislikes?: string[] }) => void
+  // Map of performer id → number of times they appear in the lineup log.
+  // Computed from lineup-log records (not booking records) per ucb-qk8.
+  lineupAppearancesById?: Map<string, number>
+  // Click handler for the lineup-appearance count — typically navigates to
+  // the Statistics tab scoped to that performer.
+  onViewLineupStats?: (performerId: string) => void
 }
 
 const inputClasses =
@@ -81,6 +87,8 @@ export function CastDirectory({
   onPerformerRemoved,
   compatibility = {},
   onCompatibilityChange,
+  lineupAppearancesById,
+  onViewLineupStats,
 }: CastDirectoryProps) {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -688,8 +696,37 @@ export function CastDirectory({
                             </div>
                           </button>
                           <div className="flex items-center gap-1 shrink-0">
+                            {(() => {
+                              const lineupCount = lineupAppearancesById?.get(p.id) ?? 0
+                              if (lineupCount === 0) return null
+                              const label = `${lineupCount} lineup ${lineupCount === 1 ? "appearance" : "appearances"} — view in Statistics`
+                              return onViewLineupStats ? (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    onViewLineupStats(p.id)
+                                  }}
+                                  className="text-[10px] text-primary border border-primary/40 hover:bg-primary/10 rounded px-1 py-0.5 transition-colors"
+                                  aria-label={label}
+                                  title={label}
+                                >
+                                  {lineupCount} lineup{lineupCount === 1 ? "" : "s"}
+                                </button>
+                              ) : (
+                                <span
+                                  className="text-[10px] text-muted-foreground border border-border rounded px-1 py-0.5"
+                                  title={label}
+                                >
+                                  {lineupCount} lineup{lineupCount === 1 ? "" : "s"}
+                                </span>
+                              )
+                            })()}
                             {p.bookingCount !== undefined && p.bookingCount > 0 && (
-                              <span className="text-[10px] text-muted-foreground border border-border rounded px-1 py-0.5">
+                              <span
+                                className="text-[10px] text-muted-foreground border border-border rounded px-1 py-0.5"
+                                title="Bookings sent from this device"
+                              >
                                 {p.bookingCount}×
                               </span>
                             )}
@@ -786,6 +823,29 @@ export function CastDirectory({
                                   <div>
                                     <dt className="text-muted-foreground">Times booked</dt>
                                     <dd className="text-foreground">{p.bookingCount ?? 0}</dd>
+                                  </div>
+                                  <div>
+                                    <dt className="text-muted-foreground">Lineup appearances</dt>
+                                    <dd className="text-foreground">
+                                      {(() => {
+                                        const lineupCount = lineupAppearancesById?.get(p.id) ?? 0
+                                        if (lineupCount === 0) {
+                                          return <span className="text-muted-foreground">0</span>
+                                        }
+                                        return onViewLineupStats ? (
+                                          <button
+                                            type="button"
+                                            onClick={() => onViewLineupStats(p.id)}
+                                            className="text-primary hover:underline"
+                                            aria-label={`View ${p.name}'s ${lineupCount} lineup appearances in Statistics`}
+                                          >
+                                            {lineupCount} →
+                                          </button>
+                                        ) : (
+                                          <>{lineupCount}</>
+                                        )
+                                      })()}
+                                    </dd>
                                   </div>
                                 </dl>
                               </div>

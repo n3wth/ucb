@@ -40,6 +40,9 @@ const inputClasses =
 
 interface AsssscatLineupLogProps {
   performers: AsssscatPerformer[]
+  // Notified whenever the entry list changes so the parent can refresh
+  // appearance counts and the stats tab.
+  onEntriesChange?: (entries: LineupEntry[]) => void
 }
 
 interface EditState {
@@ -79,7 +82,7 @@ function formatShowDate(iso: string): string {
   })
 }
 
-export function AsssscatLineupLog({ performers }: AsssscatLineupLogProps) {
+export function AsssscatLineupLog({ performers, onEntriesChange }: AsssscatLineupLogProps) {
   const [entries, setEntries] = useState<LineupEntry[]>([])
   const [edit, setEdit] = useState<EditState | null>(null)
   const [pendingDelete, setPendingDelete] = useState<string | null>(null)
@@ -87,6 +90,11 @@ export function AsssscatLineupLog({ performers }: AsssscatLineupLogProps) {
   useEffect(() => {
     setEntries(loadLineupLog())
   }, [])
+
+  const updateEntries = (next: LineupEntry[]) => {
+    setEntries(next)
+    onEntriesChange?.(next)
+  }
 
   const sorted = useMemo(() => entries, [entries])
 
@@ -120,13 +128,13 @@ export function AsssscatLineupLog({ performers }: AsssscatLineupLogProps) {
       performers: buildPerformers(edit.performersText, performers),
       createdAt: existing?.createdAt ?? new Date().toISOString(),
     }
-    setEntries(saveLineupEntry(entry))
+    updateEntries(saveLineupEntry(entry))
     setEdit(null)
   }
 
   const confirmDelete = () => {
     if (!pendingDelete) return
-    setEntries(deleteLineupEntry(pendingDelete))
+    updateEntries(deleteLineupEntry(pendingDelete))
     setPendingDelete(null)
   }
 
