@@ -29,9 +29,9 @@ export function ThemeToggle() {
 
   const current: ThemeValue = mounted && THEMES.some((t) => t.value === theme)
     ? (theme as ThemeValue)
-    : "dark"
+    : "light"
 
-  const ActiveIcon = THEMES.find((t) => t.value === current)?.Icon ?? Moon
+  const ActiveIcon = THEMES.find((t) => t.value === current)?.Icon ?? Sun
 
   return (
     <DropdownMenu>
