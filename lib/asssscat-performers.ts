@@ -312,6 +312,7 @@ export function addPerformer(
   input: Omit<AsssscatPerformer, "id"> & { id?: string },
 ): AsssscatPerformer[] {
   const record: AsssscatPerformer = {
+    ...input,
     id: input.id ?? newPerformerId(),
     name: input.name.trim(),
     email: input.email.trim(),

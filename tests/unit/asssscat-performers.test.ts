@@ -91,6 +91,28 @@ describe('addPerformer / updatePerformer / removePerformer', () => {
     expect(list[0].email).toBe('')
   })
 
+  it('preserves demographics and other optional fields on add', () => {
+    const list = addPerformer([], {
+      id: 'd1',
+      name: 'Alice',
+      email: 'alice@example.com',
+      category: 'Core Cast',
+      gender: 'Female',
+      race: 'Black',
+      lgbtq: true,
+      phone: '555-1234',
+      additionalEmail: 'alice2@example.com',
+      bookingCount: 3,
+    })
+    expect(list).toHaveLength(1)
+    expect(list[0].gender).toBe('Female')
+    expect(list[0].race).toBe('Black')
+    expect(list[0].lgbtq).toBe(true)
+    expect(list[0].phone).toBe('555-1234')
+    expect(list[0].additionalEmail).toBe('alice2@example.com')
+    expect(list[0].bookingCount).toBe(3)
+  })
+
   it('updates existing performers by id', () => {
     const list = addPerformer([], {
       id: 'x',
