@@ -213,9 +213,6 @@ export function ShowConfirmationForm({
               <CardTitle className="text-lg font-medium text-foreground">
                 Producer
               </CardTitle>
-              <CardDescription className="text-sm text-muted-foreground leading-relaxed">
-                Who&apos;s the email going to, and who else gets a CC?
-              </CardDescription>
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
               {producerEmailField}
