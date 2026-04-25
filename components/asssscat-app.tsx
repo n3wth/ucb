@@ -351,7 +351,7 @@ export function AsssscatApp() {
             {activeDraftId ? "Booking Draft" : "Booking"}
           </TabsTrigger>
           <TabsTrigger value="bookings">
-            Bookings
+            Drafts
             {bookingDrafts.length > 0 && (
               <span className="ml-1.5 text-[10px] bg-primary/20 text-primary rounded-full min-w-[16px] h-4 px-1 inline-flex items-center justify-center font-semibold">
                 {bookingDrafts.length}
