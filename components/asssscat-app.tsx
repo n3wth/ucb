@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { AsssscatPerformerPanel } from "@/components/asssscat-performer-panel"
 import { AsssscatAvailablePanel } from "@/components/asssscat-available-panel"
+import { AsssscatLineupLog } from "@/components/asssscat-lineup-log"
+import { AsssscatStats } from "@/components/asssscat-stats"
 import { CastDirectory } from "@/components/cast-directory"
 import { CcEmailList } from "@/components/cc-email-list"
 import { ToolPage } from "@/components/tool-page"
@@ -54,6 +56,11 @@ import {
   newDraftId,
   type BookingDraft,
 } from "@/lib/asssscat-bookings"
+import {
+  recordLineupIfNew,
+  newLineupId,
+  type LineupEntry,
+} from "@/lib/asssscat-lineup-log"
 import type {
   AsssscatMonologist,
   AsssscatPerformer,
@@ -284,6 +291,14 @@ export function AsssscatApp() {
       setOneTimeCc([])
       const bookedIds = cast.map((p) => p.id)
       setPerformers((current) => incrementBookingCounts(current, bookedIds))
+      const lineupEntry: LineupEntry = {
+        id: newLineupId(),
+        showDate,
+        monologistName: monologist.name,
+        performers: cast.map((p) => ({ performerId: p.id, name: p.name })),
+        createdAt: new Date().toISOString(),
+      }
+      recordLineupIfNew(lineupEntry)
       // Remove from bookings if this was a draft
       if (activeDraftId) {
         setBookingDrafts(deleteBookingDraft(activeDraftId))
@@ -359,7 +374,17 @@ export function AsssscatApp() {
             )}
           </TabsTrigger>
           <TabsTrigger value="directory">Cast Directory</TabsTrigger>
+          <TabsTrigger value="lineup-log">Lineup Log</TabsTrigger>
+          <TabsTrigger value="stats">Statistics</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="lineup-log">
+          <AsssscatLineupLog performers={performers} />
+        </TabsContent>
+
+        <TabsContent value="stats">
+          <AsssscatStats performers={performers} />
+        </TabsContent>
 
         <TabsContent value="directory">
           <CastDirectory
