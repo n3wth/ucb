@@ -11,7 +11,7 @@ export default function Icon() {
         style={{
           width: '100%',
           height: '100%',
-          background: UCB_BRAND.dark,
+          background: '#2e3036',
           borderRadius: 6,
           display: 'flex',
           alignItems: 'center',

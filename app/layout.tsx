@@ -39,6 +39,7 @@ export const metadata: Metadata = {
   applicationName: title,
   openGraph: {
     type: 'website',
+    locale: 'en_US',
     url: '/',
     siteName: title,
     title,
@@ -50,9 +51,12 @@ export const metadata: Metadata = {
     description,
   },
   icons: {
-    other: [
-      { rel: 'icon', url: '/icon.svg', type: 'image/svg+xml' },
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/icon', type: 'image/png', sizes: '32x32' },
     ],
+    apple: '/apple-icon',
   },
 }
 

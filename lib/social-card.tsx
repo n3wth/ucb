@@ -15,17 +15,21 @@ export function socialCard({
   const subtitleSize = Math.round(height * 0.045)
   const eyebrowSize = Math.round(height * 0.028)
 
+  const edge = Math.round(width * 0.006)
+  const pad = Math.round(height * 0.11)
+
   return new ImageResponse(
     (
       <div
         style={{
           width: '100%',
           height: '100%',
-          background: UCB_BRAND.dark,
+          // Solid fill — Satori does not support complex gradients in all builds
+          background: '#2e3036',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          padding: Math.round(height * 0.11),
+          padding: pad,
           position: 'relative',
         }}
       >
@@ -35,7 +39,7 @@ export function socialCard({
             left: 0,
             top: 0,
             height: '100%',
-            width: Math.round(width * 0.008),
+            width: edge,
             background: UCB_BRAND.accent,
           }}
         />
@@ -62,7 +66,7 @@ export function socialCard({
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: subtitleSize * 0.6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: subtitleSize * 0.5 }}>
           <div
             style={{
               color: UCB_BRAND.light,
@@ -77,11 +81,23 @@ export function socialCard({
           </div>
           <div
             style={{
+              color: UCB_BRAND.accent,
+              fontSize: Math.round(eyebrowSize * 1.05),
+              fontWeight: 600,
+              letterSpacing: eyebrowSize * 0.12,
+              textTransform: 'uppercase',
+              opacity: 0.9,
+            }}
+          >
+            Internal staff tools
+          </div>
+          <div
+            style={{
               color: UCB_BRAND.light,
               fontSize: subtitleSize,
-              lineHeight: 1.3,
-              opacity: 0.75,
-              maxWidth: width * 0.7,
+              lineHeight: 1.35,
+              opacity: 0.78,
+              maxWidth: width * 0.72,
               display: 'flex',
             }}
           >
