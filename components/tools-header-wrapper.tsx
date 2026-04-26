@@ -6,9 +6,7 @@ import { usePathname } from "next/navigation"
 import { SiteHeader } from "@/components/site-header"
 import { SignOutButton } from "@/components/sign-out-button"
 import { getActiveToolByPathname } from "@/lib/tools"
-
-const iconBtnClass =
-  "inline-flex items-center justify-center h-8 w-8 rounded-sm text-foreground/60 hover:text-foreground hover:bg-foreground/[0.05] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+import { headerIconButtonClass } from "@/lib/site-chrome"
 
 export function ToolsHeaderWrapper() {
   const pathname = usePathname()
@@ -24,11 +22,11 @@ export function ToolsHeaderWrapper() {
             href="/settings"
             aria-label="Settings"
             title="Settings"
-            className={iconBtnClass}
+            className={headerIconButtonClass}
           >
-            <Settings className="h-4 w-4" aria-hidden="true" />
+            <Settings aria-hidden="true" />
           </Link>
-          <SignOutButton iconOnly />
+          <SignOutButton />
         </div>
       }
     />

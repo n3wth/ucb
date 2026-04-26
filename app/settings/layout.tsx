@@ -1,11 +1,11 @@
 import type { ReactNode } from "react"
 import Link from "next/link"
-import { Home, Wrench } from "lucide-react"
+import { Wrench } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SignOutButton } from "@/components/sign-out-button"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteStatusStrip } from "@/components/site-status-strip"
-import { headerIconLinkClass } from "@/lib/site-chrome"
+import { headerIconButtonClass } from "@/lib/site-chrome"
 
 /**
  * Layout for /settings. Mirrors the tools layout (header + footer) but
@@ -17,22 +17,14 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
       <SiteHeader
         toolName="Settings"
         authSlot={
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              aria-label="Home"
-              className={headerIconLinkClass}
-            >
-              <Home className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>Home</span>
-            </Link>
+          <div className="flex items-center gap-1">
             <Link
               href="/tools"
               aria-label="Tools"
-              className={headerIconLinkClass}
+              title="Tools"
+              className={headerIconButtonClass}
             >
-              <Wrench className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>Tools</span>
+              <Wrench aria-hidden="true" />
             </Link>
             <SignOutButton />
           </div>
