@@ -125,7 +125,7 @@ export function LoginForm() {
           </FieldGroup>
           <Button
             type="submit"
-            className="w-full h-10 group cta-shimmer"
+            className="w-full h-10 group"
             disabled={loading || !password}
           >
             {loading ? (

@@ -13,7 +13,7 @@ export function SiteFooter() {
           href="https://ucbcomedy.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="link-rainbow hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           ucbcomedy.com <span aria-hidden="true">↗</span>
         </a>

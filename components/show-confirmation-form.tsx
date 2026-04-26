@@ -255,7 +255,7 @@ export function ShowConfirmationForm({
           <CardContent className="pt-6">
             <div className="space-y-8">
               {renderShowDetailFields()}
-              <Button type="submit" className="w-full h-11 group cta-shimmer" size="lg">
+              <Button type="submit" className="w-full h-11 group" size="lg">
                 Continue to review
                 <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
               </Button>
@@ -909,7 +909,7 @@ export function ShowConfirmationForm({
           {/* Submit button */}
           <Button
             type="submit"
-            className="w-full h-11 group cta-shimmer"
+            className="w-full h-11 group"
             size="lg"
           >
             Continue to review
