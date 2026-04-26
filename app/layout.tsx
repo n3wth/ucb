@@ -1,28 +1,45 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Archivo_Black, Playfair_Display } from 'next/font/google'
+import { Geist_Mono } from 'next/font/google'
+import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { env } from '@/lib/env'
 import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
-const geist = Geist({
-  subsets: ['latin'],
-  variable: '--font-geist',
+const circular = localFont({
+  variable: '--font-circular',
+  display: 'swap',
+  src: [
+    { path: '../public/fonts/Circular-400-Book.woff2',   weight: '400', style: 'normal' },
+    { path: '../public/fonts/Circular-500-Medium.woff2', weight: '500', style: 'normal' },
+    { path: '../public/fonts/Circular-700-Bold.woff2',   weight: '700', style: 'normal' },
+    { path: '../public/fonts/Circular-800-Black.woff2',  weight: '800', style: 'normal' },
+  ],
 })
+
+const boomer = localFont({
+  variable: '--font-boomer',
+  display: 'swap',
+  src: [
+    { path: '../public/fonts/BoomerSerifExtraCond-Light.woff2',  weight: '300', style: 'normal' },
+    { path: '../public/fonts/BoomerSerifExtraCond-Reg.woff2',    weight: '400', style: 'normal' },
+    { path: '../public/fonts/BoomerSerifExtraCond-RegIta.woff2', weight: '400', style: 'italic' },
+    { path: '../public/fonts/BoomerSerifExtraCond-Bold.woff2',   weight: '700', style: 'normal' },
+    { path: '../public/fonts/BoomerSerifExtraCond-Black.woff2',  weight: '900', style: 'normal' },
+  ],
+})
+
+const dahlia = localFont({
+  variable: '--font-dahlia',
+  display: 'swap',
+  src: [
+    { path: '../public/fonts/Dahlia-Medium.woff2', weight: '500', style: 'normal' },
+  ],
+})
+
 const geistMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-geist-mono',
-})
-const archivoBlack = Archivo_Black({
-  subsets: ['latin'],
-  weight: '400',
-  variable: '--font-archivo-black',
-})
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '700', '900'],
-  style: ['normal', 'italic'],
-  variable: '--font-playfair',
 })
 
 const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? 'https://ucb-bookings.vercel.app'
@@ -76,7 +93,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`bg-background ${geist.variable} ${geistMono.variable} ${archivoBlack.variable} ${playfair.variable}`}
+      className={`bg-background ${circular.variable} ${boomer.variable} ${dahlia.variable} ${geistMono.variable}`}
     >
       <body className="font-sans antialiased [font-synthesis-weight:none]">
         <ThemeProvider

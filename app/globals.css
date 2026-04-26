@@ -159,10 +159,11 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-circular), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-display: var(--font-archivo-black), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-playfair), ui-serif, Georgia, 'Times New Roman', serif;
+  --font-display: var(--font-boomer), ui-serif, Georgia, 'Times New Roman', serif;
+  --font-serif: var(--font-boomer), ui-serif, Georgia, 'Times New Roman', serif;
+  --font-accent: var(--font-dahlia), ui-serif, Georgia, serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
