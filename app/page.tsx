@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { LiveTimestamp } from "@/components/live-timestamp"
@@ -19,15 +20,17 @@ export default function LandingPage() {
       <section className="flex-1 grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] page-fade-in">
         {/* LEFT: identity, top-aligned */}
         <div className="border-b lg:border-b-0 lg:border-r border-border px-6 sm:px-10 lg:px-14 pt-14 sm:pt-20 pb-14">
-          <p
-            className="font-display text-foreground/55 text-base sm:text-lg tracking-[0.01em]"
-            style={{ fontWeight: 500 }}
-          >
-            UCB
-          </p>
+          <Image
+            src="/ucb-wordmark.svg"
+            alt="UCB Comedy"
+            width={2006}
+            height={313}
+            className="w-[clamp(180px,28vw,320px)] h-auto dark:invert gay:invert"
+            priority
+          />
 
           <h1
-            className="mt-2 sm:mt-3 font-display text-foreground leading-[0.88] tracking-[-0.04em] text-[clamp(5rem,16vw,12rem)]"
+            className="mt-6 sm:mt-8 font-display text-foreground leading-[0.88] tracking-[-0.04em] text-[clamp(5rem,16vw,12rem)]"
             style={{ fontWeight: 800 }}
           >
             Bookings
