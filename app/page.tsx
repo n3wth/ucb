@@ -9,9 +9,9 @@ export default function LandingPage() {
     <main className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Top hairline strip */}
       <div className="border-b border-border">
-        <div className="flex items-center justify-between px-5 sm:px-8 h-9 text-[10px] tracking-[0.18em] uppercase text-muted-foreground font-medium">
-          <span className="tabular-nums">UCB · Internal</span>
-          <LiveTimestamp className="font-mono tracking-[0.05em] normal-case text-foreground/80" />
+        <div className="flex items-center justify-between px-5 sm:px-8 h-9 text-[11px] text-muted-foreground">
+          <span>UCB · Internal</span>
+          <LiveTimestamp />
         </div>
       </div>
 
@@ -20,24 +20,22 @@ export default function LandingPage() {
         {/* LEFT: identity */}
         <div className="relative flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-border px-6 sm:px-10 lg:px-14 py-14 sm:py-20">
           <div>
-            <p className="text-[10px] tracking-[0.22em] uppercase text-muted-foreground font-medium">
-              Bookings · v1
+            <p
+              className="font-display text-foreground/70 text-base sm:text-lg tracking-[0.01em]"
+              style={{ fontWeight: 500 }}
+            >
+              UCB
             </p>
 
             <h1
-              className="mt-10 sm:mt-14 font-display text-foreground leading-[0.88] tracking-[-0.04em] text-[clamp(5rem,16vw,12rem)]"
+              className="mt-2 sm:mt-3 font-display text-foreground leading-[0.88] tracking-[-0.04em] text-[clamp(5rem,16vw,12rem)]"
               style={{ fontWeight: 800 }}
             >
-              UCB
+              Bookings
             </h1>
 
             <p className="mt-8 sm:mt-10 max-w-md text-sm sm:text-base text-foreground/85 leading-relaxed">
-              Internal bookings <span className="text-muted-foreground">·</span>{" "}
-              for the artistic team.
-            </p>
-
-            <p className="mt-6 font-mono text-[11px] tracking-[0.04em] text-muted-foreground">
-              @ucbcomedy.com only
+              Internal bookings for the artistic team.
             </p>
           </div>
         </div>
