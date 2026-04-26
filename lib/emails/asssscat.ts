@@ -1,8 +1,18 @@
 import { formatDate } from "@/lib/format"
 import type { AsssscatShowDetails } from "@/lib/types"
 
+export interface AsssscatEmailOverrides {
+  callTime?: string
+  arrivalTime?: string
+  contactPhone?: string
+  compsEmail?: string
+  venue?: string
+  signature?: string
+}
+
 export interface AsssscatEmailInput {
   showDetails: AsssscatShowDetails
+  overrides?: AsssscatEmailOverrides
 }
 
 export const ASSSSCAT_TO = "chris.renfro@ucbcomedy.com"
@@ -14,6 +24,11 @@ export const ASSSSCAT_COMPS_EMAIL = "lacomps@ucbcomedy.com"
 export const ASSSSCAT_SIGNATURE = "Chris Renfro, Artistic Director"
 export const ASSSSCAT_MAX_IMPROVISERS = 8
 export const ASSSSCAT_SMALL_CAST_THRESHOLD = 6
+
+function pick(override: string | undefined, fallback: string): string {
+  const trimmed = override?.trim()
+  return trimmed && trimmed.length > 0 ? trimmed : fallback
+}
 
 export function renderAsssscatSubject(showDetails: AsssscatShowDetails): string {
   const date = showDetails.showDate ? formatDate(showDetails.showDate) : "TBD"
@@ -29,8 +44,15 @@ function formatMonologist(monologist: AsssscatShowDetails["monologist"]): string
   return credits ? `${nameLine} — ${credits}` : nameLine
 }
 
-export function renderAsssscatBody({ showDetails }: AsssscatEmailInput): string {
+export function renderAsssscatBody({ showDetails, overrides }: AsssscatEmailInput): string {
   const formattedDate = showDetails.showDate ? formatDate(showDetails.showDate) : "TBD"
+
+  const callTime = pick(overrides?.callTime, ASSSSCAT_CALL_TIME)
+  const arrivalTime = pick(overrides?.arrivalTime, ASSSSCAT_ARRIVAL_TIME)
+  const contactPhone = pick(overrides?.contactPhone, ASSSSCAT_CONTACT_PHONE)
+  const compsEmail = pick(overrides?.compsEmail, ASSSSCAT_COMPS_EMAIL)
+  const venue = pick(overrides?.venue, ASSSSCAT_VENUE)
+  const signature = overrides?.signature?.trim() ?? ""
 
   const castLines = Array.from({ length: ASSSSCAT_MAX_IMPROVISERS }, (_, i) => {
     const performer = showDetails.improvisers[i]
@@ -40,9 +62,11 @@ export function renderAsssscatBody({ showDetails }: AsssscatEmailInput): string 
 
   const ticketLink = showDetails.ticketLink.trim() || "TBD"
 
+  const closing = signature ? `\n\n${signature}` : ""
+
   return `Hello everybody--
 
-Excited to have you for ASSSSCAT on ${formattedDate}! The show begins at ${ASSSSCAT_CALL_TIME}, please arrive no later than ${ASSSSCAT_ARRIVAL_TIME}. If you are running late or your availability changes, please let me know as soon as possible. Should you need to get ahold of me, my number is ${ASSSSCAT_CONTACT_PHONE}.
+Excited to have you for ASSSSCAT on ${formattedDate}! The show begins at ${callTime}, please arrive no later than ${arrivalTime}. If you are running late or your availability changes, please let me know as soon as possible. Should you need to get ahold of me, my number is ${contactPhone}.
 
 CAST
 ${castLines}
@@ -52,15 +76,15 @@ ${formatMonologist(showDetails.monologist)}
 
 TICKET LINK
 ${ticketLink}
-For comps, please email ${ASSSSCAT_COMPS_EMAIL}.
+For comps, please email ${compsEmail}.
 
 VENUE
-${ASSSSCAT_VENUE}
+${venue}
 
 REMINDERS
 - Show is 1.5hrs with no intermission.
 - Expect 3-4 monologues from the monologist throughout.
 - You call your own show — trust your instincts.
 - If you need to cancel, please reply or text me as soon as possible.
-- Valet is available at Schwartz and Sandy's Wednesday through Sunday.`
+- Valet is available at Schwartz and Sandy's Wednesday through Sunday.${closing}`
 }

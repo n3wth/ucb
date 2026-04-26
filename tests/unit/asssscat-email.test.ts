@@ -102,4 +102,48 @@ describe('renderAsssscatBody', () => {
     })
     expect(noMono).toMatch(/MONOLOGIST\nTBD/)
   })
+
+  it('applies overrides for call time, arrival, contact phone, comps email, and venue', () => {
+    const overridden = renderAsssscatBody({
+      showDetails: baseDetails,
+      overrides: {
+        callTime: '9:00PM',
+        arrivalTime: '8:45PM',
+        contactPhone: '(555) 123-4567',
+        compsEmail: 'comps@example.com',
+        venue: 'Custom Venue, 1 Test St',
+      },
+    })
+    expect(overridden).toContain('9:00PM')
+    expect(overridden).toContain('8:45PM')
+    expect(overridden).toContain('(555) 123-4567')
+    expect(overridden).toContain('comps@example.com')
+    expect(overridden).toContain('Custom Venue, 1 Test St')
+    // Defaults should not leak through when overrides are provided.
+    expect(overridden).not.toContain('8:30PM')
+    expect(overridden).not.toContain('8:15PM')
+  })
+
+  it('appends signature when override is non-empty, omits when blank', () => {
+    const withSig = renderAsssscatBody({
+      showDetails: baseDetails,
+      overrides: { signature: 'Chris Renfro, Artistic Director' },
+    })
+    expect(withSig).toContain('Chris Renfro, Artistic Director')
+
+    const noSig = renderAsssscatBody({
+      showDetails: baseDetails,
+      overrides: { signature: '   ' },
+    })
+    expect(noSig).not.toContain('Chris Renfro')
+  })
+
+  it('falls back to defaults when override values are empty strings', () => {
+    const body = renderAsssscatBody({
+      showDetails: baseDetails,
+      overrides: { callTime: '', venue: '   ' },
+    })
+    expect(body).toContain('8:30PM')
+    expect(body).toContain(ASSSSCAT_VENUE)
+  })
 })

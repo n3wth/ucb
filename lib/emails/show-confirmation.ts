@@ -4,15 +4,19 @@ import type { ShowDetails } from "@/lib/types"
 export interface ShowConfirmationInput {
   showDetails: ShowDetails
   driveFolderUrl?: string
+  signature?: string
 }
 
 export const DRIVE_FOLDER_PLACEHOLDER = "A Google Drive folder will be created for your show materials."
+
+export const SHOW_CONFIRMATION_DEFAULT_SIGNATURE = "UCB Artistic Team"
 
 export function renderShowConfirmationSubject(showDetails: ShowDetails): string {
   return `Your show at ${showDetails.venue} is confirmed — ${showDetails.showTitle}`
 }
 
-export function renderShowConfirmationBody({ showDetails, driveFolderUrl }: ShowConfirmationInput): string {
+export function renderShowConfirmationBody({ showDetails, driveFolderUrl, signature }: ShowConfirmationInput): string {
+  const sig = signature?.trim() || SHOW_CONFIRMATION_DEFAULT_SIGNATURE
   const formattedDate = formatDate(showDetails.showDate)
   const formattedShowTime = formatTime(showDetails.showTime)
   const formattedTechTime = showDetails.techRehearsalTime
@@ -51,7 +55,7 @@ ${ticketLines}
 Please review these details and reply if anything needs to be changed.
 
 Thanks,
-UCB Artistic Team`
+${sig}`
 }
 
 // Replaces the placeholder line with the real folder URL so user edits in other

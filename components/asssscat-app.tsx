@@ -43,6 +43,11 @@ import {
   saveAsssscatDefaultCc,
 } from "@/lib/asssscat-preferences"
 import {
+  DEFAULT_EMAIL_SETTINGS,
+  loadEmailSettings,
+  type EmailSettings,
+} from "@/lib/asssscat-settings"
+import {
   getIncompatiblePairs,
   loadCompatibility,
   removePerformerCompatibility,
@@ -117,11 +122,15 @@ export function AsssscatApp() {
   // When set, the Statistics tab shows lineups filtered to this performer.
   const [statsPerformerFilterId, setStatsPerformerFilterId] = useState<string | null>(null)
 
+  // Editable defaults (call time, venue, signature, etc.) loaded from /settings.
+  const [emailSettings, setEmailSettings] = useState<EmailSettings>(DEFAULT_EMAIL_SETTINGS)
+
   useEffect(() => {
     setPerformers(loadPerformers())
     setDefaultCc(loadAsssscatDefaultCc())
     setCompatibility(loadCompatibility())
     setBookingDrafts(loadBookingDrafts())
+    setEmailSettings(loadEmailSettings())
     let cancelled = false
     void loadLineupLog().then((entries) => {
       if (!cancelled) setLineupEntries(entries)
@@ -233,9 +242,21 @@ export function AsssscatApp() {
     [showDate, cast, monologist, ticketLink, oneTimeCc, defaultCc],
   )
 
+  const emailOverrides = useMemo(
+    () => ({
+      callTime: emailSettings.asssscatCallTime,
+      arrivalTime: emailSettings.asssscatArrivalTime,
+      contactPhone: emailSettings.asssscatContactPhone,
+      compsEmail: emailSettings.asssscatCompsEmail,
+      venue: emailSettings.asssscatVenue,
+      signature: emailSettings.asssscatSignature,
+    }),
+    [emailSettings],
+  )
+
   const emailPreview = useMemo(
-    () => renderAsssscatBody({ showDetails }),
-    [showDetails],
+    () => renderAsssscatBody({ showDetails, overrides: emailOverrides }),
+    [showDetails, emailOverrides],
   )
   const subjectPreview = useMemo(
     () => renderAsssscatSubject(showDetails),

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Home } from "lucide-react"
+import { Home, Settings } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { SiteHeader } from "@/components/site-header"
 import { SignOutButton } from "@/components/sign-out-button"
@@ -26,6 +26,14 @@ export function ToolsHeaderWrapper() {
           >
             <Home className="h-3.5 w-3.5" aria-hidden="true" />
             <span>Home</span>
+          </Link>
+          <Link
+            href="/settings"
+            aria-label="Settings"
+            className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-medium tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <Settings className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Settings</span>
           </Link>
           <SignOutButton />
         </div>

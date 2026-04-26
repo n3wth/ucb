@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ShowConfirmationForm } from "@/components/show-confirmation-form"
 import { PreviewStage } from "@/components/preview-stage"
 import { ConfirmationResults } from "@/components/confirmation-results"
@@ -9,6 +9,7 @@ import { ToolPage } from "@/components/tool-page"
 import { DefaultCcPreferences } from "@/components/default-cc-preferences"
 import { ShowCcPreferencesPanel } from "@/components/show-cc-preferences-panel"
 import { renderShowConfirmationBody, renderShowConfirmationSubject } from "@/lib/emails"
+import { loadEmailSettings } from "@/lib/asssscat-settings"
 import type { ShowDetails, ConfirmationResult } from "@/lib/types"
 
 type Stage = "compose" | "preview" | "result"
@@ -33,10 +34,15 @@ export function ShowConfirmationApp() {
   const [result, setResult] = useState<ConfirmationResult | null>(null)
   const [isConfirming, setIsConfirming] = useState(false)
   const [activeShowTitle, setActiveShowTitle] = useState<string>("")
+  const [signature, setSignature] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    setSignature(loadEmailSettings().showConfirmationSignature)
+  }, [])
 
   const handleComposeSubmit = (data: ShowDetails) => {
     setShowDetails(data)
-    setEmailContent(renderShowConfirmationBody({ showDetails: data }))
+    setEmailContent(renderShowConfirmationBody({ showDetails: data, signature }))
     setStage("preview")
   }
 
@@ -74,7 +80,7 @@ export function ShowConfirmationApp() {
       setResult(data)
 
       if (data.driveFolder.status === "success" && data.driveFolder.url) {
-        setEmailContent(renderShowConfirmationBody({ showDetails, driveFolderUrl: data.driveFolder.url }))
+        setEmailContent(renderShowConfirmationBody({ showDetails, driveFolderUrl: data.driveFolder.url, signature }))
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Network error"

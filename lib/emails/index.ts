@@ -27,4 +27,5 @@ export {
   ASSSSCAT_MAX_IMPROVISERS,
   ASSSSCAT_SMALL_CAST_THRESHOLD,
   type AsssscatEmailInput,
+  type AsssscatEmailOverrides,
 } from "./asssscat"

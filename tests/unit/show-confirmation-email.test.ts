@@ -62,6 +62,22 @@ describe('renderShowConfirmationBody', () => {
     expect(folderIdx).toBeLessThan(detailsIdx)
     expect(folderIdx).toBeLessThan(pricingIdx)
   })
+
+  it('uses the default signature when none is provided', () => {
+    const body = renderShowConfirmationBody({ showDetails })
+    expect(body).toMatch(/Thanks,\nUCB Artistic Team$/)
+  })
+
+  it('uses the override signature when provided', () => {
+    const body = renderShowConfirmationBody({ showDetails, signature: 'Chris Renfro, Artistic Director' })
+    expect(body).toMatch(/Thanks,\nChris Renfro, Artistic Director$/)
+    expect(body).not.toContain('UCB Artistic Team')
+  })
+
+  it('falls back to the default signature when override is whitespace', () => {
+    const body = renderShowConfirmationBody({ showDetails, signature: '   ' })
+    expect(body).toMatch(/Thanks,\nUCB Artistic Team$/)
+  })
 })
 
 describe('injectDriveFolderUrl', () => {
