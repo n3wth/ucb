@@ -213,20 +213,6 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    /* One warm specular + cool floor — distinct from default “slop” flat grays. */
-    background-color: var(--background);
-    background-image: radial-gradient(
-        1000px 480px at 0% 0%,
-        color-mix(in oklch, var(--primary) 7%, transparent) 0%,
-        transparent 55%
-      ),
-      radial-gradient(900px 420px at 100% 12%, color-mix(in oklch, var(--foreground) 4%, transparent) 0%, transparent 50%),
-      linear-gradient(
-        180deg,
-        color-mix(in oklch, var(--foreground) 2.2%, var(--background)) 0%,
-        var(--background) min(32rem, 70vh)
-      );
-    background-attachment: fixed;
   }
   ::selection {
     @apply bg-primary/30 text-foreground;
@@ -325,7 +311,7 @@
 
   /** Elevated panel: lists, hub, empty states */
   .surface-panel {
-    @apply rounded-xl border border-border/80 bg-card/50 shadow-[0_1px_0_0_color-mix(in_oklch,var(--foreground)_4%,transparent)];
+    @apply rounded-xl border border-border bg-card;
   }
 
   .font-display {
