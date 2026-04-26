@@ -3,6 +3,11 @@ import { ArrowRight } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { UcbLogo } from "@/components/ucb-logo"
+import {
+  ctaIconShiftClassName,
+  headerSecondaryLinkClass,
+  primaryCtaClassName,
+} from "@/lib/site-chrome"
 
 export default function LandingPage() {
   return (
@@ -11,7 +16,7 @@ export default function LandingPage() {
         authSlot={
           <Link
             href="/login"
-            className="text-[10px] sm:text-xs font-medium tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className={headerSecondaryLinkClass}
           >
             Sign in
           </Link>
@@ -41,11 +46,11 @@ export default function LandingPage() {
           <div className="mt-10 pl-4 sm:pl-5">
             <Link
               href="/login"
-              className="group inline-flex items-center gap-2 border-2 border-foreground bg-foreground px-5 py-3 text-xs font-semibold tracking-[0.2em] uppercase text-background shadow-sm hover:bg-primary hover:text-primary-foreground hover:border-primary transition-[background-color,border-color,color,box-shadow,transform] duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:translate-y-px"
+              className={primaryCtaClassName}
             >
               <span>Sign in</span>
               <ArrowRight
-                className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
+                className={ctaIconShiftClassName}
                 aria-hidden="true"
               />
             </Link>

@@ -3,6 +3,7 @@ import { Suspense } from "react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { LoginForm } from "@/components/login-form"
+import { headerSecondaryLinkClass } from "@/lib/site-chrome"
 
 export const dynamic = "force-dynamic"
 
@@ -13,7 +14,7 @@ export default function LoginPage() {
         authSlot={
           <Link
             href="/"
-            className="text-[10px] sm:text-xs font-medium tracking-[0.2em] uppercase text-foreground underline underline-offset-[6px] decoration-1 hover:text-primary hover:decoration-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className={headerSecondaryLinkClass}
           >
             Back
           </Link>

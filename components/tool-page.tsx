@@ -36,21 +36,21 @@ export function ToolPage({
   return (
     <div className={cn("mx-auto", sizes[size], className)}>
       {hasHeader && (
-        <div className="mb-8 flex items-start justify-between gap-4">
+        <header className="mb-8 flex items-start justify-between gap-4">
           <div className="min-w-0">
             {title && (
-              <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+              <h1 className="font-display pl-4 sm:pl-5 -ml-px border-l-2 border-primary/35 text-2xl sm:text-3xl tracking-tight text-foreground">
                 {title}
               </h1>
             )}
             {description && (
-              <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+              <p className="mt-1.5 pl-4 sm:pl-5 text-sm text-muted-foreground leading-relaxed">
                 {description}
               </p>
             )}
           </div>
           {actions && <div className="shrink-0 flex items-center gap-2">{actions}</div>}
-        </div>
+        </header>
       )}
       {children}
     </div>

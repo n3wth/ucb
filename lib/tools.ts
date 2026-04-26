@@ -66,6 +66,21 @@ export function getToolById(id: string): Tool | undefined {
   return TOOLS.find((t) => t.id === id)
 }
 
+/** True when `pathname` is exactly the tool route or a nested path under it. */
+export function isPathUnderToolPath(pathname: string, toolHref: string): boolean {
+  return pathname === toolHref || pathname.startsWith(toolHref + "/")
+}
+
+/**
+ * The tool whose `href` is the longest prefix match of `pathname` (breadcrumb / header).
+ * Matches the logic used in tools navigation active state, preferring the most specific tool.
+ */
+export function getActiveToolByPathname(pathname: string): Tool | undefined {
+  return TOOLS.filter((t) => isPathUnderToolPath(pathname, t.href)).sort(
+    (a, b) => b.href.length - a.href.length,
+  )[0]
+}
+
 /**
  * Next.js metadata derived from the registry.
  * Use as: `export const metadata = getToolMeta("show-confirmation")`

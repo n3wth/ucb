@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { ToolPage } from "@/components/tool-page"
-import { formatDate, formatTime } from "@/lib/format"
+import { formatDate, formatTime, splitIsoDateTime } from "@/lib/format"
 import type { AuditEntry } from "@/lib/audit"
 
 interface AuditLogResponse {
@@ -22,13 +22,6 @@ async function defaultFetchEntries(): Promise<AuditLogResponse> {
   return (await res.json()) as AuditLogResponse
 }
 
-function splitTimestamp(iso: string): { date: string; time: string } {
-  const [date, timePart] = iso.split("T")
-  if (!timePart) return { date, time: "" }
-  const [hh, mm] = timePart.split(":")
-  return { date, time: `${hh}:${mm}` }
-}
-
 const ACTION_LABEL: Record<AuditEntry["action"], string> = {
   "confirm-show": "Confirm",
   "edit-show": "Edit",
@@ -36,13 +29,13 @@ const ACTION_LABEL: Record<AuditEntry["action"], string> = {
 }
 
 function EntryRow({ entry }: { entry: AuditEntry }) {
-  const { date, time } = splitTimestamp(entry.timestamp)
+  const { date, time } = splitIsoDateTime(entry.timestamp)
   const dateLabel = date ? formatDate(date) : "—"
   const timeLabel = time ? formatTime(time) : ""
   const payloadJson = entry.payload ? JSON.stringify(entry.payload) : ""
 
   return (
-    <li className="py-4">
+    <li className="py-4 px-1 -mx-1 rounded-sm transition-colors hover:bg-muted/25">
       <div className="flex items-baseline justify-between gap-4">
         <div className="min-w-0">
           <p className="text-sm font-medium text-foreground">
@@ -94,7 +87,13 @@ export function AuditLogApp({ fetchEntries = defaultFetchEntries }: AuditLogAppP
           {error}
         </div>
       ) : entries === null ? (
-        <p className="text-sm text-muted-foreground">Loading…</p>
+        <div
+          className="rounded-lg border border-dashed border-border bg-muted/20 py-14 text-center"
+          aria-busy="true"
+          aria-label="Loading audit log"
+        >
+          <p className="text-sm text-muted-foreground">Loading audit log…</p>
+        </div>
       ) : entries.length === 0 ? (
         <div className="border border-dashed border-border rounded-lg py-16 text-center">
           <p className="text-sm text-muted-foreground">No audit entries yet.</p>

@@ -36,6 +36,17 @@ export function formatTime(timeString: string): string {
   return `${hour12}:${minutes} ${ampm}`
 }
 
+/**
+ * Splits an ISO date-time string into calendar date and `HH:MM` (24h) time.
+ * Used for audit timestamps and show start times.
+ */
+export function splitIsoDateTime(iso: string): { date: string; time: string } {
+  const [date, timePart] = iso.split("T")
+  if (!timePart) return { date, time: "" }
+  const [hh, mm] = timePart.split(":")
+  return { date, time: `${hh}:${mm}` }
+}
+
 export function addMinutesToTime(timeString: string, minutes: number): string {
   if (!timeString) return ""
   const [hours, mins] = timeString.split(":").map(Number)
