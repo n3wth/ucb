@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { ExternalLink } from "lucide-react"
 import { ToolPage } from "@/components/tool-page"
-import { formatDate, formatTime } from "@/lib/format"
+import { formatDate, formatTime, splitIsoDateTime } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { ShowListItem, ShowListResponse } from "@/lib/types"
 
@@ -30,21 +30,13 @@ async function defaultFetchShows(): Promise<ShowListResponse> {
   return (await res.json()) as ShowListResponse
 }
 
-function splitDateTime(startISO: string): { date: string; time: string } {
-  // Accepts "YYYY-MM-DDTHH:mm:ss..." or "YYYY-MM-DD" (all-day).
-  const [date, timePart] = startISO.split("T")
-  if (!timePart) return { date, time: "" }
-  const [hh, mm] = timePart.split(":")
-  return { date, time: `${hh}:${mm}` }
-}
-
 function ShowRow({ show }: { show: ShowListItem }) {
-  const { date, time } = splitDateTime(show.startISO)
+  const { date, time } = splitIsoDateTime(show.startISO)
   const dateLabel = date ? formatDate(date) : "—"
   const timeLabel = time ? formatTime(time) : ""
 
   return (
-    <li className="py-4">
+    <li className="py-4 px-1 -mx-1 rounded-sm transition-colors hover:bg-muted/25">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h3 className="text-sm font-medium text-foreground truncate">

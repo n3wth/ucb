@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ToolPage } from "@/components/tool-page"
 import { Check, RotateCcw } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   DEFAULT_EMAIL_SETTINGS,
   loadEmailSettings,
@@ -114,7 +115,35 @@ export function SettingsApp() {
     setDraft((prev) => ({ ...prev, [key]: DEFAULT_EMAIL_SETTINGS[key] }))
   }
 
-  if (!hydrated) return null
+  if (!hydrated) {
+    return (
+      <ToolPage title="Settings" size="md">
+        <div className="space-y-6" aria-busy="true" aria-label="Loading settings">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded-lg border border-border bg-card overflow-hidden"
+            >
+              <div className="p-4 sm:p-6 border-b border-border/80">
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="mt-2 h-3.5 w-72 max-w-full" />
+              </div>
+              <div className="p-4 sm:p-6 space-y-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-3.5 w-24" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-3.5 w-32" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </ToolPage>
+    )
+  }
 
   return (
     <ToolPage

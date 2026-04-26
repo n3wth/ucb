@@ -17,6 +17,9 @@ const THEMES = [
   { value: "gay", label: "Gay", Icon: Sparkles },
 ] as const
 
+const GAY_MODE_SWATCH =
+  "conic-gradient(from 210deg, oklch(0.65 0.24 25), oklch(0.78 0.18 65), oklch(0.85 0.18 95), oklch(0.65 0.22 145), oklch(0.60 0.18 240), oklch(0.55 0.24 305), oklch(0.65 0.24 25))"
+
 type ThemeValue = (typeof THEMES)[number]["value"]
 
 export function ThemeToggle() {
@@ -46,10 +49,7 @@ export function ThemeToggle() {
             <span
               aria-hidden="true"
               className="inline-block h-4 w-4 rounded-full"
-              style={{
-                background:
-                  "conic-gradient(from 210deg, oklch(0.65 0.24 25), oklch(0.78 0.18 65), oklch(0.85 0.18 95), oklch(0.65 0.22 145), oklch(0.60 0.18 240), oklch(0.55 0.24 305), oklch(0.65 0.24 25))",
-              }}
+              style={{ background: GAY_MODE_SWATCH }}
             />
           ) : (
             <ActiveIcon className="h-4 w-4" aria-hidden="true" />
@@ -69,10 +69,7 @@ export function ThemeToggle() {
               <span
                 aria-hidden="true"
                 className="inline-block h-3.5 w-3.5 rounded-full"
-                style={{
-                  background:
-                    "conic-gradient(from 210deg, oklch(0.65 0.24 25), oklch(0.78 0.18 65), oklch(0.85 0.18 95), oklch(0.65 0.22 145), oklch(0.60 0.18 240), oklch(0.55 0.24 305), oklch(0.65 0.24 25))",
-                }}
+                style={{ background: GAY_MODE_SWATCH }}
               />
             ) : (
               <Icon className="h-3.5 w-3.5" aria-hidden="true" />

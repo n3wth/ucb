@@ -136,7 +136,7 @@ export function LoginForm() {
             ) : (
               <>
                 Continue
-                <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />
               </>
             )}
           </Button>
