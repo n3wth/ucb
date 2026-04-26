@@ -1,12 +1,14 @@
 "use client"
 
 import Link from "next/link"
-import { Home, Settings } from "lucide-react"
+import { Settings } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { SiteHeader } from "@/components/site-header"
 import { SignOutButton } from "@/components/sign-out-button"
 import { getActiveToolByPathname } from "@/lib/tools"
-import { headerIconLinkClass } from "@/lib/site-chrome"
+
+const iconBtnClass =
+  "inline-flex items-center justify-center h-8 w-8 rounded-sm text-foreground/60 hover:text-foreground hover:bg-foreground/[0.05] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 
 export function ToolsHeaderWrapper() {
   const pathname = usePathname()
@@ -17,24 +19,16 @@ export function ToolsHeaderWrapper() {
     <SiteHeader
       toolName={tool?.name}
       authSlot={
-        <div className="flex items-center gap-3">
-          <Link
-            href="/"
-            aria-label="Home"
-            className={headerIconLinkClass}
-          >
-            <Home className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Home</span>
-          </Link>
+        <div className="flex items-center gap-1">
           <Link
             href="/settings"
             aria-label="Settings"
-            className={headerIconLinkClass}
+            title="Settings"
+            className={iconBtnClass}
           >
-            <Settings className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Settings</span>
+            <Settings className="h-4 w-4" aria-hidden="true" />
           </Link>
-          <SignOutButton />
+          <SignOutButton iconOnly />
         </div>
       }
     />

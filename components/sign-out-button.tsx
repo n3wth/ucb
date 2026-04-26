@@ -4,13 +4,26 @@ import { useRouter } from "next/navigation"
 import { LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-export function SignOutButton() {
+export function SignOutButton({ iconOnly = false }: { iconOnly?: boolean }) {
   const router = useRouter()
 
   const handleSignOut = async () => {
     await fetch("/api/auth/logout", { method: "POST" })
     router.push("/")
     router.refresh()
+  }
+
+  if (iconOnly) {
+    return (
+      <button
+        onClick={handleSignOut}
+        aria-label="Sign out"
+        title="Sign out"
+        className="inline-flex items-center justify-center h-8 w-8 rounded-sm text-foreground/60 hover:text-foreground hover:bg-foreground/[0.05] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      >
+        <LogOut className="h-4 w-4" aria-hidden="true" />
+      </button>
+    )
   }
 
   return (

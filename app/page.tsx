@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 import { cookies } from "next/headers"
 import { ArrowRight } from "lucide-react"
@@ -26,13 +27,14 @@ export default async function LandingPage() {
       <section className="flex-1 grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] page-fade-in">
         {/* LEFT: identity, top-aligned */}
         <div className="lg:border-r border-border px-6 sm:px-10 lg:px-14 pt-10 sm:pt-16 lg:pt-20 pb-8 lg:pb-14">
-          <div
-            className="font-display text-foreground leading-[0.86] tracking-[-0.04em] text-[clamp(3.25rem,11vw,7.25rem)]"
-            style={{ fontWeight: 800 }}
-            aria-label="UCB"
-          >
-            UCB
-          </div>
+          <Image
+            src="/ucb-wordmark.svg"
+            alt="UCB Comedy"
+            width={2006}
+            height={313}
+            className="w-[clamp(220px,38vw,460px)] h-auto dark:invert gay:invert"
+            priority
+          />
 
           <h1
             className="mt-3 sm:mt-4 font-display text-foreground/90 leading-[0.92] tracking-[-0.035em] text-[clamp(2.25rem,6vw,4.5rem)]"
