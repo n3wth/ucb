@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import { formInputClassName } from "@/lib/site-chrome"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -77,8 +78,7 @@ import type {
 import { AlertTriangle, Calendar, Check, Pencil, Plus, Send, Trash2, Users, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const inputClasses =
-  "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
+const inputClasses = formInputClassName()
 
 type SendStatus =
   | { kind: "idle" }

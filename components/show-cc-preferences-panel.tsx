@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { formInputClassName } from "@/lib/site-chrome"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -132,7 +133,7 @@ export function ShowCcPreferencesPanel({ activeShowTitle, onChange }: ShowCcPref
                     handleAddTitle()
                   }
                 }}
-                className="bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
+                className={formInputClassName()}
               />
               <Button
                 type="button"

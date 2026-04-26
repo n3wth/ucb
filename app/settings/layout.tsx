@@ -17,7 +17,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
       <SiteHeader
         toolName="Settings"
         authSlot={
-          <div className="flex items-center gap-1">
+          <div className="flex items-center">
             <Link
               href="/tools"
               aria-label="Tools"

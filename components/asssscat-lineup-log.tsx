@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { formInputClassName } from "@/lib/site-chrome"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -35,8 +36,7 @@ import { matchPerformersByName, parseCastInput } from "@/lib/asssscat-performers
 import type { AsssscatPerformer } from "@/lib/types"
 import { Pencil, Plus, Save, Trash2, X } from "lucide-react"
 
-const inputClasses =
-  "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
+const inputClasses = formInputClassName()
 
 interface AsssscatLineupLogProps {
   performers: AsssscatPerformer[]

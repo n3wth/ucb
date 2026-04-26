@@ -2,6 +2,7 @@
 
 import { forwardRef, useImperativeHandle, useState } from "react"
 import { X, Plus } from "lucide-react"
+import { formInputClassName } from "@/lib/site-chrome"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -39,7 +40,7 @@ export const CcEmailList = forwardRef<CcEmailListHandle, CcEmailListProps>(funct
   const [error, setError] = useState<string | null>(null)
 
   const inputClasses =
-    "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
+    formInputClassName()
 
   const commitDraft = (current: string[]): { next: string[]; accepted: boolean } => {
     const candidate = normalizeEmail(draft)
