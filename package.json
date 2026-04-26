@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "favicon:build": "python3 scripts/generate_favicon_ico.py"
+    "favicon:build": "python3 scripts/generate_favicon_assets.py"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

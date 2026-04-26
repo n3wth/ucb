@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { UCB_BRAND, ucbMarkDataUrl } from '@/lib/ucb-mark'
+import { UCB_BRAND, ucbWordmarkDataUrl } from '@/lib/ucb-mark'
 
 export const size = { width: 180, height: 180 }
 export const contentType = 'image/png'
@@ -18,7 +18,12 @@ export default function AppleIcon() {
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={ucbMarkDataUrl(UCB_BRAND.light)} width={140} height={140} alt="" />
+        <img
+          src={ucbWordmarkDataUrl(UCB_BRAND.light)}
+          width={150}
+          height={90}
+          alt=""
+        />
       </div>
     ),
     { ...size }

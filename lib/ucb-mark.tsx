@@ -1,5 +1,8 @@
-// UCB mark — UCB "UC" two-path mark (geometry matches /public/icon.svg foreground paths).
-// Rendered via data URL so it works inside Next.js ImageResponse (Satori).
+// Full UCB wordmark (same as /public/ucb.svg in the app header) as a data URL for
+// next/og (Satori) and icon routes. Replaces `fill="black"` so the mark reads on dark tiles.
+
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 export const UCB_BRAND = {
   dark: '#2b2c30',
@@ -7,7 +10,16 @@ export const UCB_BRAND = {
   accent: '#f5c518',
 } as const
 
-export function ucbMarkDataUrl(fill: string) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180"><path fill="${fill}" d="M65.2926 124.136L14 66.7372H34.6355L64.7495 100.436V66.7372H80.1365V118.47C80.1365 126.278 70.4953 129.958 65.2926 124.136Z"/><path fill="${fill}" d="M101.141 53H136.632C151.023 53 162.689 64.6662 162.689 79.0573V112.904H148.112V79.0573C148.112 78.7105 148.098 78.3662 148.072 78.0251L112.581 112.898C112.701 112.902 112.821 112.904 112.941 112.904H148.112V126.672H112.941C98.5504 126.672 86.5638 114.891 86.5638 100.5V66.7434H101.141V100.5C101.141 101.15 101.191 101.792 101.289 102.422L137.56 66.7816C137.255 66.7563 136.945 66.7434 136.632 66.7434H101.141V53Z"/></svg>`
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
+const dataUrlByFill = new Map<string, string>()
+
+export function ucbWordmarkDataUrl(foreground: string = UCB_BRAND.light) {
+  const hit = dataUrlByFill.get(foreground)
+  if (hit) return hit
+
+  const path = join(process.cwd(), 'public', 'ucb.svg')
+  const wordmark = readFileSync(path, 'utf-8')
+  const tinted = wordmark.replaceAll('fill="black"', `fill="${foreground}"`)
+  const url = `data:image/svg+xml;utf8,${encodeURIComponent(tinted)}`
+  dataUrlByFill.set(foreground, url)
+  return url
 }
