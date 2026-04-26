@@ -36,11 +36,18 @@ describe('lineupLogStore (in-memory fallback)', () => {
     expect(list[0].monologistName).toBe('New')
   })
 
+  it('upsert reports persisted=false when no Supabase backend is configured', async () => {
+    const result = await lineupLogStore.upsert(entry({ id: 'mem' }))
+    expect(result.persisted).toBe(false)
+    expect(result.entries.map((e) => e.id)).toEqual(['mem'])
+  })
+
   it('remove drops the matching entry', async () => {
     await lineupLogStore.upsert(entry({ id: 'a' }))
     await lineupLogStore.upsert(entry({ id: 'b' }))
     const after = await lineupLogStore.remove('a')
-    expect(after.map((e) => e.id)).toEqual(['b'])
+    expect(after.entries.map((e) => e.id)).toEqual(['b'])
+    expect(after.persisted).toBe(false)
   })
 
   it('recordIfNew skips duplicates by date + monologist + performer set', async () => {
@@ -66,8 +73,8 @@ describe('lineupLogStore (in-memory fallback)', () => {
         ],
       }),
     )
-    expect(result).toHaveLength(1)
-    expect(result[0].id).toBe('a')
+    expect(result.entries).toHaveLength(1)
+    expect(result.entries[0].id).toBe('a')
   })
 
   it('recordIfNew records when same date but different cast', async () => {
@@ -85,7 +92,7 @@ describe('lineupLogStore (in-memory fallback)', () => {
         performers: [{ performerId: 'p2', name: 'Bob' }],
       }),
     )
-    expect(result).toHaveLength(2)
+    expect(result.entries).toHaveLength(2)
   })
 
   it('importMany skips duplicates and entries with existing ids', async () => {
@@ -98,7 +105,20 @@ describe('lineupLogStore (in-memory fallback)', () => {
         performers: [{ performerId: 'p9', name: 'Zed' }],
       }),
     ])
-    const ids = result.map((e) => e.id).sort()
+    const ids = result.entries.map((e) => e.id).sort()
     expect(ids).toEqual(['existing', 'new-1'])
+  })
+
+  it('importMany reports persisted=false when writes only landed in memory', async () => {
+    const result = await lineupLogStore.importMany([
+      entry({ id: 'leg-1' }),
+      entry({
+        id: 'leg-2',
+        showDate: '2026-06-01',
+        performers: [{ performerId: 'p9', name: 'Zed' }],
+      }),
+    ])
+    expect(result.persisted).toBe(false)
+    expect(result.entries.map((e) => e.id).sort()).toEqual(['leg-1', 'leg-2'])
   })
 })

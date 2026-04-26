@@ -9,6 +9,6 @@ export async function DELETE(
   if (!id) {
     return NextResponse.json({ error: "id is required" }, { status: 400 })
   }
-  const entries = await lineupLogStore.remove(id)
-  return NextResponse.json({ entries })
+  const result = await lineupLogStore.remove(id)
+  return NextResponse.json({ entries: result.entries })
 }

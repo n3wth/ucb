@@ -22,9 +22,9 @@ export async function POST(request: NextRequest) {
   }
 
   const { dedupe, ...entry } = parsed.data
-  const entries = dedupe
+  const result = dedupe
     ? await lineupLogStore.recordIfNew(entry)
     : await lineupLogStore.upsert(entry)
 
-  return NextResponse.json({ entries })
+  return NextResponse.json({ entries: result.entries })
 }

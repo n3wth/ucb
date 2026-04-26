@@ -16,6 +16,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: message }, { status: 400 })
   }
 
-  const entries = await lineupLogStore.importMany(parsed.data.entries)
-  return NextResponse.json({ entries, imported: parsed.data.entries.length })
+  const result = await lineupLogStore.importMany(parsed.data.entries)
+
+  // If the import only landed in per-instance memory, refuse to acknowledge
+  // success — otherwise the client will mark its localStorage as migrated and
+  // the legacy entries are lost forever once that browser opens a different
+  // serverless instance with an empty in-memory store.
+  if (!result.persisted) {
+    return NextResponse.json(
+      {
+        error:
+          "lineup-log storage unavailable; legacy entries were not migrated",
+        entries: result.entries,
+        imported: 0,
+      },
+      { status: 503 },
+    )
+  }
+
+  return NextResponse.json({
+    entries: result.entries,
+    imported: parsed.data.entries.length,
+  })
 }

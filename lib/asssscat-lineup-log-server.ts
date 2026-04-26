@@ -1,6 +1,12 @@
 // Server-side store for ASSSSCAT lineup-log entries. Backed by Supabase when
 // configured; falls back to an in-memory ring buffer (useful for local dev and
 // tests). Mirrors the pattern used by `lib/audit.ts`.
+//
+// Each mutating method returns `{ entries, persisted }` so callers can tell
+// whether the change actually hit shared storage. The migrate endpoint relies
+// on this to refuse to "succeed" when data only landed in per-instance memory
+// — otherwise clients would tombstone their local backup of legacy entries
+// after a no-op migration and lose data permanently.
 
 import {
   MAX_LINEUP_ENTRIES,
@@ -12,6 +18,11 @@ import {
 import { getSupabaseClient } from "@/lib/supabase"
 
 const TABLE = "asssscat_lineup_log"
+
+export interface LineupWriteResult {
+  entries: LineupEntry[]
+  persisted: boolean
+}
 
 // Newest-by-show-date first. Used as a write-through cache and a fallback
 // when Supabase is not configured.
@@ -99,14 +110,15 @@ export const lineupLogStore = {
     return memoryEntries.slice()
   },
 
-  // Insert or update a lineup entry. Returns the latest list.
-  async upsert(entry: LineupEntry): Promise<LineupEntry[]> {
-    const ok = await upsertInDb(entry)
-    if (ok) {
+  // Insert or update a lineup entry. Returns the latest list and whether the
+  // write actually reached shared (DB) storage.
+  async upsert(entry: LineupEntry): Promise<LineupWriteResult> {
+    const persisted = await upsertInDb(entry)
+    if (persisted) {
       const refreshed = await listFromDb()
       if (refreshed !== null) {
         memoryEntries = sortChronological(refreshed).slice(0, MAX_LINEUP_ENTRIES)
-        return memoryEntries
+        return { entries: memoryEntries, persisted: true }
       }
     }
     const idx = memoryEntries.findIndex((e) => e.id === entry.id)
@@ -114,43 +126,58 @@ export const lineupLogStore = {
       idx >= 0
         ? memoryEntries.map((e, i) => (i === idx ? entry : e))
         : [...memoryEntries, entry]
-    return persistMemory(next)
+    return { entries: persistMemory(next), persisted: false }
   },
 
   // Insert only when no existing entry has the same date + monologist +
-  // performer-name set. Returns the latest list.
-  async recordIfNew(entry: LineupEntry): Promise<LineupEntry[]> {
+  // performer-name set.
+  async recordIfNew(entry: LineupEntry): Promise<LineupWriteResult> {
     const current = await this.list()
-    if (isDuplicateLineup(entry, current)) return current
+    if (isDuplicateLineup(entry, current)) {
+      // No-op write; treat as persisted iff the read came from the DB.
+      const persisted = (await listFromDb()) !== null
+      return { entries: current, persisted }
+    }
     return this.upsert(entry)
   },
 
-  async remove(id: string): Promise<LineupEntry[]> {
-    const ok = await deleteInDb(id)
-    if (ok) {
+  async remove(id: string): Promise<LineupWriteResult> {
+    const persisted = await deleteInDb(id)
+    if (persisted) {
       const refreshed = await listFromDb()
       if (refreshed !== null) {
         memoryEntries = sortChronological(refreshed).slice(0, MAX_LINEUP_ENTRIES)
-        return memoryEntries
+        return { entries: memoryEntries, persisted: true }
       }
     }
-    return persistMemory(memoryEntries.filter((e) => e.id !== id))
+    return {
+      entries: persistMemory(memoryEntries.filter((e) => e.id !== id)),
+      persisted: false,
+    }
   },
 
   // Bulk import — used to migrate legacy per-device entries into the shared
   // server store. Existing rows with the same id are left alone; duplicates
   // (same date + monologist + performer set) are dropped.
-  async importMany(entries: LineupEntry[]): Promise<LineupEntry[]> {
+  //
+  // `persisted` is true only if every accepted entry actually reached the DB
+  // (or the import was a no-op against a DB-backed read). If even one write
+  // fell back to memory, the result is reported as not persisted so the
+  // caller can refuse to acknowledge the migration.
+  async importMany(entries: LineupEntry[]): Promise<LineupWriteResult> {
     const current = await this.list()
     const existingIds = new Set(current.map((e) => e.id))
     let snapshot = current
+    let persisted = (await listFromDb()) !== null
     for (const entry of entries) {
       if (existingIds.has(entry.id)) continue
       if (isDuplicateLineup(entry, snapshot)) continue
-      snapshot = await this.upsert(entry)
+      const result = await this.upsert(entry)
+      snapshot = result.entries
+      if (!result.persisted) persisted = false
       existingIds.add(entry.id)
     }
-    return snapshot
+    return { entries: snapshot, persisted }
   },
 
   // Test-only.

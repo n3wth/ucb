@@ -80,6 +80,31 @@ describe('loadLineupLog', () => {
     expect(window.localStorage.getItem(LEGACY_MIGRATED_KEY)).toBe('1')
   })
 
+  it('does not mark legacy as migrated when the migrate endpoint fails', async () => {
+    const legacy = entry({ id: 'legacy-keep' })
+    window.localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify([legacy]))
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo) => {
+        if (typeof input === 'string' && input.includes('/migrate')) {
+          return new Response(
+            JSON.stringify({ error: 'storage unavailable' }),
+            { status: 503, headers: { 'Content-Type': 'application/json' } },
+          )
+        }
+        return new Response(JSON.stringify({ entries: [] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }),
+    )
+
+    await loadLineupLog()
+    expect(window.localStorage.getItem(LEGACY_MIGRATED_KEY)).toBeNull()
+    expect(window.localStorage.getItem(LEGACY_STORAGE_KEY)).not.toBeNull()
+  })
+
   it('skips legacy migration once already migrated', async () => {
     window.localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify([entry({ id: 'x' })]))
     window.localStorage.setItem(LEGACY_MIGRATED_KEY, '1')
