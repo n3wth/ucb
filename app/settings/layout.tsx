@@ -4,6 +4,7 @@ import { Home, Wrench } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SignOutButton } from "@/components/sign-out-button"
 import { SiteFooter } from "@/components/site-footer"
+import { SiteStatusStrip } from "@/components/site-status-strip"
 import { headerIconLinkClass } from "@/lib/site-chrome"
 
 /**
@@ -37,6 +38,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
           </div>
         }
       />
+      <SiteStatusStrip />
       <div className="app-shell page-fade-in flex-1 w-full py-8 sm:py-11 lg:py-12">{children}</div>
       <SiteFooter />
     </main>

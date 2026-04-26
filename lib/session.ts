@@ -43,43 +43,63 @@ async function hmac(payload: string): Promise<string> {
 interface SessionPayload {
   exp: number // unix seconds
   v: 1
+  email?: string
 }
 
-export async function signSession(maxAgeSeconds: number = DEFAULT_MAX_AGE_SECONDS): Promise<string> {
+export async function signSession(
+  maxAgeSeconds: number = DEFAULT_MAX_AGE_SECONDS,
+  options: { email?: string } = {},
+): Promise<string> {
   const payload: SessionPayload = {
     exp: Math.floor(Date.now() / 1000) + maxAgeSeconds,
     v: 1,
+    ...(options.email ? { email: options.email } : {}),
   }
   const payloadStr = base64UrlEncode(new TextEncoder().encode(JSON.stringify(payload)))
   const sig = await hmac(payloadStr)
   return `${payloadStr}.${sig}`
 }
 
-export async function verifySession(token: string | undefined): Promise<boolean> {
-  if (!token) return false
+async function decodePayload(token: string | undefined): Promise<SessionPayload | null> {
+  if (!token) return null
   const parts = token.split(".")
-  if (parts.length !== 2) return false
+  if (parts.length !== 2) return null
   const [payloadStr, sig] = parts
 
   const expected = await hmac(payloadStr)
-  // Constant-time compare
-  if (expected.length !== sig.length) return false
+  if (expected.length !== sig.length) return null
   let diff = 0
   for (let i = 0; i < expected.length; i++) {
     diff |= expected.charCodeAt(i) ^ sig.charCodeAt(i)
   }
-  if (diff !== 0) return false
+  if (diff !== 0) return null
 
   try {
     const json = new TextDecoder().decode(base64UrlDecode(payloadStr))
     const payload = JSON.parse(json) as SessionPayload
-    if (payload.v !== 1) return false
-    if (typeof payload.exp !== "number") return false
-    if (payload.exp < Math.floor(Date.now() / 1000)) return false
-    return true
+    if (payload.v !== 1) return null
+    if (typeof payload.exp !== "number") return null
+    if (payload.exp < Math.floor(Date.now() / 1000)) return null
+    return payload
   } catch {
-    return false
+    return null
   }
+}
+
+export async function verifySession(token: string | undefined): Promise<boolean> {
+  return (await decodePayload(token)) !== null
+}
+
+/**
+ * Returns the session payload if the token is valid, or null otherwise.
+ * Useful for surfacing the signed-in email in the UI.
+ */
+export async function readSession(
+  token: string | undefined,
+): Promise<{ email: string | null } | null> {
+  const payload = await decodePayload(token)
+  if (!payload) return null
+  return { email: payload.email ?? null }
 }
 
 export function constantTimeEqual(a: string, b: string): boolean {
