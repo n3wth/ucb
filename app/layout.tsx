@@ -6,26 +6,16 @@ import { env } from '@/lib/env'
 import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
-const circular = localFont({
-  variable: '--font-circular',
+const sohne = localFont({
+  variable: '--font-sohne',
   display: 'swap',
   src: [
-    { path: '../public/fonts/Circular-400-Book.woff2',   weight: '400', style: 'normal' },
-    { path: '../public/fonts/Circular-500-Medium.woff2', weight: '500', style: 'normal' },
-    { path: '../public/fonts/Circular-700-Bold.woff2',   weight: '700', style: 'normal' },
-    { path: '../public/fonts/Circular-800-Black.woff2',  weight: '800', style: 'normal' },
-  ],
-})
-
-const boomer = localFont({
-  variable: '--font-boomer',
-  display: 'swap',
-  src: [
-    { path: '../public/fonts/BoomerSerifExtraCond-Light.woff2',  weight: '300', style: 'normal' },
-    { path: '../public/fonts/BoomerSerifExtraCond-Reg.woff2',    weight: '400', style: 'normal' },
-    { path: '../public/fonts/BoomerSerifExtraCond-RegIta.woff2', weight: '400', style: 'italic' },
-    { path: '../public/fonts/BoomerSerifExtraCond-Bold.woff2',   weight: '700', style: 'normal' },
-    { path: '../public/fonts/BoomerSerifExtraCond-Black.woff2',  weight: '900', style: 'normal' },
+    { path: '../public/fonts/Sohne-Buch.woff2',            weight: '400', style: 'normal' },
+    { path: '../public/fonts/Sohne-BuchKursiv.woff2',      weight: '400', style: 'italic' },
+    { path: '../public/fonts/Sohne-Kraftig.woff2',         weight: '500', style: 'normal' },
+    { path: '../public/fonts/Sohne-Halbfett.woff2',        weight: '600', style: 'normal' },
+    { path: '../public/fonts/Sohne-Dreiviertelfett.woff2', weight: '700', style: 'normal' },
+    { path: '../public/fonts/Sohne-Fett.woff2',            weight: '800', style: 'normal' },
   ],
 })
 
@@ -93,7 +83,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`bg-background ${circular.variable} ${boomer.variable} ${dahlia.variable} ${geistMono.variable}`}
+      className={`bg-background ${sohne.variable} ${dahlia.variable} ${geistMono.variable}`}
     >
       <body className="font-sans antialiased [font-synthesis-weight:none]">
         <ThemeProvider
