@@ -20,27 +20,28 @@ export default function LandingPage() {
 
       <section className="flex-1 flex items-center">
         <div className="mx-auto max-w-2xl w-full px-6 py-16 sm:py-24">
-          <div className="flex items-center gap-4 mb-10">
+          <div className="flex items-center gap-4 mb-8 sm:mb-10">
             <UcbLogo size={40} showEyes={false} />
-            <span className="text-[11px] tracking-[0.25em] uppercase text-foreground/60 font-medium">
+            <div className="h-6 w-px bg-border" aria-hidden="true" />
+            <span className="text-[11px] tracking-[0.25em] uppercase text-muted-foreground font-medium">
               Bookings
             </span>
           </div>
 
-          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl leading-[1.05] tracking-tight text-foreground">
+          <h1 className="font-display pl-4 sm:pl-5 -ml-px border-l-2 border-primary/35 text-3xl sm:text-4xl lg:text-5xl leading-[1.05] tracking-tight text-foreground">
             Internal booking tools for the UCB Artistic Team.
           </h1>
 
-          <p className="mt-5 text-sm sm:text-base text-foreground/70 leading-relaxed max-w-lg">
+          <p className="mt-5 pl-4 sm:pl-5 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-lg">
             Confirm shows, send the ASSSSCAT cast booking email, and review the
             audit log. Sign in with your{" "}
             <span className="text-foreground">@ucbcomedy.com</span> account.
           </p>
 
-          <div className="mt-10">
+          <div className="mt-10 pl-4 sm:pl-5">
             <Link
               href="/login"
-              className="group inline-flex items-center gap-2 border-2 border-foreground bg-foreground px-5 py-3 text-xs font-semibold tracking-[0.2em] uppercase text-background hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="group inline-flex items-center gap-2 border-2 border-foreground bg-foreground px-5 py-3 text-xs font-semibold tracking-[0.2em] uppercase text-background shadow-sm hover:bg-primary hover:text-primary-foreground hover:border-primary transition-[background-color,border-color,color,box-shadow,transform] duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:translate-y-px"
             >
               <span>Sign in</span>
               <ArrowRight

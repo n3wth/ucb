@@ -90,7 +90,7 @@ export function UcbLogo({ size = 36, className = "", showEyes = false }: UcbLogo
         alt="UCB"
         width={size}
         height={size}
-        className="object-contain"
+        className={cn("object-contain ucb-mark-adaptive")}
         style={{ width: size, height: size }}
         priority
       />
