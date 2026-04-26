@@ -16,19 +16,19 @@ export function ToolRow({ tool }: ToolRowProps) {
   const available = tool.status === "available"
 
   const content = (
-    <div className="flex items-start gap-4 py-4">
-      <div className="shrink-0 mt-0.5">
-        <Icon className="h-5 w-5 text-foreground" aria-hidden="true" />
+    <div className="flex items-start gap-4 py-4 sm:py-5 pl-0.5 sm:pl-1 pr-0.5">
+      <div className="shrink-0 mt-0.5 rounded-md p-1.5 bg-foreground/[0.05] text-primary">
+        <Icon className="h-5 w-5" aria-hidden="true" />
       </div>
       <div className="flex-1 min-w-0">
-        <h3 className="text-sm font-medium text-foreground">{tool.name}</h3>
-        <p className="mt-1 text-sm text-muted-foreground leading-relaxed line-clamp-2">
+        <h3 className="text-sm font-medium text-foreground tracking-tight">{tool.name}</h3>
+        <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed line-clamp-2">
           {tool.description}
         </p>
       </div>
       {available && (
         <ArrowRight
-          className="h-4 w-4 text-foreground shrink-0 mt-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all"
+          className="h-4 w-4 text-foreground/80 shrink-0 mt-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200 motion-reduce:transition-none"
           aria-hidden="true"
         />
       )}
@@ -48,8 +48,8 @@ export function ToolRow({ tool }: ToolRowProps) {
       <Link
         href={tool.href}
         className={cn(
-          "group block px-1 -mx-1 rounded-md transition-all duration-200",
-          "hover:bg-muted/50 hover:-translate-y-px motion-reduce:hover:translate-y-0",
+          "group block rounded-lg transition-[background-color,transform,box-shadow] duration-200",
+          "hover:bg-muted/35 hover:shadow-sm hover:-translate-y-px motion-reduce:hover:translate-y-0",
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         )}
       >

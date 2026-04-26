@@ -10,10 +10,10 @@ import { SiteFooter } from "@/components/site-footer"
  */
 export default function ToolsLayout({ children }: { children: ReactNode }) {
   return (
-    <main className="min-h-screen bg-background flex flex-col">
+    <main className="min-h-screen bg-background text-foreground flex flex-col">
       <ToolsHeaderWrapper />
       <ToolsNav />
-      <div className="mx-auto max-w-6xl px-6 py-10 sm:py-14 flex-1 w-full">{children}</div>
+      <div className="app-shell page-fade-in flex-1 w-full py-8 sm:py-11 lg:py-12">{children}</div>
       <SiteFooter />
     </main>
   )

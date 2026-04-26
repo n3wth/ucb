@@ -11,8 +11,9 @@ export const headerIconLinkClass = cn(
 
 /** Primary solid CTA (landing, 404, etc.). */
 export const primaryCtaClassName = cn(
-  "group inline-flex items-center justify-center gap-2 border-2 border-foreground bg-foreground px-5 py-3 text-xs font-semibold tracking-[0.2em] uppercase text-background",
-  "shadow-sm hover:bg-primary hover:text-primary-foreground hover:border-primary",
+  "group inline-flex items-center justify-center gap-2 border-2 border-foreground/90 bg-foreground px-5 py-3.5 sm:py-3 text-xs font-semibold tracking-[0.2em] uppercase text-background",
+  "shadow-[0_1px_2px_rgba(0,0,0,0.12)]",
+  "hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-sm",
   "transition-[background-color,border-color,color,box-shadow,transform] duration-200",
   "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
   "active:translate-y-px",

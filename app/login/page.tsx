@@ -21,7 +21,7 @@ export default function LoginPage() {
         }
       />
 
-      <div className="flex-1 flex items-center justify-center px-6 py-16">
+      <div className="flex-1 flex items-center justify-center app-shell page-fade-in py-16 sm:py-20">
         <div className="w-full max-w-sm">
           <Suspense fallback={<LoginFormSkeleton />}>
             <LoginForm />
@@ -36,7 +36,7 @@ export default function LoginPage() {
 
 function LoginFormSkeleton() {
   return (
-    <div className="rounded-lg border border-border bg-card p-6 space-y-4 animate-pulse">
+    <div className="surface-panel p-6 sm:p-7 space-y-4 animate-pulse">
       <div className="h-4 w-20 bg-muted rounded" />
       <div className="h-11 bg-muted rounded" />
       <div className="h-11 bg-muted rounded" />

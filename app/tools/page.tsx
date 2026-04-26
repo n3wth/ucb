@@ -16,21 +16,23 @@ export default function ToolsHubPage() {
   return (
     <ToolPage title="Tools" description="Internal tools for the UCB artistic team.">
       {available.length > 0 ? (
-        <ul className="divide-y divide-border border-y border-border">
+        <ul className="surface-panel divide-y divide-border/90 overflow-hidden px-1.5 sm:px-2">
           {available.map((tool) => (
             <ToolRow key={tool.id} tool={tool} />
           ))}
         </ul>
       ) : (
-        <div className="border border-dashed border-border rounded-lg py-16 text-center">
+        <div className="surface-panel py-20 sm:py-24 text-center px-4">
           <p className="text-sm text-muted-foreground">No tools available yet.</p>
         </div>
       )}
 
       {comingSoon.length > 0 && (
-        <div className="mt-10">
-          <h2 className="text-xs font-medium text-muted-foreground mb-3">Coming soon</h2>
-          <ul className="divide-y divide-border border-y border-border">
+        <div className="mt-12">
+          <h2 className="text-[11px] font-medium tracking-[0.2em] uppercase text-muted-foreground mb-3">
+            Coming soon
+          </h2>
+          <ul className="surface-panel divide-y divide-border/90 overflow-hidden px-1.5 sm:px-2">
             {comingSoon.map((tool) => (
               <ToolRow key={tool.id} tool={tool} />
             ))}
