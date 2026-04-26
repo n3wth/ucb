@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { UCB_BRAND, ucbMarkDataUrl } from '@/lib/ucb-mark'
+import { UCB_BRAND, ucbWordmarkDataUrl } from '@/lib/ucb-mark'
 
 export const SOCIAL_ALT = 'UCB Bookings — staff tools for confirming shows.'
 
@@ -10,7 +10,9 @@ export function socialCard({
   width: number
   height: number
 }) {
-  const markSize = Math.round(height * 0.22)
+  // Wordmark is wide (~1.66:1); height drives layout
+  const markH = Math.round(height * 0.16)
+  const markW = Math.round(markH * 1.66)
   const titleSize = Math.round(height * 0.11)
   const subtitleSize = Math.round(height * 0.045)
   const eyebrowSize = Math.round(height * 0.028)
@@ -44,12 +46,12 @@ export function socialCard({
           }}
         />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: markSize * 0.35 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: markW * 0.2 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={ucbMarkDataUrl(UCB_BRAND.light)}
-            width={markSize}
-            height={markSize}
+            src={ucbWordmarkDataUrl(UCB_BRAND.light)}
+            width={markW}
+            height={markH}
             alt=""
           />
           <div
