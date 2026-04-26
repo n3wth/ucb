@@ -2,9 +2,9 @@
 
 import { useRouter } from "next/navigation"
 import { LogOut } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { headerIconButtonClass } from "@/lib/site-chrome"
 
-export function SignOutButton({ iconOnly = false }: { iconOnly?: boolean }) {
+export function SignOutButton() {
   const router = useRouter()
 
   const handleSignOut = async () => {
@@ -13,28 +13,15 @@ export function SignOutButton({ iconOnly = false }: { iconOnly?: boolean }) {
     router.refresh()
   }
 
-  if (iconOnly) {
-    return (
-      <button
-        onClick={handleSignOut}
-        aria-label="Sign out"
-        title="Sign out"
-        className="inline-flex items-center justify-center h-8 w-8 rounded-sm text-foreground/60 hover:text-foreground hover:bg-foreground/[0.05] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-      >
-        <LogOut className="h-4 w-4" aria-hidden="true" />
-      </button>
-    )
-  }
-
   return (
-    <Button
-      variant="ghost"
-      size="sm"
+    <button
+      type="button"
       onClick={handleSignOut}
-      className="text-[10px] sm:text-xs font-medium tracking-[0.2em] uppercase text-foreground/60 hover:text-foreground hover:bg-transparent transition-colors"
+      aria-label="Sign out"
+      title="Sign out"
+      className={headerIconButtonClass}
     >
-      <LogOut className="h-3.5 w-3.5 mr-1.5" />
-      Sign out
-    </Button>
+      <LogOut aria-hidden="true" />
+    </button>
   )
 }

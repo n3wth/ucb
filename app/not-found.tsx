@@ -2,6 +2,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { SiteStatusStrip } from "@/components/site-status-strip"
 import {
   ctaIconShiftClassName,
   headerSecondaryLinkClass,
@@ -22,6 +23,7 @@ export default function NotFound() {
           </Link>
         }
       />
+      <SiteStatusStrip />
 
       <section className="flex-1 flex items-center page-fade-in">
         <div className="app-shell max-w-2xl py-20 sm:py-28">

@@ -3,13 +3,13 @@
 import * as React from "react"
 import { useTheme } from "next-themes"
 import { Moon, Sun, Sparkles } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { headerIconButtonClass } from "@/lib/site-chrome"
 
 const THEMES = [
   { value: "light", label: "Light", Icon: Sun },
@@ -39,23 +39,23 @@ export function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
+        <button
+          type="button"
           aria-label="Change theme"
-          className="h-8 w-8 rounded-md border border-transparent text-foreground/70 hover:text-foreground hover:border-foreground/30 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          title="Change theme"
+          className={headerIconButtonClass}
         >
           {current === "gay" ? (
             <span
               aria-hidden="true"
-              className="inline-block h-4 w-4 rounded-full"
+              className="inline-block h-[18px] w-[18px] rounded-full"
               style={{ background: GAY_MODE_SWATCH }}
             />
           ) : (
-            <ActiveIcon className="h-4 w-4" aria-hidden="true" />
+            <ActiveIcon aria-hidden="true" />
           )}
           <span className="sr-only">Change theme (current: {current})</span>
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-[8rem]">
         {THEMES.map(({ value, label, Icon }) => (

@@ -9,6 +9,15 @@ export const headerIconLinkClass = cn(
   headerSecondaryLinkClass,
 )
 
+/**
+ * Shared icon-button shell used in the header right cluster (theme toggle,
+ * settings, sign out). Keeping all three on the same shape, rounding, color,
+ * and stroke weight makes the row feel optically aligned even though the
+ * lucide glyphs each have slightly different visual centers.
+ */
+export const headerIconButtonClass =
+  "inline-flex items-center justify-center h-8 w-8 rounded-sm text-foreground/60 hover:text-foreground hover:bg-foreground/[0.05] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background [&_svg]:h-[18px] [&_svg]:w-[18px] [&_svg]:shrink-0"
+
 /** Primary solid CTA (landing, 404, etc.). */
 export const primaryCtaClassName = cn(
   "group inline-flex items-center justify-center gap-2 border-2 border-foreground/90 bg-foreground px-5 py-3.5 sm:py-3 text-xs font-semibold tracking-[0.2em] uppercase text-background",

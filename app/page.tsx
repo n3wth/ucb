@@ -7,6 +7,10 @@ import { SiteFooter } from "@/components/site-footer"
 import { SiteStatusStrip } from "@/components/site-status-strip"
 import { HeaderAuth } from "@/components/header-auth"
 import { readSession, SESSION_COOKIE } from "@/lib/session"
+import {
+  ctaIconShiftClassName,
+  primaryCtaClassName,
+} from "@/lib/site-chrome"
 
 export const dynamic = "force-dynamic"
 
@@ -78,15 +82,9 @@ export default async function LandingPage() {
               )}
             </p>
 
-            <Link
-              href={ctaHref}
-              className="group mt-6 inline-flex items-center gap-2 border border-primary bg-primary px-5 py-3 text-xs font-semibold tracking-[0.2em] uppercase text-primary-foreground hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            >
+            <Link href={ctaHref} className={`${primaryCtaClassName} mt-6`}>
               <span>{ctaLabel}</span>
-              <ArrowRight
-                className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
-                aria-hidden="true"
-              />
+              <ArrowRight className={ctaIconShiftClassName} aria-hidden="true" />
             </Link>
 
             <p className="mt-8 max-w-sm text-[11px] leading-relaxed text-muted-foreground">
