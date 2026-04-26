@@ -1,28 +1,35 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Archivo_Black, Playfair_Display } from 'next/font/google'
+import { Geist_Mono } from 'next/font/google'
+import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { env } from '@/lib/env'
 import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
-const geist = Geist({
-  subsets: ['latin'],
-  variable: '--font-geist',
+const sohne = localFont({
+  variable: '--font-sohne',
+  display: 'swap',
+  src: [
+    { path: '../public/fonts/Sohne-Buch.woff2',            weight: '400', style: 'normal' },
+    { path: '../public/fonts/Sohne-BuchKursiv.woff2',      weight: '400', style: 'italic' },
+    { path: '../public/fonts/Sohne-Kraftig.woff2',         weight: '500', style: 'normal' },
+    { path: '../public/fonts/Sohne-Halbfett.woff2',        weight: '600', style: 'normal' },
+    { path: '../public/fonts/Sohne-Dreiviertelfett.woff2', weight: '700', style: 'normal' },
+    { path: '../public/fonts/Sohne-Fett.woff2',            weight: '800', style: 'normal' },
+  ],
 })
+
+const dahlia = localFont({
+  variable: '--font-dahlia',
+  display: 'swap',
+  src: [
+    { path: '../public/fonts/Dahlia-Medium.woff2', weight: '500', style: 'normal' },
+  ],
+})
+
 const geistMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-geist-mono',
-})
-const archivoBlack = Archivo_Black({
-  subsets: ['latin'],
-  weight: '400',
-  variable: '--font-archivo-black',
-})
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '700', '900'],
-  style: ['normal', 'italic'],
-  variable: '--font-playfair',
 })
 
 const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? 'https://ucb-bookings.vercel.app'
@@ -76,7 +83,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`bg-background ${geist.variable} ${geistMono.variable} ${archivoBlack.variable} ${playfair.variable}`}
+      className={`bg-background ${sohne.variable} ${dahlia.variable} ${geistMono.variable}`}
     >
       <body className="font-sans antialiased [font-synthesis-weight:none]">
         <ThemeProvider

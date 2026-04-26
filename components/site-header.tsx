@@ -28,13 +28,13 @@ export function SiteHeader({ toolName, authSlot }: SiteHeaderProps) {
             aria-label={`${APP_NAME} — home`}
           >
             <UcbLogo size={28} showEyes={false} />
-            <span className="font-display text-[0.9375rem] sm:text-base tracking-[0.06em] uppercase shrink-0 text-foreground">
+            <span className="font-display text-[0.9375rem] sm:text-base tracking-[0.01em] shrink-0 text-foreground">
               {APP_NAME}
             </span>
           </Link>
           {toolName && (
             <div className="flex items-baseline leading-none min-w-0 pl-2.5 sm:pl-3 border-l border-border">
-              <span className="font-display text-[0.9375rem] sm:text-base tracking-[0.06em] uppercase text-muted-foreground truncate">
+              <span className="font-display text-[0.9375rem] sm:text-base tracking-[0.01em] text-muted-foreground truncate">
                 {toolName}
               </span>
             </div>
