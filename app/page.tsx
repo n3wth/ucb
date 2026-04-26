@@ -30,8 +30,8 @@ export default function LandingPage() {
           />
 
           <h1
-            className="mt-6 sm:mt-8 font-display text-foreground leading-[0.88] tracking-[-0.04em] text-[clamp(5rem,16vw,12rem)]"
-            style={{ fontWeight: 800 }}
+            className="mt-6 sm:mt-8 font-display text-foreground leading-[0.92] tracking-[-0.035em] text-[clamp(3rem,8vw,7rem)]"
+            style={{ fontWeight: 700 }}
           >
             Bookings
           </h1>
