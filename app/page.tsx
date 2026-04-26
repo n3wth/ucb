@@ -15,62 +15,57 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Horizontal split */}
+      {/* Split */}
       <section className="flex-1 grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] page-fade-in">
-        {/* LEFT: identity */}
-        <div className="relative flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-border px-6 sm:px-10 lg:px-14 py-14 sm:py-20">
-          <div>
-            <p
-              className="font-display text-foreground/70 text-base sm:text-lg tracking-[0.01em]"
-              style={{ fontWeight: 500 }}
-            >
-              UCB
-            </p>
+        {/* LEFT: identity, top-aligned */}
+        <div className="border-b lg:border-b-0 lg:border-r border-border px-6 sm:px-10 lg:px-14 pt-14 sm:pt-20 pb-14">
+          <p
+            className="font-display text-foreground/55 text-base sm:text-lg tracking-[0.01em]"
+            style={{ fontWeight: 500 }}
+          >
+            UCB
+          </p>
 
-            <h1
-              className="mt-2 sm:mt-3 font-display text-foreground leading-[0.88] tracking-[-0.04em] text-[clamp(5rem,16vw,12rem)]"
-              style={{ fontWeight: 800 }}
-            >
-              Bookings
-            </h1>
+          <h1
+            className="mt-2 sm:mt-3 font-display text-foreground leading-[0.88] tracking-[-0.04em] text-[clamp(5rem,16vw,12rem)]"
+            style={{ fontWeight: 800 }}
+          >
+            Bookings
+          </h1>
 
-            <p className="mt-8 sm:mt-10 max-w-md text-sm sm:text-base text-foreground/85 leading-relaxed">
-              Internal bookings for the artistic team.
-            </p>
-          </div>
+          <p className="mt-8 sm:mt-10 max-w-md text-base sm:text-lg text-foreground/80 leading-snug">
+            Internal bookings for the artistic team.
+          </p>
         </div>
 
-        {/* RIGHT: sign-in panel */}
-        <div className="flex items-center justify-center px-6 sm:px-10 lg:px-14 py-14 sm:py-20">
-          <div className="w-full max-w-sm border border-border bg-card">
-            <div className="px-6 sm:px-7 pt-6 pb-5 border-b border-border">
-              <p className="text-[10px] tracking-[0.22em] uppercase text-muted-foreground font-medium">
-                Authentication
-              </p>
-              <h2 className="mt-2 font-display text-2xl sm:text-[1.6rem] tracking-tight text-foreground" style={{ fontWeight: 600 }}>
-                Sign in
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Use your <span className="text-foreground">@ucbcomedy.com</span> Google account to continue.
-              </p>
-            </div>
+        {/* RIGHT: sign-in, anchored to bottom */}
+        <div className="flex flex-col justify-end px-6 sm:px-10 lg:px-14 pt-14 pb-14 sm:pb-20">
+          <div className="max-w-md">
+            <h2
+              className="font-display text-foreground tracking-[-0.02em] text-3xl sm:text-4xl"
+              style={{ fontWeight: 700 }}
+            >
+              Sign in
+            </h2>
+            <p className="mt-3 text-base text-muted-foreground leading-relaxed">
+              Use your <span className="text-foreground">@ucbcomedy.com</span>{" "}
+              Google account to continue.
+            </p>
 
-            <div className="px-6 sm:px-7 py-6">
-              <Link
-                href="/login"
-                className="group inline-flex w-full items-center justify-center gap-2 border border-foreground bg-foreground px-4 py-3 text-xs font-semibold tracking-[0.2em] uppercase text-background hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-              >
-                <span>Continue to sign in</span>
-                <ArrowRight
-                  className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
-                  aria-hidden="true"
-                />
-              </Link>
+            <Link
+              href="/login"
+              className="group mt-6 inline-flex items-center gap-2 border border-foreground bg-foreground px-5 py-3 text-xs font-semibold tracking-[0.2em] uppercase text-background hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <span>Continue</span>
+              <ArrowRight
+                className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
+                aria-hidden="true"
+              />
+            </Link>
 
-              <p className="mt-5 pt-5 border-t border-border text-[11px] leading-relaxed text-muted-foreground">
-                All sign-ins and booking actions are written to the audit log with your name, account, and timestamp.
-              </p>
-            </div>
+            <p className="mt-8 max-w-sm text-[11px] leading-relaxed text-muted-foreground">
+              All sign-ins and booking actions are written to the audit log with your name, account, and timestamp.
+            </p>
           </div>
         </div>
       </section>
