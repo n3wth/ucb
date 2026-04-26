@@ -6,10 +6,9 @@
 
 /*
   UCB Bookings — internal tools design system.
-  Default palette is the dark graphite + UCB yellow that Chris signed off on.
-  .dark is an alias for the default so next-themes can target it directly.
-  .light flips to an off-white paper palette with the same yellow accent.
-  .gay swaps in a pride-flag accent run for the designer-discretion "gay mode".
+  Default is a monochrome graphite/paper palette; .gay is the only themed accent.
+  .dark and .light share the monochrome treatment; .gay re-introduces a pride
+  accent run for designer-discretion "gay mode".
 */
 :root {
   --content-max: 72rem; /* aligns with max-w-6xl */
@@ -20,22 +19,22 @@
   --card-foreground: oklch(0.96 0.01 100);
   --popover: oklch(0.26 0.005 260);
   --popover-foreground: oklch(0.96 0.01 100);
-  --primary: oklch(0.87 0.19 98);
+  --primary: oklch(0.96 0.01 100);
   --primary-foreground: oklch(0.18 0.005 260);
   --secondary: oklch(0.30 0.005 260);
   --secondary-foreground: oklch(0.96 0.01 100);
   --muted: oklch(0.30 0.005 260);
   --muted-foreground: oklch(0.72 0.01 100);
-  --accent: oklch(0.87 0.19 98);
+  --accent: oklch(0.96 0.01 100);
   --accent-foreground: oklch(0.18 0.005 260);
   --destructive: oklch(0.58 0.22 25);
   --destructive-foreground: oklch(0.98 0.005 100);
   --border: oklch(0.36 0.005 260);
   --input: oklch(0.30 0.005 260);
-  --ring: oklch(0.87 0.19 98);
+  --ring: oklch(0.72 0.01 100);
   --success: oklch(0.70 0.17 145);
   --success-foreground: oklch(0.18 0.005 260);
-  --chart-1: oklch(0.87 0.19 98);
+  --chart-1: oklch(0.96 0.01 100);
   --chart-2: oklch(0.72 0.01 100);
   --chart-3: oklch(0.70 0.08 200);
   --chart-4: oklch(0.70 0.17 145);
@@ -43,12 +42,12 @@
   --radius: 0.5rem;
   --sidebar: oklch(0.18 0.005 260);
   --sidebar-foreground: oklch(0.96 0.01 100);
-  --sidebar-primary: oklch(0.87 0.19 98);
+  --sidebar-primary: oklch(0.96 0.01 100);
   --sidebar-primary-foreground: oklch(0.18 0.005 260);
   --sidebar-accent: oklch(0.30 0.005 260);
   --sidebar-accent-foreground: oklch(0.96 0.01 100);
   --sidebar-border: oklch(0.36 0.005 260);
-  --sidebar-ring: oklch(0.87 0.19 98);
+  --sidebar-ring: oklch(0.72 0.01 100);
 }
 
 @media (min-width: 640px) {
@@ -64,29 +63,29 @@
   --card-foreground: oklch(0.96 0.01 100);
   --popover: oklch(0.22 0.005 260);
   --popover-foreground: oklch(0.96 0.01 100);
-  --primary: oklch(0.87 0.19 98);
+  --primary: oklch(0.96 0.01 100);
   --primary-foreground: oklch(0.18 0.005 260);
   --secondary: oklch(0.26 0.005 260);
   --secondary-foreground: oklch(0.96 0.01 100);
   --muted: oklch(0.26 0.005 260);
   --muted-foreground: oklch(0.70 0.01 100);
-  --accent: oklch(0.87 0.19 98);
+  --accent: oklch(0.96 0.01 100);
   --accent-foreground: oklch(0.18 0.005 260);
   --destructive: oklch(0.62 0.22 25);
   --destructive-foreground: oklch(0.98 0.005 100);
   --border: oklch(0.32 0.005 260);
   --input: oklch(0.26 0.005 260);
-  --ring: oklch(0.87 0.19 98);
+  --ring: oklch(0.70 0.01 100);
   --success: oklch(0.72 0.17 145);
   --success-foreground: oklch(0.18 0.005 260);
   --sidebar: oklch(0.22 0.005 260);
   --sidebar-foreground: oklch(0.96 0.01 100);
-  --sidebar-primary: oklch(0.87 0.19 98);
+  --sidebar-primary: oklch(0.96 0.01 100);
   --sidebar-primary-foreground: oklch(0.18 0.005 260);
   --sidebar-accent: oklch(0.26 0.005 260);
   --sidebar-accent-foreground: oklch(0.96 0.01 100);
   --sidebar-border: oklch(0.32 0.005 260);
-  --sidebar-ring: oklch(0.87 0.19 98);
+  --sidebar-ring: oklch(0.70 0.01 100);
 }
 
 .light {
@@ -96,29 +95,29 @@
   --card-foreground: oklch(0.18 0.005 260);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.005 260);
-  --primary: oklch(0.82 0.18 96);
-  --primary-foreground: oklch(0.18 0.005 260);
+  --primary: oklch(0.18 0.005 260);
+  --primary-foreground: oklch(0.98 0.005 100);
   --secondary: oklch(0.94 0.005 100);
   --secondary-foreground: oklch(0.18 0.005 260);
   --muted: oklch(0.94 0.005 100);
   --muted-foreground: oklch(0.45 0.01 260);
-  --accent: oklch(0.82 0.18 96);
-  --accent-foreground: oklch(0.18 0.005 260);
+  --accent: oklch(0.18 0.005 260);
+  --accent-foreground: oklch(0.98 0.005 100);
   --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.98 0.005 100);
   --border: oklch(0.86 0.005 260);
   --input: oklch(0.92 0.005 260);
-  --ring: oklch(0.82 0.18 96);
+  --ring: oklch(0.45 0.01 260);
   --success: oklch(0.58 0.17 145);
   --success-foreground: oklch(0.98 0.005 100);
   --sidebar: oklch(0.96 0.005 100);
   --sidebar-foreground: oklch(0.18 0.005 260);
-  --sidebar-primary: oklch(0.82 0.18 96);
-  --sidebar-primary-foreground: oklch(0.18 0.005 260);
+  --sidebar-primary: oklch(0.18 0.005 260);
+  --sidebar-primary-foreground: oklch(0.98 0.005 100);
   --sidebar-accent: oklch(0.94 0.005 100);
   --sidebar-accent-foreground: oklch(0.18 0.005 260);
   --sidebar-border: oklch(0.86 0.005 260);
-  --sidebar-ring: oklch(0.82 0.18 96);
+  --sidebar-ring: oklch(0.45 0.01 260);
 }
 
 .gay {
