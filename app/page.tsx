@@ -23,8 +23,8 @@ export default function LandingPage() {
         }
       />
 
-      <section className="flex-1 flex items-center">
-        <div className="mx-auto max-w-2xl w-full px-6 py-16 sm:py-24">
+      <section className="flex-1 flex items-center page-fade-in">
+        <div className="app-shell max-w-2xl py-20 sm:py-28">
           <div className="flex items-center gap-4 mb-8 sm:mb-10">
             <UcbLogo size={40} showEyes={false} />
             <div className="h-6 w-px bg-border" aria-hidden="true" />

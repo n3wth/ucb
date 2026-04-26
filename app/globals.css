@@ -12,6 +12,8 @@
   .gay swaps in a pride-flag accent run for the designer-discretion "gay mode".
 */
 :root {
+  --content-max: 72rem; /* aligns with max-w-6xl */
+  --shell-px: 1.25rem;
   --background: oklch(0.22 0.005 260);
   --foreground: oklch(0.96 0.01 100);
   --card: oklch(0.26 0.005 260);
@@ -47,6 +49,12 @@
   --sidebar-accent-foreground: oklch(0.96 0.01 100);
   --sidebar-border: oklch(0.36 0.005 260);
   --sidebar-ring: oklch(0.87 0.19 98);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --shell-px: 1.5rem;
+  }
 }
 
 .dark {
@@ -199,6 +207,9 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    text-rendering: optimizeLegibility;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     /* One warm specular + cool floor — distinct from default “slop” flat grays. */
@@ -284,6 +295,38 @@
 }
 
 @layer components {
+  /** Horizontally centered column: same max width + horizontal padding site-wide. */
+  .app-shell {
+    @apply mx-auto w-full max-w-[var(--content-max)] px-5 sm:px-6;
+  }
+
+  /** First paint for route content: subtle lift, respects reduced motion. */
+  .page-fade-in {
+    animation: page-enter 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes page-enter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-fade-in {
+      animation: none;
+    }
+  }
+
+  /** Elevated panel: lists, hub, empty states */
+  .surface-panel {
+    @apply rounded-xl border border-border/80 bg-card/50 shadow-[0_1px_0_0_color-mix(in_oklch,var(--foreground)_4%,transparent)];
+  }
+
   .font-display {
     font-family: var(--font-display);
     font-weight: 400;

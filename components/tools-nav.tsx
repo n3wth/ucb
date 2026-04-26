@@ -19,10 +19,10 @@ export function ToolsNav() {
   return (
     <nav
       aria-label="Tools"
-      className="border-b border-border bg-background/90"
+      className="border-b border-border/80 bg-gradient-to-b from-background/70 to-background/95"
     >
-      <div className="mx-auto max-w-6xl px-6">
-        <ul className="flex items-center gap-1 overflow-x-auto -mx-2">
+      <div className="app-shell">
+        <ul className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto -mx-1 py-0.5 [scrollbar-width:thin]">
           {items.map((tool) => {
             const isActive = isPathUnderToolPath(pathname, tool.href)
             return (
@@ -31,12 +31,13 @@ export function ToolsNav() {
                   href={tool.href}
                   aria-current={isActive ? "page" : undefined}
                   className={cn(
-                    "inline-flex items-center rounded-sm px-3 py-2.5 text-[11px] sm:text-xs font-medium tracking-[0.18em] uppercase",
-                    "transition-colors border-b-2 -mb-px",
+                    "inline-flex items-center rounded-md px-3 py-2.5 text-[11px] sm:text-xs font-medium tracking-[0.16em] uppercase",
+                    "transition-[color,background-color,border-color] duration-200",
+                    "border-b-2 -mb-px",
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                     isActive
-                      ? "text-foreground border-foreground"
-                      : "text-foreground/60 border-transparent hover:text-foreground hover:border-foreground/40",
+                      ? "text-foreground border-foreground bg-foreground/[0.04] sm:bg-transparent"
+                      : "text-foreground/55 border-transparent hover:text-foreground hover:bg-foreground/[0.03] hover:border-foreground/25",
                   )}
                 >
                   {tool.name}

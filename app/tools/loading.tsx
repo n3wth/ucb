@@ -17,15 +17,15 @@ function ToolRowSkeleton() {
 export default function ToolsLoading() {
   return (
     <div
-      className="mx-auto max-w-3xl"
+      className="mx-auto w-full max-w-3xl page-fade-in"
       aria-busy="true"
       aria-label="Loading tools"
     >
-      <div className="mb-8">
-        <Skeleton className="h-8 w-24" />
+      <div className="mb-9 sm:mb-10 pl-1">
+        <Skeleton className="h-9 w-28 rounded" />
         <Skeleton className="mt-2.5 h-4 w-80 max-w-full" />
       </div>
-      <ul className="divide-y divide-border border-y border-border">
+      <ul className="surface-panel divide-y divide-border/90 overflow-hidden px-1.5 sm:px-2">
         {Array.from({ length: 4 }).map((_, i) => (
           <ToolRowSkeleton key={i} />
         ))}

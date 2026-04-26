@@ -19,8 +19,8 @@ const brandLinkClass = cn(
 
 export function SiteHeader({ toolName, authSlot }: SiteHeaderProps) {
   return (
-    <header className="sticky top-0 z-40 text-foreground border-b border-border bg-background/95">
-      <div className="mx-auto max-w-6xl px-5 sm:px-6 py-3 sm:py-3.5 flex items-center justify-between gap-4 sm:gap-6">
+    <header className="sticky top-0 z-40 text-foreground border-b border-border bg-background/90 shadow-[0_1px_0_0_color-mix(in_oklch,var(--foreground)_4%,transparent)]">
+      <div className="app-shell py-3 sm:py-3.5 flex items-center justify-between gap-4 sm:gap-6">
         <div className="flex items-center min-w-0 flex-1 gap-2 sm:gap-3">
           <Link
             href="/"

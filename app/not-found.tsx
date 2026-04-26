@@ -23,8 +23,8 @@ export default function NotFound() {
         }
       />
 
-      <section className="flex-1 flex items-center">
-        <div className="mx-auto max-w-2xl w-full px-6 py-16 sm:py-24">
+      <section className="flex-1 flex items-center page-fade-in">
+        <div className="app-shell max-w-2xl py-20 sm:py-28">
           <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground font-semibold">
             404
           </p>

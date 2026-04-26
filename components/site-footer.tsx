@@ -4,8 +4,8 @@
 export function SiteFooter() {
   const year = new Date().getFullYear()
   return (
-    <footer className="mt-auto border-t border-border">
-      <div className="mx-auto max-w-6xl px-5 sm:px-6 py-4 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2 text-[10px] sm:text-xs tracking-[0.2em] uppercase text-muted-foreground font-medium tabular-nums">
+    <footer className="mt-auto border-t border-border/90 bg-background/30">
+      <div className="app-shell py-5 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2 text-[10px] sm:text-xs tracking-[0.2em] uppercase text-muted-foreground font-medium tabular-nums">
         <span>
           <span className="text-foreground/90">&copy; {year}</span>
           <span className="text-muted-foreground/90">&nbsp;&nbsp;Upright&nbsp;Citizens&nbsp;Brigade</span>
