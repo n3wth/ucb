@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, type ReactNode } from "react"
+import { formInputClassName } from "@/lib/site-chrome"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -166,7 +167,7 @@ export function ShowConfirmationForm({
     updateField("techRehearsalDurationMinutes", minutes)
   }
 
-  const inputClasses = "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
+  const inputClasses = formInputClassName()
 
   const producerEmailField = (
     <Field>

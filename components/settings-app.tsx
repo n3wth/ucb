@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { formInputClassName } from "@/lib/site-chrome"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,8 +17,7 @@ import {
   type EmailSettings,
 } from "@/lib/asssscat-settings"
 
-const inputClasses =
-  "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-10 placeholder:text-muted-foreground"
+const inputClasses = formInputClassName()
 
 interface FieldConfig {
   key: keyof EmailSettings

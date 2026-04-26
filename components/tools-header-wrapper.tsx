@@ -17,7 +17,7 @@ export function ToolsHeaderWrapper() {
     <SiteHeader
       toolName={tool?.name}
       authSlot={
-        <div className="flex items-center gap-1">
+        <div className="flex items-center">
           <Link
             href="/settings"
             aria-label="Settings"

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { formInputClassName } from "@/lib/site-chrome"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -116,7 +117,7 @@ export function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
-                className="bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-11 placeholder:text-muted-foreground"
+                className={formInputClassName("tall")}
                 placeholder="Enter password"
                 required
                 autoFocus

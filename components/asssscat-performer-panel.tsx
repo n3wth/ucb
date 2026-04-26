@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { formInputClassName } from "@/lib/site-chrome"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -61,7 +62,7 @@ interface PerformerPanelProps {
 }
 
 const inputClasses =
-  "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-9 placeholder:text-muted-foreground text-sm"
+  formInputClassName("compact")
 
 export function AsssscatPerformerPanel({
   performers,

@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useRef, useState } from "react"
+import { formInputClassName } from "@/lib/site-chrome"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -63,8 +64,7 @@ interface CastDirectoryProps {
   onViewLineupStats?: (performerId: string) => void
 }
 
-const inputClasses =
-  "bg-input border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all h-9 placeholder:text-muted-foreground text-sm"
+const inputClasses = formInputClassName("compact")
 
 const NONE_VALUE = "__none__"
 
