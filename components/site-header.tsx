@@ -20,7 +20,7 @@ const brandLinkClass = cn(
 export function SiteHeader({ toolName, authSlot }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-40 text-foreground border-b border-border bg-background">
-      <div className="app-shell py-3 sm:py-3.5 flex items-center justify-between gap-4 sm:gap-6">
+      <div className="app-shell h-14 sm:h-16 flex items-center justify-between gap-4 sm:gap-6">
         <div className="flex items-center min-w-0 flex-1 gap-2 sm:gap-3">
           <Link
             href="/"
@@ -28,20 +28,20 @@ export function SiteHeader({ toolName, authSlot }: SiteHeaderProps) {
             aria-label={`${APP_NAME} — home`}
           >
             <UcbLogo size={28} showEyes={false} />
-            <span className="font-display text-[0.9375rem] sm:text-base tracking-[0.01em] shrink-0 text-foreground">
+            <span className="font-display text-[0.9375rem] sm:text-base tracking-[0.01em] leading-none shrink-0 text-foreground">
               {APP_NAME}
             </span>
           </Link>
           {toolName && (
-            <div className="flex items-baseline leading-none min-w-0 pl-2.5 sm:pl-3 border-l border-border">
-              <span className="font-display text-[0.9375rem] sm:text-base tracking-[0.01em] text-muted-foreground truncate">
+            <div className="flex items-center min-w-0 pl-2.5 sm:pl-3 border-l border-border self-stretch py-2">
+              <span className="font-display text-[0.9375rem] sm:text-base tracking-[0.01em] leading-none text-muted-foreground truncate">
                 {toolName}
               </span>
             </div>
           )}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <ThemeToggle />
           {authSlot}
         </div>
