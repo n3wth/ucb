@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
   }
 
   const next = sanitizeNextPath(request.cookies.get(SIGNIN_NEXT_COOKIE)?.value)
-  const token = await signSession(SESSION_MAX_AGE)
+  const token = await signSession(SESSION_MAX_AGE, { email: user.email })
   const res = NextResponse.redirect(new URL(next, request.url))
   res.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,

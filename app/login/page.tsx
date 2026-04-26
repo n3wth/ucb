@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Suspense } from "react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { SiteStatusStrip } from "@/components/site-status-strip"
 import { LoginForm } from "@/components/login-form"
 import { headerSecondaryLinkClass } from "@/lib/site-chrome"
 
@@ -20,6 +21,7 @@ export default function LoginPage() {
           </Link>
         }
       />
+      <SiteStatusStrip />
 
       <div className="flex-1 flex items-center justify-center app-shell page-fade-in py-16 sm:py-20">
         <div className="w-full max-w-sm">
