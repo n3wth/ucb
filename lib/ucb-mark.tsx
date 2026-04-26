@@ -1,4 +1,4 @@
-// UCB mark — two-path vector derived from /public/icon.svg.
+// UCB mark — UCB "UC" two-path mark (geometry matches /public/icon.svg foreground paths).
 // Rendered via data URL so it works inside Next.js ImageResponse (Satori).
 
 export const UCB_BRAND = {
