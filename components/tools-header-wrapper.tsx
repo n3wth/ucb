@@ -5,14 +5,13 @@ import { Home, Settings } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { SiteHeader } from "@/components/site-header"
 import { SignOutButton } from "@/components/sign-out-button"
-import { TOOLS } from "@/lib/tools"
+import { getActiveToolByPathname } from "@/lib/tools"
+import { headerIconLinkClass } from "@/lib/site-chrome"
 
 export function ToolsHeaderWrapper() {
   const pathname = usePathname()
 
-  const tool = TOOLS.filter(
-    (t) => pathname === t.href || pathname.startsWith(t.href + "/"),
-  ).sort((a, b) => b.href.length - a.href.length)[0]
+  const tool = getActiveToolByPathname(pathname)
 
   return (
     <SiteHeader
@@ -22,7 +21,7 @@ export function ToolsHeaderWrapper() {
           <Link
             href="/"
             aria-label="Home"
-            className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-medium tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className={headerIconLinkClass}
           >
             <Home className="h-3.5 w-3.5" aria-hidden="true" />
             <span>Home</span>
@@ -30,7 +29,7 @@ export function ToolsHeaderWrapper() {
           <Link
             href="/settings"
             aria-label="Settings"
-            className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-medium tracking-[0.2em] uppercase text-foreground/70 hover:text-foreground transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className={headerIconLinkClass}
           >
             <Settings className="h-3.5 w-3.5" aria-hidden="true" />
             <span>Settings</span>
