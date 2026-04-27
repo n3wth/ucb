@@ -95,6 +95,7 @@ export interface AsssscatShowDetails {
   ticketLink: string
   oneTimeCc: string[]
   defaultCc: string[]
+  oneTimeBcc: string[]
 }
 
 export interface ShowListItem {

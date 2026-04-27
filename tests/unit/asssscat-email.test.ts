@@ -26,6 +26,7 @@ const baseDetails: AsssscatShowDetails = {
   ticketLink: 'https://tickets.example.com/asssscat',
   oneTimeCc: [],
   defaultCc: [],
+  oneTimeBcc: [],
 }
 
 describe('renderAsssscatSubject', () => {

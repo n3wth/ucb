@@ -102,29 +102,20 @@ export async function POST(request: NextRequest) {
     hasCreds: hasGoogleCredentials(),
   })
 
-  const subject = body.emailSubject?.trim() || renderAsssscatSubject({
+  const showDetailsForRender = {
     showDate: body.showDate,
     improvisers: body.improvisers,
     monologist: body.monologist,
     ticketLink: body.ticketLink,
     oneTimeCc: body.oneTimeCc,
     defaultCc: body.defaultCc,
-  })
-  const emailBody =
-    body.emailBody?.trim() ||
-    renderAsssscatBody({
-      showDetails: {
-        showDate: body.showDate,
-        improvisers: body.improvisers,
-        monologist: body.monologist,
-        ticketLink: body.ticketLink,
-        oneTimeCc: body.oneTimeCc,
-        defaultCc: body.defaultCc,
-      },
-    })
+    oneTimeBcc: body.oneTimeBcc ?? [],
+  }
+  const subject = body.emailSubject?.trim() || renderAsssscatSubject(showDetailsForRender)
+  const emailBody = body.emailBody?.trim() || renderAsssscatBody({ showDetails: showDetailsForRender })
 
   const improviserEmails = body.improvisers.map((p) => p.email)
-  const bcc = dedupeBcc(improviserEmails, [ASSSSCAT_TO])
+  const bcc = dedupeBcc([...improviserEmails, ...(body.oneTimeBcc ?? [])], [ASSSSCAT_TO])
   const cc = dedupeCc([...body.defaultCc, ...body.oneTimeCc], [ASSSSCAT_TO, ...improviserEmails])
 
   if (!hasGoogleCredentials()) {
