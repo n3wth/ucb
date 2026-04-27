@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react"
 import { formInputClassName } from "@/lib/site-chrome"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import {
   Table,
@@ -32,7 +31,7 @@ import {
   type LineupEntry,
   type LineupPerformer,
 } from "@/lib/asssscat-lineup-log"
-import { matchPerformersByName, parseCastInput } from "@/lib/asssscat-performers"
+import { PerformerChipInput } from "@/components/performer-chip-input"
 import type { AsssscatPerformer } from "@/lib/types"
 import { Pencil, Plus, Save, Trash2, X } from "lucide-react"
 
@@ -49,23 +48,7 @@ interface EditState {
   id: string
   showDate: string
   monologistName: string
-  performersText: string
-}
-
-function performersToText(performers: LineupPerformer[]): string {
-  return performers.map((p) => p.name).join(", ")
-}
-
-function buildPerformers(
-  text: string,
-  directory: AsssscatPerformer[],
-): LineupPerformer[] {
-  const names = parseCastInput(text)
-  const matches = matchPerformersByName(names, directory)
-  return matches.map((m) => ({
-    name: m.input,
-    performerId: m.matched ? m.matched.id : null,
-  }))
+  performers: LineupPerformer[]
 }
 
 function formatShowDate(iso: string): string {
@@ -109,7 +92,7 @@ export function AsssscatLineupLog({ performers, onEntriesChange }: AsssscatLineu
       id: newLineupId(),
       showDate: "",
       monologistName: "",
-      performersText: "",
+      performers: [],
     })
   }
 
@@ -118,7 +101,7 @@ export function AsssscatLineupLog({ performers, onEntriesChange }: AsssscatLineu
       id: entry.id,
       showDate: entry.showDate,
       monologistName: entry.monologistName,
-      performersText: performersToText(entry.performers),
+      performers: entry.performers,
     })
   }
 
@@ -131,7 +114,7 @@ export function AsssscatLineupLog({ performers, onEntriesChange }: AsssscatLineu
       id: edit.id,
       showDate: edit.showDate,
       monologistName: edit.monologistName.trim(),
-      performers: buildPerformers(edit.performersText, performers),
+      performers: edit.performers,
       createdAt: existing?.createdAt ?? new Date().toISOString(),
     }
     setEdit(null)
@@ -187,13 +170,12 @@ export function AsssscatLineupLog({ performers, onEntriesChange }: AsssscatLineu
             </div>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="lineup-performers">Performers (comma or newline separated)</Label>
-            <Textarea
-              id="lineup-performers"
-              value={edit.performersText}
-              onChange={(e) => setEdit({ ...edit, performersText: e.target.value })}
-              placeholder="Alex Fernie, Betsy Sodaro, Brian Huskey..."
-              rows={3}
+            <Label htmlFor="lineup-performers">Performers</Label>
+            <PerformerChipInput
+              directory={performers}
+              value={edit.performers}
+              onChange={(next) => setEdit({ ...edit, performers: next })}
+              placeholder="Type a name to search..."
             />
           </div>
           <div className="flex justify-end gap-2">
