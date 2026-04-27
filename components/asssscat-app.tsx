@@ -75,7 +75,7 @@ import type {
   AsssscatShowDetails,
   CompatibilityMap,
 } from "@/lib/types"
-import { AlertTriangle, Calendar, Check, Pencil, Plus, Send, Trash2, Users, X } from "lucide-react"
+import { AlertTriangle, ArrowLeft, Calendar, Check, Pencil, Plus, Send, Trash2, Users, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const inputClasses = formInputClassName()
@@ -85,6 +85,8 @@ type SendStatus =
   | { kind: "sending" }
   | { kind: "success"; id?: string }
   | { kind: "error"; message: string }
+
+type BookingStage = "compose" | "preview"
 
 export function AsssscatApp() {
   const [performers, setPerformers] = useState<AsssscatPerformer[]>([])
@@ -99,24 +101,26 @@ export function AsssscatApp() {
   const [ticketLink, setTicketLink] = useState("")
   const [oneTimeCc, setOneTimeCc] = useState<string[]>([])
   const [defaultCc, setDefaultCc] = useState<string[]>([])
+  const [oneTimeBcc, setOneTimeBcc] = useState<string[]>([])
   const [castInput, setCastInput] = useState("")
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [sendStatus, setSendStatus] = useState<SendStatus>({ kind: "idle" })
   const [activeTab, setActiveTab] = useState("booking")
+  const [bookingStage, setBookingStage] = useState<BookingStage>("compose")
+  const [editableEmailPreview, setEditableEmailPreview] = useState("")
 
-  // Available performers filter (feature 4) — chip list of pasted names
+  // Available performers filter — chip list of pasted names
   const [availableNames, setAvailableNames] = useState<string[]>([])
   const [filterByAvailable, setFilterByAvailable] = useState(false)
 
-  // Bookings tab state (feature 3)
+  // Bookings tab state
   const [bookingDrafts, setBookingDrafts] = useState<BookingDraft[]>([])
   const [activeDraftId, setActiveDraftId] = useState<string | null>(null)
 
   // Drag-and-drop state for the Cast slot list
   const [castDragActive, setCastDragActive] = useState(false)
 
-  // Lineup log entries (kept in app state so appearance counts and the stats
-  // tab stay in sync with bookings sent / lineup-log edits).
+  // Lineup log entries
   const [lineupEntries, setLineupEntries] = useState<LineupEntry[]>([])
 
   // When set, the Statistics tab shows lineups filtered to this performer.
@@ -140,8 +144,7 @@ export function AsssscatApp() {
     }
   }, [])
 
-  // Refresh lineup entries whenever the user opens lineup-log/stats tabs so
-  // edits made elsewhere (lineup-log tab edits, manual additions) propagate.
+  // Refresh lineup entries whenever the user opens lineup-log/stats tabs
   useEffect(() => {
     if (activeTab !== "lineup-log" && activeTab !== "stats" && activeTab !== "directory") {
       return
@@ -215,7 +218,6 @@ export function AsssscatApp() {
   }
 
   const handleCastDragLeave = (e: React.DragEvent) => {
-    // Only clear when leaving the list, not when crossing child boundaries
     if (e.currentTarget.contains(e.relatedTarget as Node | null)) return
     setCastDragActive(false)
   }
@@ -238,8 +240,9 @@ export function AsssscatApp() {
       ticketLink,
       oneTimeCc,
       defaultCc,
+      oneTimeBcc,
     }),
-    [showDate, cast, monologist, ticketLink, oneTimeCc, defaultCc],
+    [showDate, cast, monologist, ticketLink, oneTimeCc, defaultCc, oneTimeBcc],
   )
 
   const emailOverrides = useMemo(
@@ -254,10 +257,6 @@ export function AsssscatApp() {
     [emailSettings],
   )
 
-  const emailPreview = useMemo(
-    () => renderAsssscatBody({ showDetails, overrides: emailOverrides }),
-    [showDetails, emailOverrides],
-  )
   const subjectPreview = useMemo(
     () => renderAsssscatSubject(showDetails),
     [showDetails],
@@ -285,7 +284,6 @@ export function AsssscatApp() {
     [castIds, compatibility],
   )
 
-  // Available performers filter: compute the set of matched IDs
   const availableMatches = useMemo(
     () => matchPerformersByName(availableNames, performers),
     [availableNames, performers],
@@ -299,8 +297,22 @@ export function AsssscatApp() {
   const canSubmit =
     showDate.length > 0 && cast.length > 0 && sendStatus.kind !== "sending"
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleReviewClick = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!canSubmit) return
+    // Build editable preview from current state
+    setEditableEmailPreview(
+      renderAsssscatBody({ showDetails, overrides: emailOverrides }),
+    )
+    setBookingStage("preview")
+  }
+
+  const handleBackToCompose = () => {
+    setBookingStage("compose")
+    setSendStatus({ kind: "idle" })
+  }
+
+  const handleSubmit = () => {
     if (!canSubmit) return
     if (isSmallCast) {
       setConfirmOpen(true)
@@ -323,8 +335,9 @@ export function AsssscatApp() {
           ticketLink,
           oneTimeCc,
           defaultCc,
+          oneTimeBcc,
           emailSubject: subjectPreview,
-          emailBody: emailPreview,
+          emailBody: editableEmailPreview,
           smallCastAcknowledged,
         }),
       })
@@ -353,6 +366,7 @@ export function AsssscatApp() {
 
       setSendStatus({ kind: "success", id: data.email.id })
       setOneTimeCc([])
+      setOneTimeBcc([])
       const bookedIds = cast.map((p) => p.id)
       setPerformers((current) => incrementBookingCounts(current, bookedIds))
       const lineupEntry: LineupEntry = {
@@ -363,7 +377,6 @@ export function AsssscatApp() {
         createdAt: new Date().toISOString(),
       }
       setLineupEntries(await recordLineupIfNew(lineupEntry))
-      // Remove from bookings if this was a draft
       if (activeDraftId) {
         setBookingDrafts(deleteBookingDraft(activeDraftId))
         setActiveDraftId(null)
@@ -374,7 +387,6 @@ export function AsssscatApp() {
     }
   }
 
-  // Save current booking form as a draft
   const handleSaveDraft = () => {
     const id = activeDraftId ?? newDraftId()
     const draft: BookingDraft = {
@@ -390,7 +402,6 @@ export function AsssscatApp() {
     setActiveDraftId(id)
   }
 
-  // Load a draft into the booking form and switch to booking tab
   const handleLoadDraft = (draft: BookingDraft) => {
     setShowDate(draft.showDate)
     setMonologist(draft.monologist)
@@ -399,6 +410,7 @@ export function AsssscatApp() {
     setOneTimeCc(draft.oneTimeCc)
     setActiveDraftId(draft.id)
     setSendStatus({ kind: "idle" })
+    setBookingStage("compose")
     setActiveTab("booking")
   }
 
@@ -413,8 +425,10 @@ export function AsssscatApp() {
     setTicketLink("")
     setCast([])
     setOneTimeCc([])
+    setOneTimeBcc([])
     setActiveDraftId(null)
     setSendStatus({ kind: "idle" })
+    setBookingStage("compose")
     setActiveTab("booking")
   }
 
@@ -561,339 +575,391 @@ export function AsssscatApp() {
         </TabsContent>
 
         <TabsContent value="booking">
-      <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-6">
-        <aside className="space-y-3">
-          <AsssscatPerformerPanel
-            performers={performers}
-            onChange={handlePerformersChange}
-            onPickPerformer={handlePickPerformer}
-            selectedIds={castIds}
-            canAddMore={cast.length < ASSSSCAT_MAX_IMPROVISERS}
-            compatibility={compatibility}
-            onCompatibilityChange={handleCompatibilityChange}
-            onCompatibilitySave={handleCompatibilitySave}
-            onPerformerRemoved={handlePerformerRemoved}
-            availableFilter={filterByAvailable ? availableIds : null}
-          />
-          <AsssscatAvailablePanel
-            performers={performers}
-            names={availableNames}
-            onChange={setAvailableNames}
-            filterActive={filterByAvailable}
-            onFilterToggle={setFilterByAvailable}
-          />
-        </aside>
+          {bookingStage === "compose" ? (
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] gap-6">
+              {/* Left: show info form */}
+              <form onSubmit={handleReviewClick} className="space-y-6">
+                <section className="border border-border rounded-lg bg-card p-5 space-y-5">
+                  <div>
+                    <h2 className="text-sm font-medium text-foreground">Show</h2>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Sends to {ASSSSCAT_TO} with the cast on BCC.
+                    </p>
+                  </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <section className="border border-border rounded-lg bg-card p-5 space-y-5">
-            <div>
-              <h2 className="text-sm font-medium text-foreground">Show</h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                Sends to {ASSSSCAT_TO} with the cast on BCC.
-              </p>
-            </div>
+                  <Field>
+                    <FieldLabel htmlFor="showDate" className="text-xs">
+                      <Calendar className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
+                      Show date
+                    </FieldLabel>
+                    <Input
+                      id="showDate"
+                      type="date"
+                      value={showDate}
+                      onChange={(e) => setShowDate(e.target.value)}
+                      className={inputClasses}
+                      required
+                    />
+                  </Field>
 
-            <Field>
-              <FieldLabel htmlFor="showDate" className="text-xs">
-                <Calendar className="inline-block h-3 w-3 mr-1.5 -mt-0.5 opacity-70" />
-                Show date
-              </FieldLabel>
-              <Input
-                id="showDate"
-                type="date"
-                value={showDate}
-                onChange={(e) => setShowDate(e.target.value)}
-                className={inputClasses}
-                required
-              />
-            </Field>
+                  <Field>
+                    <FieldLabel htmlFor="ticketLink" className="text-xs">
+                      Ticket link
+                    </FieldLabel>
+                    <Input
+                      id="ticketLink"
+                      type="url"
+                      value={ticketLink}
+                      onChange={(e) => setTicketLink(e.target.value)}
+                      className={inputClasses}
+                      placeholder="https://"
+                    />
+                  </Field>
 
-            <div>
-              <Label htmlFor="castInput" className="text-xs">
-                Paste cast list
-              </Label>
-              <p className="text-xs text-muted-foreground mt-0.5 mb-2">
-                One name per line (or comma-separated). Matched performers are resolved automatically.
-              </p>
-              <Textarea
-                id="castInput"
-                value={castInput}
-                onChange={(e) => setCastInput(e.target.value)}
-                placeholder={"Jane Doe\nJohn Smith\n..."}
-                className="font-mono text-xs min-h-[80px] bg-input border-border resize-none"
-              />
-              {castInputNames.length > 0 && (
-                <div className="mt-2 space-y-1">
-                  {castInputMatches.map((r, i) => (
-                    <div key={i} className="flex items-center gap-2 text-xs">
-                      {r.matched ? (
-                        <>
-                          <Check className="h-3 w-3 text-green-600 dark:text-green-400 shrink-0" />
-                          <span className="text-foreground">{r.matched.name}</span>
-                          <span className="text-muted-foreground truncate">{r.matched.email}</span>
-                        </>
-                      ) : (
-                        <>
-                          <X className="h-3 w-3 text-destructive shrink-0" />
-                          <span className="text-muted-foreground line-through">{r.input}</span>
-                          <span className="text-destructive">not found</span>
-                        </>
-                      )}
+                  <div>
+                    <Label htmlFor="oneTimeCc" className="text-xs">
+                      CC
+                    </Label>
+                    <div className="mt-2">
+                      <CcEmailList
+                        inputId="oneTimeCc"
+                        emails={oneTimeCc}
+                        onChange={setOneTimeCc}
+                        emptyHint="Added only to this send."
+                      />
                     </div>
-                  ))}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="defaultCc" className="text-xs">
+                      Default CC (saved on this device)
+                    </Label>
+                    <div className="mt-2">
+                      <CcEmailList
+                        inputId="defaultCc"
+                        emails={defaultCc}
+                        onChange={handleDefaultCcChange}
+                        emptyHint="Persistent — used for every ASSSSCAT send."
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="oneTimeBcc" className="text-xs">
+                      BCC
+                    </Label>
+                    <div className="mt-2">
+                      <CcEmailList
+                        inputId="oneTimeBcc"
+                        emails={oneTimeBcc}
+                        onChange={setOneTimeBcc}
+                        emptyHint="Added only to this send (cast is always on BCC)."
+                      />
+                    </div>
+                  </div>
+                </section>
+
+                <section className="border border-border rounded-lg bg-card p-5 space-y-4">
+                  <h2 className="text-sm font-medium text-foreground">Monologist</h2>
+                  <Field>
+                    <FieldLabel htmlFor="monoName" className="text-xs">Name</FieldLabel>
+                    <Input
+                      id="monoName"
+                      value={monologist.name}
+                      onChange={(e) =>
+                        setMonologist((m) => ({ ...m, name: e.target.value }))
+                      }
+                      className={inputClasses}
+                      placeholder="Monologist name"
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="monoLink" className="text-xs">
+                      Link (social media / Wikipedia)
+                    </FieldLabel>
+                    <Input
+                      id="monoLink"
+                      type="url"
+                      value={monologist.link}
+                      onChange={(e) =>
+                        setMonologist((m) => ({ ...m, link: e.target.value }))
+                      }
+                      className={inputClasses}
+                      placeholder="https://"
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="monoCredits" className="text-xs">
+                      Credits
+                    </FieldLabel>
+                    <Input
+                      id="monoCredits"
+                      value={monologist.credits}
+                      onChange={(e) =>
+                        setMonologist((m) => ({ ...m, credits: e.target.value }))
+                      }
+                      className={inputClasses}
+                      placeholder="SNL, Hacks, etc."
+                    />
+                  </Field>
+                </section>
+
+                <div className="flex gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11"
+                    onClick={handleSaveDraft}
+                  >
+                    {activeDraftId ? "Update draft" : "Save draft"}
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1 h-11"
+                    size="lg"
+                    disabled={!canSubmit}
+                  >
+                    Review &amp; send
+                  </Button>
+                </div>
+              </form>
+
+              {/* Right: availability confirmed + performers */}
+              <aside className="space-y-3">
+                <div className="border border-border rounded-lg bg-card p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                      <Users className="h-3.5 w-3.5 opacity-70" />
+                      CAST ({cast.length}/{ASSSSCAT_MAX_IMPROVISERS})
+                    </h2>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Click or drag a performer from the list below to add.
+                  </p>
+
+                  {/* Cast list — only show filled slots */}
+                  {cast.length > 0 && (
+                    <ol
+                      className={cn(
+                        "space-y-1.5 rounded-md p-1 transition-colors",
+                        castDragActive
+                          ? "outline-2 outline-dashed outline-primary/60 bg-primary/5"
+                          : "outline-2 outline-transparent",
+                      )}
+                      onDragOver={handleCastDragOver}
+                      onDragLeave={handleCastDragLeave}
+                      onDrop={handleCastDrop}
+                      aria-label="Cast slots — drop performers here to add"
+                    >
+                      {cast.map((performer, i) => {
+                        const isIncompat = incompatiblePairs.some((pair) => pair.includes(performer.id))
+                        return (
+                          <li
+                            key={performer.id}
+                            className={cn(
+                              "flex items-center gap-2 border rounded-md px-3 py-2 transition-colors",
+                              isIncompat
+                                ? "border-destructive/60 bg-destructive/10"
+                                : "border-border bg-input",
+                            )}
+                          >
+                            <span className="text-xs text-muted-foreground w-5">
+                              {i + 1}.
+                            </span>
+                            {isIncompat && (
+                              <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0" aria-label="Compatibility conflict" />
+                            )}
+                            <span className="text-sm text-foreground flex-1 truncate">
+                              {performer.name}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveFromCast(performer.id)}
+                              className="text-muted-foreground hover:text-destructive"
+                              aria-label={`Remove ${performer.name}`}
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </li>
+                        )
+                      })}
+                    </ol>
+                  )}
+
+                  {/* Drop zone when empty */}
+                  {cast.length === 0 && (
+                    <div
+                      className={cn(
+                        "rounded-md border-2 border-dashed p-4 text-center transition-colors",
+                        castDragActive ? "border-primary bg-primary/5" : "border-border",
+                      )}
+                      onDragOver={handleCastDragOver}
+                      onDragLeave={handleCastDragLeave}
+                      onDrop={handleCastDrop}
+                    >
+                      <p className="text-xs text-muted-foreground">No cast yet</p>
+                    </div>
+                  )}
+
+                  {incompatiblePairs.length > 0 && (
+                    <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 space-y-1">
+                      {incompatiblePairs.map(([aId, bId], idx) => {
+                        const a = cast.find((p) => p.id === aId)
+                        const b = cast.find((p) => p.id === bId)
+                        if (!a || !b) return null
+                        return (
+                          <p key={idx} className="text-xs text-destructive flex items-center gap-1.5">
+                            <AlertTriangle className="h-3 w-3 shrink-0" />
+                            {a.name} and {b.name} have a compatibility conflict.
+                          </p>
+                        )
+                      })}
+                    </div>
+                  )}
+                  {isSmallCast && cast.length > 0 && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400">
+                      Fewer than {ASSSSCAT_SMALL_CAST_THRESHOLD} improvisers — you&apos;ll
+                      be asked to confirm before sending.
+                    </p>
+                  )}
+
+                  {/* Cast input */}
+                  <div>
+                    <Label htmlFor="castInput" className="text-xs">
+                      Paste cast list
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-0.5 mb-2">
+                      One name per line or comma-separated.
+                    </p>
+                    <Textarea
+                      id="castInput"
+                      value={castInput}
+                      onChange={(e) => setCastInput(e.target.value)}
+                      placeholder={"Jane Doe\nJohn Smith\n..."}
+                      className="font-mono text-xs min-h-[60px] bg-input border-border resize-none"
+                    />
+                    {castInputNames.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {castInputMatches.map((r, i) => (
+                          <div key={i} className="flex items-center gap-2 text-xs">
+                            {r.matched ? (
+                              <>
+                                <Check className="h-3 w-3 text-green-600 dark:text-green-400 shrink-0" />
+                                <span className="text-foreground">{r.matched.name}</span>
+                              </>
+                            ) : (
+                              <>
+                                <X className="h-3 w-3 text-destructive shrink-0" />
+                                <span className="text-muted-foreground line-through">{r.input}</span>
+                                <span className="text-destructive">not found</span>
+                              </>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {castInputMatches.some((r) => r.matched !== null) && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="secondary"
+                        className="mt-2 h-8 text-xs"
+                        onClick={handleApplyCastInput}
+                      >
+                        Add {castInputMatches.filter((r) => r.matched !== null).length} to cast
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <AsssscatAvailablePanel
+                  performers={performers}
+                  names={availableNames}
+                  onChange={setAvailableNames}
+                  filterActive={filterByAvailable}
+                  onFilterToggle={setFilterByAvailable}
+                />
+
+                <AsssscatPerformerPanel
+                  performers={performers}
+                  onChange={handlePerformersChange}
+                  onPickPerformer={handlePickPerformer}
+                  selectedIds={castIds}
+                  canAddMore={cast.length < ASSSSCAT_MAX_IMPROVISERS}
+                  compatibility={compatibility}
+                  onCompatibilityChange={handleCompatibilityChange}
+                  onCompatibilitySave={handleCompatibilitySave}
+                  onPerformerRemoved={handlePerformerRemoved}
+                  availableFilter={filterByAvailable ? availableIds : null}
+                />
+              </aside>
+            </div>
+          ) : (
+            /* Preview stage */
+            <div className="space-y-6">
+              <div className="space-y-1.5">
+                <h2 className="text-lg font-medium text-foreground">Review &amp; send</h2>
+                <p className="text-sm text-muted-foreground">
+                  Review the email below. You can edit it before sending.
+                </p>
+              </div>
+
+              <section className="border border-border rounded-lg bg-card p-5 space-y-3">
+                <div>
+                  <h3 className="text-sm font-medium text-foreground">Email preview</h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Subject: {subjectPreview}
+                  </p>
+                </div>
+                <Textarea
+                  value={editableEmailPreview}
+                  onChange={(e) => setEditableEmailPreview(e.target.value)}
+                  className="font-mono text-xs min-h-[320px] bg-input border-border"
+                />
+              </section>
+
+              {sendStatus.kind === "success" && (
+                <div className="rounded-md border border-green-600/40 bg-green-600/10 px-4 py-3 text-sm text-green-700 dark:text-green-400">
+                  Email sent.
                 </div>
               )}
-              {castInputMatches.some((r) => r.matched !== null) && (
+              {sendStatus.kind === "error" && (
+                <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                  {sendStatus.message}
+                </div>
+              )}
+
+              <div className="flex gap-3">
                 <Button
                   type="button"
-                  size="sm"
-                  variant="secondary"
-                  className="mt-2 h-8 text-xs"
-                  onClick={handleApplyCastInput}
+                  variant="outline"
+                  className="h-11"
+                  onClick={handleBackToCompose}
                 >
-                  Add {castInputMatches.filter((r) => r.matched !== null).length} to cast
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back
                 </Button>
-              )}
-            </div>
-
-            <div>
-              <Label className="text-xs flex items-center gap-1.5">
-                <Users className="h-3 w-3 opacity-70" />
-                Cast ({cast.length}/{ASSSSCAT_MAX_IMPROVISERS})
-              </Label>
-              <ol
-                className={cn(
-                  "mt-2 space-y-1.5 rounded-md p-1 transition-colors",
-                  castDragActive
-                    ? "outline-2 outline-dashed outline-primary/60 bg-primary/5"
-                    : "outline-2 outline-transparent",
-                )}
-                onDragOver={handleCastDragOver}
-                onDragLeave={handleCastDragLeave}
-                onDrop={handleCastDrop}
-                aria-label="Cast slots — drop performers here to add"
-              >
-                {Array.from({ length: ASSSSCAT_MAX_IMPROVISERS }).map((_, i) => {
-                  const performer = cast[i]
-                  const isIncompat = performer
-                    ? incompatiblePairs.some((pair) => pair.includes(performer.id))
-                    : false
-                  const isNextEmptySlot = !performer && i === cast.length
-                  return (
-                    <li
-                      key={i}
-                      className={cn(
-                        "flex items-center gap-2 border rounded-md px-3 py-2 transition-colors",
-                        isIncompat
-                          ? "border-destructive/60 bg-destructive/10"
-                          : "border-border bg-input",
-                        castDragActive && isNextEmptySlot && "border-primary bg-primary/10",
-                      )}
-                    >
-                      <span className="text-xs text-muted-foreground w-5">
-                        {i + 1}.
-                      </span>
-                      {performer ? (
-                        <>
-                          {isIncompat && (
-                            <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0" aria-label="Compatibility conflict" />
-                          )}
-                          <span className="text-sm text-foreground flex-1 truncate">
-                            {performer.name}
-                          </span>
-                          <span className="text-[11px] text-muted-foreground truncate hidden sm:block">
-                            {performer.email}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveFromCast(performer.id)}
-                            className="text-muted-foreground hover:text-destructive"
-                            aria-label={`Remove ${performer.name}`}
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </>
-                      ) : (
-                        <span className="text-xs text-muted-foreground italic">
-                          {castDragActive && isNextEmptySlot
-                            ? "Drop to add"
-                            : "Click or drag a performer to add"}
-                        </span>
-                      )}
-                    </li>
-                  )
-                })}
-              </ol>
-              {incompatiblePairs.length > 0 && (
-                <div className="mt-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 space-y-1">
-                  {incompatiblePairs.map(([aId, bId], idx) => {
-                    const a = cast.find((p) => p.id === aId)
-                    const b = cast.find((p) => p.id === bId)
-                    if (!a || !b) return null
-                    return (
-                      <p key={idx} className="text-xs text-destructive flex items-center gap-1.5">
-                        <AlertTriangle className="h-3 w-3 shrink-0" />
-                        {a.name} and {b.name} have a compatibility conflict.
-                      </p>
-                    )
-                  })}
-                </div>
-              )}
-              {isSmallCast && cast.length > 0 && (
-                <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
-                  Fewer than {ASSSSCAT_SMALL_CAST_THRESHOLD} improvisers — you&apos;ll
-                  be asked to confirm before sending.
-                </p>
-              )}
-            </div>
-          </section>
-
-          <section className="border border-border rounded-lg bg-card p-5 space-y-4">
-            <h2 className="text-sm font-medium text-foreground">Monologist</h2>
-            <Field>
-              <FieldLabel htmlFor="monoName" className="text-xs">Name</FieldLabel>
-              <Input
-                id="monoName"
-                value={monologist.name}
-                onChange={(e) =>
-                  setMonologist((m) => ({ ...m, name: e.target.value }))
-                }
-                className={inputClasses}
-                placeholder="Monologist name"
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="monoLink" className="text-xs">
-                Link (social media / Wikipedia)
-              </FieldLabel>
-              <Input
-                id="monoLink"
-                type="url"
-                value={monologist.link}
-                onChange={(e) =>
-                  setMonologist((m) => ({ ...m, link: e.target.value }))
-                }
-                className={inputClasses}
-                placeholder="https://"
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="monoCredits" className="text-xs">
-                Credits
-              </FieldLabel>
-              <Input
-                id="monoCredits"
-                value={monologist.credits}
-                onChange={(e) =>
-                  setMonologist((m) => ({ ...m, credits: e.target.value }))
-                }
-                className={inputClasses}
-                placeholder="SNL, Hacks, etc."
-              />
-            </Field>
-          </section>
-
-          <section className="border border-border rounded-lg bg-card p-5 space-y-4">
-            <h2 className="text-sm font-medium text-foreground">Ticket link</h2>
-            <Field>
-              <FieldLabel htmlFor="ticketLink" className="text-xs">
-                URL
-              </FieldLabel>
-              <Input
-                id="ticketLink"
-                type="url"
-                value={ticketLink}
-                onChange={(e) => setTicketLink(e.target.value)}
-                className={inputClasses}
-                placeholder="https://"
-              />
-            </Field>
-          </section>
-
-          <section className="border border-border rounded-lg bg-card p-5 space-y-4">
-            <h2 className="text-sm font-medium text-foreground">CC</h2>
-            <div>
-              <Label htmlFor="oneTimeCc" className="text-xs">
-                One-time CC
-              </Label>
-              <div className="mt-2">
-                <CcEmailList
-                  inputId="oneTimeCc"
-                  emails={oneTimeCc}
-                  onChange={setOneTimeCc}
-                  emptyHint="Added only to this send."
-                />
+                <Button
+                  type="button"
+                  className="flex-1 h-11"
+                  size="lg"
+                  disabled={!canSubmit}
+                  onClick={handleSubmit}
+                >
+                  {sendStatus.kind === "sending" ? (
+                    "Sending..."
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4 mr-2" />
+                      Send booking email
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
-            <div>
-              <Label htmlFor="defaultCc" className="text-xs">
-                Default CC (saved on this device)
-              </Label>
-              <div className="mt-2">
-                <CcEmailList
-                  inputId="defaultCc"
-                  emails={defaultCc}
-                  onChange={handleDefaultCcChange}
-                  emptyHint="Persistent — used for every ASSSSCAT send."
-                />
-              </div>
-            </div>
-          </section>
-
-          <section className="border border-border rounded-lg bg-card p-5 space-y-3">
-            <div>
-              <h2 className="text-sm font-medium text-foreground">
-                Email preview
-              </h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                Subject: {subjectPreview}
-              </p>
-            </div>
-            <Textarea
-              value={emailPreview}
-              readOnly
-              className="font-mono text-xs min-h-[320px] bg-input border-border"
-            />
-          </section>
-
-          {sendStatus.kind === "success" && (
-            <div className="rounded-md border border-green-600/40 bg-green-600/10 px-4 py-3 text-sm text-green-700 dark:text-green-400">
-              Email sent.
-            </div>
           )}
-          {sendStatus.kind === "error" && (
-            <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {sendStatus.message}
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-11"
-              onClick={handleSaveDraft}
-            >
-              {activeDraftId ? "Update draft" : "Save draft"}
-            </Button>
-            <Button
-              type="submit"
-              className="flex-1 h-11"
-              size="lg"
-              disabled={!canSubmit}
-            >
-              {sendStatus.kind === "sending" ? (
-                "Sending..."
-              ) : (
-                <>
-                  <Send className="h-4 w-4 mr-2" />
-                  Send booking email
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-      </div>
+        </TabsContent>
+      </Tabs>
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
@@ -911,8 +977,6 @@ export function AsssscatApp() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-        </TabsContent>
-      </Tabs>
     </ToolPage>
   )
 }
