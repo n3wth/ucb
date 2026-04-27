@@ -44,11 +44,10 @@ describe('renderAsssscatSubject', () => {
 describe('renderAsssscatBody', () => {
   const body = renderAsssscatBody({ showDetails: baseDetails })
 
-  it('includes all 8 cast slots, filling missing ones as blank', () => {
+  it('includes all cast slots for performers in the lineup', () => {
     expect(body).toContain('1. Alice')
     expect(body).toContain('6. Frank')
-    expect(body).toMatch(/7\.\s*\n/)
-    expect(body).toMatch(/8\.\s*\n/)
+    expect(body).not.toContain('7.')
   })
 
   it('includes monologist name, link, and credits', () => {

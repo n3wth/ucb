@@ -26,8 +26,8 @@ describe('sendAsssscatRequestSchema', () => {
     expect(parsed.success).toBe(false)
   })
 
-  it('rejects more than 8 improvisers', () => {
-    const many = Array.from({ length: 9 }, (_, i) => ({
+  it('accepts more than 8 improvisers', () => {
+    const many = Array.from({ length: 12 }, (_, i) => ({
       id: String(i),
       name: `P${i}`,
       email: `p${i}@example.com`,
@@ -37,7 +37,7 @@ describe('sendAsssscatRequestSchema', () => {
       ...validBody,
       improvisers: many,
     })
-    expect(parsed.success).toBe(false)
+    expect(parsed.success).toBe(true)
   })
 
   it('rejects unknown performer categories', () => {

@@ -91,8 +91,7 @@ export const sendAsssscatRequestSchema = z.object({
   showDate: nonEmpty("showDate"),
   improvisers: z
     .array(asssscatPerformerSchema)
-    .min(1, "At least one improviser is required")
-    .max(8, "A show cannot have more than 8 improvisers"),
+    .min(1, "At least one improviser is required"),
   monologist: asssscatMonologistSchema,
   ticketLink: z.string().trim(),
   oneTimeCc: z.array(ccEmail).max(20, "oneTimeCc cannot exceed 20 addresses").optional().default([]),
@@ -113,7 +112,7 @@ export const lineupEntrySchema = z.object({
   id: nonEmpty("id"),
   showDate: nonEmpty("showDate"),
   monologistName: z.string().trim().default(""),
-  performers: z.array(lineupPerformerSchema).max(8, "A lineup cannot have more than 8 performers"),
+  performers: z.array(lineupPerformerSchema),
   createdAt: z.string().trim().min(1, "createdAt is required"),
 })
 

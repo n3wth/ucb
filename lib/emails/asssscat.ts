@@ -22,7 +22,6 @@ export const ASSSSCAT_CALL_TIME = "8:30PM"
 export const ASSSSCAT_ARRIVAL_TIME = "8:15PM"
 export const ASSSSCAT_COMPS_EMAIL = "lacomps@ucbcomedy.com"
 export const ASSSSCAT_SIGNATURE = "Chris Renfro, Artistic Director"
-export const ASSSSCAT_MAX_IMPROVISERS = 8
 export const ASSSSCAT_SMALL_CAST_THRESHOLD = 6
 
 function pick(override: string | undefined, fallback: string): string {
@@ -54,11 +53,9 @@ export function renderAsssscatBody({ showDetails, overrides }: AsssscatEmailInpu
   const venue = pick(overrides?.venue, ASSSSCAT_VENUE)
   const signature = overrides?.signature?.trim() ?? ""
 
-  const castLines = Array.from({ length: ASSSSCAT_MAX_IMPROVISERS }, (_, i) => {
-    const performer = showDetails.improvisers[i]
-    const label = `${i + 1}.`
-    return performer ? `${label} ${performer.name}` : `${label}`
-  }).join("\n")
+  const castLines = showDetails.improvisers
+    .map((performer, i) => `${i + 1}. ${performer.name}`)
+    .join("\n")
 
   const ticketLink = showDetails.ticketLink.trim() || "TBD"
 

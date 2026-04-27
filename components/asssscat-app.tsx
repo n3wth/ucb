@@ -26,7 +26,6 @@ import { CastDirectory } from "@/components/cast-directory"
 import { CcEmailList } from "@/components/cc-email-list"
 import { ToolPage } from "@/components/tool-page"
 import {
-  ASSSSCAT_MAX_IMPROVISERS,
   ASSSSCAT_SMALL_CAST_THRESHOLD,
   ASSSSCAT_TO,
   renderAsssscatBody,
@@ -196,7 +195,6 @@ export function AsssscatApp() {
   const handlePickPerformer = (p: AsssscatPerformer) => {
     setCast((current) => {
       if (current.some((c) => c.id === p.id)) return current
-      if (current.length >= ASSSSCAT_MAX_IMPROVISERS) return current
       return [...current, p]
     })
   }
@@ -568,7 +566,7 @@ export function AsssscatApp() {
             onChange={handlePerformersChange}
             onPickPerformer={handlePickPerformer}
             selectedIds={castIds}
-            canAddMore={cast.length < ASSSSCAT_MAX_IMPROVISERS}
+            canAddMore={true}
             compatibility={compatibility}
             onCompatibilityChange={handleCompatibilityChange}
             onCompatibilitySave={handleCompatibilitySave}
@@ -659,7 +657,7 @@ export function AsssscatApp() {
             <div>
               <Label className="text-xs flex items-center gap-1.5">
                 <Users className="h-3 w-3 opacity-70" />
-                Cast ({cast.length}/{ASSSSCAT_MAX_IMPROVISERS})
+                Cast ({cast.length})
               </Label>
               <ol
                 className={cn(
@@ -673,7 +671,7 @@ export function AsssscatApp() {
                 onDrop={handleCastDrop}
                 aria-label="Cast slots — drop performers here to add"
               >
-                {Array.from({ length: ASSSSCAT_MAX_IMPROVISERS }).map((_, i) => {
+                {Array.from({ length: cast.length + 1 }).map((_, i) => {
                   const performer = cast[i]
                   const isIncompat = performer
                     ? incompatiblePairs.some((pair) => pair.includes(performer.id))
